@@ -1,0 +1,982 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Inox",
+	"patterns": [
+		{
+			"include": "#css-selectors"
+		},
+		{
+			"include": "#url-patterns"
+		},
+		{
+			"include": "#functions"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#function-calls"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#constants"
+		},
+		{
+			"include": "#property-names"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#host-patterns"
+		},
+		{
+			"include": "#hosts"
+		},
+		{
+			"include": "#urls"
+		},
+		{
+			"include": "#schemes"
+		},
+		{
+			"include": "#path-patterns"
+		},
+		{
+			"include": "#paths"
+		},
+		{
+			"include": "#regex"
+		},
+		{
+			"include": "#option-names"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#template-literals"
+		},
+		{
+			"include": "#runes"
+		},
+		{
+			"include": "#named-patterns"
+		},
+		{
+			"include": "#identifiers"
+		},
+		{
+			"include": "#lists"
+		},
+		{
+			"include": "#objects"
+		}
+	],
+	"repository": {
+		"variables": {
+			"patterns": [
+				{
+					"name": "variable.name",
+					"match": "[$][a-zA-Z-]*\\b"
+				},
+				{
+					"name": "variable.name.global",
+					"match": "[$][$][a-zA-Z-]*\\b"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"comment" : "date literals",
+					"match": "(\\d+y)(-\\d{1,2}mt)?(-\\d{1,2}d)?(-\\d{1,2}h)?(-\\d{1,2}m)?(-\\d{1,2}s)?(-\\d{1,2}ms)?(-\\d{1,2}us)?(-[a-zA-Z_/]+[a-zA-Z_])",
+					"name": "constant.numeric"
+				},
+				{
+					"match": "\\b0x[a-fA-F0-9]+",
+					"name": "constant.numeric"
+				},
+				{
+					"match": "[0-9][0-9e.]*[a-zA-Z]+(/[a-zA-Z]+\\b)?",
+					"name": "constant.numeric"
+				},
+				{
+					"match": "(?x) # turn on extended mode\n (?:\n    0       # a zero\n    |       # ...or...\n    [1-9_]   # a 1-9 character\n    \\d*     # followed by zero or more digits\n  )\n  (?:\n    (?:\n      \\.    # a period\n      \\d+   # followed by one or more digits\n    )?\n    (?:\n      [eE]  # an e character\n      [+-]? # followed by an option +/-\n      \\d+   # followed by one or more digits\n    )?      # make exponent optional\n  )?        # make decimal portion optional",
+					"name": "constant.numeric"
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.language",
+					"match": "\\b(nil|true|false)\\b"
+				}
+			]
+		},
+		"property-names": {
+			"patterns": [
+				{
+					"name": "constant.language",
+					"match": "(?<![a-zA-Z0-9_\"')\\].-])\\.[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"begin": "#[ \t!]",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment"
+						}
+					},
+					"end": "\\n",
+					"name": "comment.line"
+				}
+			]
+		},
+		"host-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp",
+					"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/\\*+(\\.[-a-zA-Z0-9.*]*)?(:[0-9]{1,4})?"
+				},
+				{
+					"name": "string.regexp",
+					"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/([-a-zA-Z0-9.*]*)\\.\\*+(:[0-9]{1,4})?"
+				}
+			]
+		},
+		"hosts": {
+			"patterns": [
+				{
+					"name": "string.host",
+					"match": "([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/[-a-zA-Z0-9.]+(:[0-9]{1,4})?(?!\\*)"
+				}
+			]
+		},
+		"url-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp.url-pattern",
+					"match": "%[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]{0,100})/[.]{3}",
+					"captures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#path-patterns"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"urls": {
+			"patterns": [
+				{
+					"name": "string.interpolated.url-expression",
+					"begin": "[a-zA-Z][-a-zA-Z0-9+]*//(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})(?=[-a-zA-Z0-9@:%_+.~#?&//=]*\\{)",
+					"patterns": [
+						{
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"match": "[-a-zA-Z0-9@:%_+.~#?&//=]+",
+							"name": "string.unquoted.string-slice"
+						}
+					],
+					"end": "(?=[\\s})\\],:;])"
+				},
+				{
+					"name": "string.interpolated.url-expression",
+					"begin": "(@[a-zA-Z0-9_-]+)(?=(/[-a-zA-Z0-9@:%_+.~#?&//=]*)?\\{)",
+					"captures": {
+						"1": {
+							"name": "variable.name"
+						}
+					},
+					"patterns": [
+						{
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"match": "[-a-zA-Z0-9@:%_+.~#?&//=]+",
+							"name": "string.unquoted.string-slice"
+						}
+					],
+					"end": "(?=[\\s})\\],:;])"
+				},
+				{
+					"name": "string.unquoted.url",
+					"match": "[a-zA-Z][-a-zA-Z0-9+]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]{0,100})"
+				},
+				{
+					"name": "string.unquoted.url",
+					"match": "(@[a-zA-Z0-9_-]+)/(?:[-a-zA-Z0-9@:%_+.~#?&//=]{0,100})",
+					"captures": {
+						"1": {
+							"name": "variable.name"
+						}
+					}
+				},
+				{
+					"name": "string.unquoted.scheme",
+					"match": "[a-zA-Z][-a-zA-Z0-9+]*://"
+				}
+			]
+		},
+		"path-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp.path-pattern",
+					"begin": "%\\.{0,2}/[-a-zA-Z0-9_+@/.]*(?=\\{)",
+					"patterns": [
+						{
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"match": "[-a-zA-Z0-9_+@/.]+",
+							"name": "string.regexp.path-pattern-slice"
+						}
+					],
+					"end": "(?=[\\s})\\],:;])"
+				},
+				{
+					"name": "string.regexp.path-pattern",
+					"match": "%\\.{0,2}/[-a-zA-Z0-9_+/.*?\\[\\]]*"
+				}
+			]
+		},
+		"paths": {
+			"patterns": [
+				{
+					"name": "string.interpolated.path-expression",
+					"begin": "\\.{0,2}/[-a-zA-Z0-9_+@/.]*(?=\\{)",
+					"patterns": [
+						{
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"match": "[-a-zA-Z0-9_+@/.]+",
+							"name": "string.unquoted.string-slice"
+						}
+					],
+					"end": "(?=[\\s})\\],:;])"
+				},
+				{
+					"name": "string.unquoted",
+					"match": "\\.{0,2}/[-a-zA-Z0-9_+@/.]*"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"comment": "Function declarations",
+					"match": "(\\bfn)\\b\\s+(\\w+)\\s*\\(([^\\)]+)\\)",
+					"captures": {
+						"1": {
+							"name": "keyword.function.inox"
+						},
+						"2": {
+							"name": "entity.name.function.inox"
+						},
+						"3": {
+							"patterns": [
+								{
+									"match": "(\\w+)\\s+(\\w+)",
+									"captures": {
+										"1": {
+											"name": "variable.name.inox"
+										},
+										"2": {
+											"name": "entity.name.type.inox"
+										}
+									}
+								},
+								{
+									"match": "(\\w+)",
+									"name": "variable.name.inox"
+								},
+								{
+									"include": "#named-patterns"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.other",
+					"match": "\\b(manifest|drop-perms|import|allow|as|const|var|assign|args|Mapping|udata|concat|supersys)\\b"
+				},
+				{
+					"name": "keyword.control.inox",
+					"match": "\\b(if|else|switch|match|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received)\\b"
+				},
+				{
+					"name": "storage.type",
+					"match": "\\b(fn)\\b"
+				}
+			]
+		},
+		"regex": {
+			"patterns": [
+				{
+					"name": "string.regexp.inox",
+					"begin": "%`",
+					"end": "`",
+					"patterns": [
+						{
+							"include": "#regexp"
+						}
+					]
+				}
+			]
+		},
+		"regexp": {
+			"patterns": [
+				{
+					"name": "keyword.control.anchor.regexp",
+					"match": "\\\\[bB]|\\^|\\$"
+				},
+				{
+					"match": "\\\\[1-9]\\d*|\\\\k<([a-zA-Z_$][\\w$]*)>",
+					"captures": {
+						"0": {
+							"name": "keyword.other.back-reference.regexp"
+						},
+						"1": {
+							"name": "variable.other.regexp"
+						}
+					}
+				},
+				{
+					"name": "keyword.operator.quantifier.regexp",
+					"match": "[?+*]|\\{(\\d+,\\d+|\\d+,|,\\d+|\\d+)\\}\\??"
+				},
+				{
+					"name": "keyword.operator.or.regexp",
+					"match": "\\|"
+				},
+				{
+					"name": "meta.group.assertion.regexp",
+					"begin": "(\\()((\\?=)|(\\?!)|(\\?<=)|(\\?<!))",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.group.regexp"
+						},
+						"2": {
+							"name": "punctuation.definition.group.assertion.regexp"
+						},
+						"3": {
+							"name": "meta.assertion.look-ahead.regexp"
+						},
+						"4": {
+							"name": "meta.assertion.negative-look-ahead.regexp"
+						},
+						"5": {
+							"name": "meta.assertion.look-behind.regexp"
+						},
+						"6": {
+							"name": "meta.assertion.negative-look-behind.regexp"
+						}
+					},
+					"end": "(\\))",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.group.regexp"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#regexp"
+						}
+					]
+				},
+				{
+					"name": "meta.group.regexp",
+					"begin": "\\((?:(\\?:)|(?:\\?<([a-zA-Z_$][\\w$]*)>))?",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.group.regexp"
+						},
+						"1": {
+							"name": "punctuation.definition.group.no-capture.regexp"
+						},
+						"2": {
+							"name": "variable.other.regexp"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.group.regexp"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#regexp"
+						}
+					]
+				},
+				{
+					"name": "constant.other.character-class.set.regexp",
+					"begin": "(\\[)(\\^)?",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.character-class.regexp"
+						},
+						"2": {
+							"name": "keyword.operator.negation.regexp"
+						}
+					},
+					"end": "(\\])",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.character-class.regexp"
+						}
+					},
+					"patterns": [
+						{
+							"name": "constant.other.character-class.range.regexp",
+							"match": "(?:.|(\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}))|(\\\\c[A-Z])|(\\\\.))\\-(?:[^\\]\\\\]|(\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}))|(\\\\c[A-Z])|(\\\\.))",
+							"captures": {
+								"1": {
+									"name": "constant.character.numeric.regexp"
+								},
+								"2": {
+									"name": "constant.character.control.regexp"
+								},
+								"3": {
+									"name": "constant.character.escape.backslash.regexp"
+								},
+								"4": {
+									"name": "constant.character.numeric.regexp"
+								},
+								"5": {
+									"name": "constant.character.control.regexp"
+								},
+								"6": {
+									"name": "constant.character.escape.backslash.regexp"
+								}
+							}
+						},
+						{
+							"include": "#regex-character-class"
+						}
+					]
+				},
+				{
+					"include": "#regex-character-class"
+				}
+			]
+		},
+		"regex-character-class": {
+			"patterns": [
+				{
+					"name": "constant.other.character-class.regexp",
+					"match": "\\\\[wWsSdDtrnvf]|\\."
+				},
+				{
+					"name": "constant.character.numeric.regexp",
+					"match": "\\\\([0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4})"
+				},
+				{
+					"name": "constant.character.control.regexp",
+					"match": "\\\\c[A-Z]"
+				},
+				{
+					"name": "constant.character.escape.backslash.regexp",
+					"match": "\\\\."
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"begin": "\"",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.inox"
+						}
+					},
+					"end": "\"",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.inox"
+						}
+					},
+					"name": "string.quoted.double.inox",
+					"patterns": [
+						{
+							"include": "#stringcontent"
+						}
+					]
+				},
+				{
+					"match": "[a-zA-Z_]+(\\.[a-zA-Z0-9_-]+)+(\\\\:|[+@/~^])(\\\\:|[a-zA-Z0-9_+@./~^-])*",
+					"name": "string.unquoted.inox"
+				},
+				{
+					"match": "([+-]+|[a-zA-Z_][a-zA-Z0-9_-]*)(\\\\:|[+@/~^])(\\\\:|[a-zA-Z0-9_+@./~^-])*",
+					"name": "string.unquoted.inox"
+				},
+				{
+					"match": "-+",
+					"name": "string.unquoted.inox"
+				}
+			]
+		},
+		"stringcontent": {
+			"patterns": [
+				{
+					"match": "(?x)                # turn on extended mode\n  \\\\                # a literal backslash\n  (?:               # ...followed by...\n    [\"\\\\/bfnrt]     # one of these characters\n    |               # ...or...\n    u               # a u\n    [0-9a-fA-F]{4}) # and four hex digits",
+					"name": "constant.character.escape.json"
+				},
+				{
+					"match": "\\\\.",
+					"name": "invalid.illegal.unrecognized-string-escape.inox"
+				}
+			]
+		},
+		"template-literals": {
+			"name": "string.interpolated.template.inox",
+			"begin": "`",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.inox"
+				}
+			},
+			"end": "`",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.inox"
+				}
+			},
+			"patterns": [
+				{
+					"match": "\\\\.",
+					"name": "string.unquoted.string-slice"
+				},
+				{
+					"begin": "\\{\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.template-expression.begin"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\}\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.template-expression.end"
+						}
+					}
+				}
+			]
+		},
+		"runes": {
+			"patterns": [
+				{
+					"begin": "'",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin"
+						}
+					},
+					"end": "'",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end"
+						}
+					},
+					"name": "string.quoted.rune",
+					"patterns": [
+						{
+							"match": "\\G(\\\\([0-7]{3}|[abfnrtv\\\\'\"])|.)(?=')",
+							"name": "constant.other.rune.go"
+						},
+						{
+							"match": "[^']+",
+							"name": "invalid.illegal.unknown-rune"
+						}
+					]
+				}
+			]
+		},
+		"option-names": {
+			"patterns": [
+				{
+					"match": "--[a-zA-Z_-]+\\b",
+					"name": "string.unquoted"
+				},
+				{
+					"match": "-[a-zA-Z_-]\\b",
+					"name": "string.unquoted"
+				}
+			]
+		},
+		"lists": {
+			"begin": "\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.begin.bracket"
+				}
+			},
+			"end": "\\]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket"
+				}
+			},
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"objects": {
+			"begin": "\\{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.begin.bracket.curly"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket.curly"
+				}
+			},
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"function-calls": {
+			"patterns": [
+				{
+					"begin": "\\b([a-zA-Z_][a-zA-Z0-9_-]*!?)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function"
+						},
+						"2": {
+							"name": "punctuation.definition.begin.bracket.round"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.end.bracket.round"
+						}
+					}
+				},
+				{
+					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=\")",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#strings"
+						}
+					],
+					"end": "(?<=\")",
+					"endCaptures": {}
+				},
+				{
+					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*\\$)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\n"
+				},
+				{
+					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "}"
+				},
+				{
+					"begin": "(?:^|\\|)[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(?=[^=\\s])",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"match": "^ex\\b",
+									"name": "constant.language"
+								},
+								{
+									"include": "#keywords"
+								},
+								{
+									"name": "entity.name.function",
+									"match": ".*"
+								}
+							]
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\n"
+				},
+				{
+					"begin": "(?:^|\\|)[ \t]*([a-zA-Z0-9_.-]+\\.)([a-zA-Z][a-zA-Z0-9_-]*)[ \t]+(?![=])",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#keywords"
+								},
+								{
+									"include": "#identifiers"
+								}
+							]
+						},
+						"2": {
+							"name": "entity.name.function"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\n"
+				}
+			]
+		},
+		"css-classes": {
+			"captures": {
+				"0": {
+					"name": "punctuation.definition.entity.css"
+				}
+			},
+			"match": "\\.[a-zA-Z0-9_-]+",
+			"name": "entity.other.attribute-name.class.css"
+		},
+		"css-pseudo-classes": {
+			"captures": {
+				"0": {
+					"name": "punctuation.definition.entity.css"
+				}
+			},
+			"match": ":[a-zA-Z0-9_-]+",
+			"name": "entity.other.attribute-name.pseudo-class.css"
+		},
+		"css-pseudo-elements": {
+			"captures": {
+				"0": {
+					"name": "punctuation.definition.entity.css"
+				}
+			},
+			"match": "::[a-zA-Z0-9_-]+",
+			"name": "entity.other.attribute-name.pseudo-element.css"
+		},
+		"css-type-selectors": {
+			"patterns": [
+				{
+					"match": "\\*",
+					"name": "entity.name.tag.wildcard.css"
+				},
+				{
+					"match": "[a-zA-Z0-9_-]+",
+					"name": "entity.name.tag.wildcard.css"
+				}
+			]
+		},
+		"css-id-selectors": {
+			"patterns": [
+				{
+					"match": "#[a-zA-Z0-9_-]+",
+					"name": "entity.other.attribute-name.id.css"
+				}
+			]
+		},
+		"css-attribute-selectors": {
+			"begin": "(\\[)([a-zA-Z0-9_-]+)=",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.entity.begin.bracket.square.css"
+				},
+				"2": {
+					"name": "entity.other.attribute-name.css"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#strings"
+				}
+			],
+			"end": "\\]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.entity.end.bracket.square.css"
+				}
+			},
+			"name": "meta.attribute-selector.css"
+		},
+		"css-selectors": {
+			"begin": "s!",
+			"beginCaptures": {
+				"0": {
+					"name": "string"
+				}
+			},
+			"end": "(!|\n)",
+			"endCaptures": {
+				"0": {
+					"name": "string"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#css-pseudo-elements"
+				},
+				{
+					"include": "#css-classes"
+				},
+				{
+					"include": "#css-pseudo-classes"
+				},
+				{
+					"include": "#css-type-selectors"
+				},
+				{
+					"include": "#css-id-selectors"
+				},
+				{
+					"include": "#css-attribute-selectors"
+				}
+			]
+		},
+		"named-patterns": {
+			"patterns": [
+				{
+					"name": "entity.name.type",
+					"match": "(?<!\\w)%[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				}
+			]
+		},
+		"identifiers": {
+			"patterns": [
+				{
+					"name": "constant.character",
+					"match": "#[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				},
+				{
+					"name": "variable.other",
+					"match": "[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				}
+			]
+		}
+	},
+	"scopeName": "source.inox"
+}

@@ -1,0 +1,65 @@
+{
+	"name": "inox",
+	"displayName": "inox",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.76.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "inox",
+				"aliases": [
+					"Inox",
+					"inox"
+				],
+				"extensions": [
+					".ix"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "inox",
+				"scopeName": "source.inox",
+				"path": "./syntaxes/inox.tmLanguage.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "inox",
+				"path": "./snippets.json"
+			}
+		],
+		"configurationDefaults": {
+			"[inox]": {
+				"editor.quickSuggestions": {
+					"other": "on",
+					"comments": "on",
+					"strings": "on"
+				}
+			}
+		}
+	},
+	"activationEvents": [
+		"workspaceContains:**/*.ix",
+		"onLanguage:ix"
+	],
+	"main": "./out/extension",
+	"scripts": {
+		"compile": "tsc -p ./",
+		"postinstall": "tsc",
+		"watch": "tsc -watch -p ./"
+	},
+	"dependencies": {
+		"@types/node": "16.11.12",
+		"@types/vscode": "^1.77.0",
+		"typescript": "4.5.2",
+		"vscode-languageclient": "^8.1.0"
+	}
+}

@@ -1,0 +1,162 @@
+{
+
+	"manifest": {
+		"scope": "Inox",
+		"prefix": "manifest",
+		"body": [
+			"manifest {",
+			"\t$1",
+			"}"
+		],
+		"description": "empty manifest"
+	},
+    "walk": {
+        "scope": "Inox",
+		"prefix": "walk",
+		"body": [
+			"walk $1 entry {",
+			"\t$0$2",
+			"}"
+		],
+		"description": "for .. in loop"
+    },
+	"forin": {
+		"scope": "Inox",
+		"prefix": "forin",
+		"body": [
+			"for $1 in $2 {",
+			"\t$0$3",
+			"}"
+		],
+		"description": "for .. in loop"
+	},
+    "for10": {
+		"scope": "Inox",
+		"prefix": "for10",
+		"body": [
+			"for (1 .. 10) {",
+			"\t$1",
+			"}"
+		],
+		"description": "for (1.. 10) loop"
+	},
+    "for0n": {
+		"scope": "Inox",
+		"prefix": "for0n",
+		"body": [
+			"for (0 .. $$n) {",
+			"\t$1",
+			"}"
+		]
+	},
+    "for1n": {
+		"scope": "Inox",
+		"prefix": "for1n",
+		"body": [
+			"for (1 .. $$n) {",
+			"\t$1",
+			"}"
+		]
+	},
+    "1_10": {
+		"scope": "Inox",
+		"prefix": "1_10",
+		"body": [
+			"(1 .. 10)"
+		]
+	},
+    "1_n": {
+		"scope": "Inox",
+		"prefix": "1_n",
+		"body": [
+			"(1 .. \\$n)"
+		]
+	},
+    "0_n": {
+		"scope": "Inox",
+		"prefix": "0_n",
+		"body": [
+			"(0 .. \\$n)"
+		]
+	},
+    "switch": {
+		"scope": "Inox",
+		"prefix": "switch",
+		"body": [
+			"switch $1 {",
+                "\t$2 {",
+                "\t\t$3",
+                "\t}",
+            "}"
+		],
+		"description": "minimal switch statement"
+	},
+    "match": {
+		"scope": "Inox",
+		"prefix": "match",
+		"body": [
+			"match $1 {",
+                "\t$2 {",
+                "\t\t$3",
+                "\t}",
+            "}"
+		],
+		"description": "minimal match statement"
+	},
+    "import": {
+        "scope": "Inox",
+        "prefix": "import",
+        "body": [
+            "import res$1 https://$2.Inox \"sha256$3\" {",
+            "\t$4",
+            "} allow {",
+            "\t$5",
+            "}"
+        ]
+    },
+    "fn": {
+        "scope": "Inox",
+        "prefix": "fn",
+        "body": [
+            "fn (\\$1){",
+            "\t$2",
+            "}"
+        ]
+    },
+    "if": {
+        "scope": "Inox",
+        "prefix": "if",
+        "body": [
+            "if $1 {",
+            "\t$2",
+            "}"
+        ]
+    },
+    "ifel": {
+        "scope": "Inox",
+        "prefix": "ifel",
+        "body": [
+            "if $1 {",
+            "\t$2",
+            "} else {",
+            "\t$3",
+            "}"
+        ]
+    },
+    "in": {
+        "scope": "Inox",
+        "prefix": "in",
+        "body": [
+            "($1 in $2)"
+        ]
+    },
+    "go": {
+        "scope": "Inox",
+        "prefix": "go",
+        "body": [
+            "go {globals: .{$1}, allow: {read: $2}} do {",
+            "\t$3",
+            "}"
+        ]
+    }
+}
