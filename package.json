@@ -3,6 +3,8 @@
 	"displayName": "inox",
 	"description": "",
 	"version": "0.0.1",
+	"repository": "https://github.com/inoxlang/inox-vscode",
+	"publisher": "graphr00t",
 	"engines": {
 		"vscode": "^1.76.0"
 	},
