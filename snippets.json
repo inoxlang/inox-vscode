@@ -10,6 +10,17 @@
 		],
 		"description": "empty manifest"
 	},
+	"manifest-rw": {
+		"scope": "Inox",
+		"prefix": "manifest-rw",
+		"body": [
+			"manifest {",
+			"\tread: $1",
+			"\twrite: $1",
+			"}"
+		],
+		"description": "empty manifest"
+	},
     "walk": {
         "scope": "Inox",
 		"prefix": "walk",
@@ -103,14 +114,22 @@
 		],
 		"description": "minimal match statement"
 	},
+	"assertmatch": {
+		"scope": "Inox",
+		"prefix": "assertmatch",
+		"body": [
+			"assert ($1 match $2)"
+		]
+	},
     "import": {
         "scope": "Inox",
         "prefix": "import",
         "body": [
-            "import res$1 https://$2.Inox \"sha256$3\" {",
-            "\t$4",
-            "} allow {",
-            "\t$5",
+            "import res$1 https://$2.ix {",
+            "\targuments: {$3}",
+            "\tallow: {",
+            "\t\t$4",
+            "\t}",
             "}"
         ]
     },
@@ -143,6 +162,20 @@
             "}"
         ]
     },
+	 "ifex": {
+        "scope": "Inox",
+        "prefix": "ifex",
+        "body": [
+            "(if $1 $2)"
+        ]
+    },
+    "ifelex": {
+        "scope": "Inox",
+        "prefix": "ifelex",
+        "body": [
+            "(if $1 else $2)"
+        ]
+    },
     "in": {
         "scope": "Inox",
         "prefix": "in",
@@ -154,9 +187,37 @@
         "scope": "Inox",
         "prefix": "go",
         "body": [
-            "go {globals: .{$1}, allow: {read: $2}} do {",
-            "\t$3",
+            "go {globals: .{$1}} do {",
+            "\t$2",
             "}"
+        ]
+    },
+	"gogroup": {
+        "scope": "Inox",
+        "prefix": "gogroup",
+        "body": [
+			"group = RoutineGroup()",
+			"coroutine1 = go {globals: .{$1}} do {",
+            "\t",
+            "}",
+            "coroutine2 = go {globals: .{}} do {",
+            "\t",
+            "}",
+			"results = group.wait_results!()"
+        ]
+    },
+	"union2": {
+        "scope": "Inox",
+        "prefix": "union2",
+        "body": [
+            "%| $1 | $2"
+        ]
+    },
+	"union3": {
+        "scope": "Inox",
+        "prefix": "union3",
+        "body": [
+            "%| $1 | $2 | $3"
         ]
     }
 }
