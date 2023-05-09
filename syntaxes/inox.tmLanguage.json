@@ -3,6 +3,12 @@
 	"name": "Inox",
 	"patterns": [
 		{
+			"include": "#xml-opening-tag"
+		},
+		{
+			"include": "#xml-closing-tag"
+		},
+		{
 			"include": "#css-selectors"
 		},
 		{
@@ -40,9 +46,6 @@
 		},
 		{
 			"include": "#urls"
-		},
-		{
-			"include": "#schemes"
 		},
 		{
 			"include": "#path-patterns"
@@ -962,6 +965,36 @@
 				{
 					"name": "entity.name.type",
 					"match": "(?<!\\w)%[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				}
+			]
+		},
+		"xml-opening-tag": {
+			"patterns": [
+				{
+					"begin": "(<)([a-zA-Z_][a-zA-Z0-9_-]*)(?=[ \t]*[>]|[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*=|[a-zA-Z_][a-zA-Z0-9_-]*([ \t]|>)))",
+					"beginCaptures": {
+						"1": {"name": "punctuation.definition.tag.begin.inox"},
+						"2": {"name": "entity.name.tag.inox"}
+					},
+					"patterns": [
+						{"include": "$self"}
+					],
+					"end": ">",
+					"endCaptures": {
+						"0": {"name": "punctuation.definition.tag.end.inox"}
+					}
+				}
+			]
+		},
+		"xml-closing-tag": {
+			"patterns": [
+				{
+					"match": "(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)",
+					"captures": {
+						"1": {"name": "punctuation.definition.tag.begin.inox"},
+						"2": {"name": "entity.name.tag.inox"},
+						"3": {"name": "punctuation.definition.tag.begin.inox"}
+					}
 				}
 			]
 		},
