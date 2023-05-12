@@ -55,7 +55,6 @@
 	"main": "./out/extension",
 	"scripts": {
 		"compile": "tsc -p ./",
-		"postinstall": "tsc",
 		"watch": "tsc -watch -p ./"
 	},
 	"devDependencies": {
