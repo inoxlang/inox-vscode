@@ -2,11 +2,11 @@
 	"name": "inox",
 	"displayName": "inox",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"repository": "https://github.com/inoxlang/inox-vscode",
 	"publisher": "graphr00t",
 	"engines": {
-		"vscode": "^1.76.0"
+		"vscode": "^1.77.0"
 	},
 	"categories": [
 		"Programming Languages"
@@ -58,10 +58,12 @@
 		"postinstall": "tsc",
 		"watch": "tsc -watch -p ./"
 	},
-	"dependencies": {
+	"devDependencies": {
 		"@types/node": "16.11.12",
 		"@types/vscode": "^1.77.0",
-		"typescript": "4.5.2",
+		"typescript": "4.5.2"
+	},
+	"dependencies": {
 		"vscode-languageclient": "^8.1.0"
 	}
 }
