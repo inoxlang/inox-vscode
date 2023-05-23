@@ -121,9 +121,16 @@
 			"assert ($1 match $2)"
 		]
 	},
-    "import": {
+    "importincl": {
         "scope": "Inox",
-        "prefix": "import",
+        "prefix": "importincl",
+        "body": [
+            "import ./$1"
+        ]
+    },
+    "importmod": {
+        "scope": "Inox",
+        "prefix": "importmod",
         "body": [
             "import res$1 https://$2.ix {",
             "\targuments: {$3}",
