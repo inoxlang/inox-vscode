@@ -15,6 +15,9 @@
 			"include": "#url-patterns"
 		},
 		{
+			"include": "#local-var-declarations"
+		},
+		{
 			"include": "#functions"
 		},
 		{
@@ -343,6 +346,76 @@
 					"match": "\\.{0,2}/[-a-zA-Z0-9_+@/.]*"
 				}
 			]
+		},
+		"local-var-declarations": {
+			"patterns": [
+				{
+					"match": "(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"captures": {
+						"1": {
+							"name": "storage.type.inox"
+						},
+						"2": {
+							"name": "variable.name.inox"
+						},
+						"3": {
+							"patterns": [
+								{
+									"match": "([a-zA-Z_][a-zA-Z0-9._-]*)\\b",
+									"name": "entity.name.type.inox"
+								},
+								{
+									"include": "#named-patterns"
+								}
+							]
+						}
+					}
+				},
+				{
+					"begin": "(\\bvar)[ \t]+(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "storage.type.inox"
+						},
+						"2": {
+							"name": "punctuation.definition.variables.begin.bracket.round.inox"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.variables.end.bracket.round.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#single-local-var-declaration"
+						},
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		"single-local-var-declaration":	{
+			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
+			"captures": {
+				"1": {
+					"name": "variable.name.inox"
+				},
+				"2": {
+					"patterns": [
+						{
+							"match": "([a-zA-Z_][a-zA-Z0-9._-]*)\\b",
+							"name": "entity.name.type.inox"
+						},
+						{
+							"include": "#named-patterns"
+						}
+					]
+				}
+			}
 		},
 		"functions": {
 			"patterns": [
