@@ -54,11 +54,21 @@
 		"configuration": {
 			"title": "Inox",
 			"properties": {
+				"inox.websocketEndpoint": {
+					"order": 0,
+					"type": "string",
+					"default": "wss://lsp.x.inox.run:7840",
+					"description": "the endpoint of the Websocket LSP server.",
+					"pattern": "^wss://.*$"
+				},
 				"inox.useInoxBinary": {
+					"order": 1,
 					"type": "boolean",
 					"default": false,
-					"description": "use the LSP server provided by the `inox` binary, `inox` should be in your $PATH for this to work."
+					"description": "use the LSP server provided by the `inox` binary, `inox` should be in your $PATH for this to work.",
+					"markdownDescription": "use the LSP server provided by the `inox` binary, `inox` should be in your `$PATH` for this to work."
 				}
+				
 			}
 		}
 	},
