@@ -15,6 +15,18 @@
 			"include": "#url-patterns"
 		},
 		{
+			"include": "#object-patterns"
+		},
+		{
+			"include": "#list-patterns"
+		},
+		{
+			"include": "#pattern-declarations"
+		},
+		{
+			"include": "#pattern-conversions"
+		},
+		{
 			"include": "#local-var-declarations"
 		},
 		{
@@ -347,6 +359,140 @@
 				}
 			]
 		},
+		"object-patterns": {
+			"patterns": [
+				{
+					"begin": "%\\{",
+					"beginCaptures": {
+						"0": {"name" :"punctuation.begin.bracket.curly.inox"}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				}
+			]
+		},
+		"unprefixed-object-patterns": {
+			"patterns": [
+				{
+					"begin": "\\{",
+					"beginCaptures": {
+						"0": {"name" :"punctuation.begin.bracket.curly.inox"}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				}
+			]
+		},
+		"list-patterns": {
+			"patterns": [
+				{
+					"begin": "%\\[",
+					"beginCaptures": {
+						"0": {"name" :"punctuation.begin.bracket.inox"}
+					},
+					"end": "\\]",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				}
+			]
+		},
+		"unprefixed-list-patterns": {
+			"patterns": [
+				{
+					"begin": "\\[",
+					"beginCaptures": {
+						"0": {"name" :"punctuation.begin.bracket.inox"}
+					},
+					"end": "\\]",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				}
+			]
+		},
+		"pattern-content": {
+			"patterns": [
+				{
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?!:)",
+					"name": "entity.name.type.inox"
+				},
+				{
+					"include": "#unprefixed-list-patterns"
+				},
+				{
+					"include": "#unprefixed-object-patterns"
+				},
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"pattern-declarations": {
+			"patterns": [
+				{
+					"comment": "declaration for an object pattern",
+					"begin": "(%[a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {"name" :"punctuation.begin.bracket.curly.inox"}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				},
+				{
+					"comment": "declaration for a list pattern",
+					"begin": "(%[a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\[])",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {"name" :"punctuation.begin.bracket.inox"}
+					},
+					"end": "\\]",
+					"endCaptures": {
+						"0": {"name" :"punctuation.end.bracket.inox"}
+					},
+					"patterns": [
+						{"include": "#pattern-content"}
+					]
+				}
+			]
+		},
+		"pattern-conversions": {
+			"patterns": [
+				{
+					"begin": "%\\(",
+					"end": "\\)",
+					"patterns": [
+						{"include": "$self"}
+					]
+				}
+			]
+		},
 		"local-var-declarations": {
 			"patterns": [
 				{
@@ -445,6 +591,43 @@
 								{
 									"match": "(\\w+)",
 									"name": "variable.name.inox"
+								},
+								{
+									"include": "#named-patterns"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "Function expressions",
+					"match": "(\\bfn)\\s*\\(([^\\)]+)\\)",
+					"captures": {
+						"1": {
+							"name": "keyword.function.inox"
+						},
+						"2": {
+							"patterns": [
+								{
+									"match": "(\\w+)\\s+(\\w+)",
+									"captures": {
+										"1": {
+											"name": "variable.name.inox"
+										},
+										"2": {
+											"name": "entity.name.type.inox"
+										}
+									}
+								},
+								{
+									"match": "(\\w+)",
+									"name": "variable.name.inox"
+								},
+								{
+									"include": "#unprefixed-list-patterns"
+								},
+								{
+									"include": "#unprefixed-object-patterns"
 								},
 								{
 									"include": "#named-patterns"
