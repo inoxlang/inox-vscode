@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
-      "target": "es6",
+      "module": "CommonJS",
+      "moduleResolution": "node",
+      "target": "ES2016",
       "outDir": "out",
-      "lib": ["es6"],
+      "lib": ["ES2016", "DOM"],
       "sourceMap": true,
       "rootDir": "src",
       "strict": true,
