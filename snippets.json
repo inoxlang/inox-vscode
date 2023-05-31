@@ -226,5 +226,25 @@
         "body": [
             "%| $1 | $2 | $3"
         ]
+    },
+    "single-file-app/http-file-server": {
+        "scope": "Inox",
+        "prefix": "single-file-app/http-file-server",
+        "body": [
+            "const (",
+            "\tHOST = https://localhost:9090",
+            ")",
+            "",
+            "manifest {",
+            "\tpermissions: {",
+            "\t\tprovide: HOST",
+            "\t\tread: IWD_PREFIX",
+            "\t}",
+            "}",
+            "",
+            "print(\"start HTTP file server on\", HOST)",
+            "server = http.FileServer!(HOST, ./)",
+            "server.wait_closed()"
+        ]
     }
 }
