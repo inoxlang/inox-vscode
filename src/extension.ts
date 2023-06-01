@@ -6,7 +6,7 @@ import { WebSocket as _Websocket } from 'ws';
 import { inspect } from 'util';
 import { connectToWebsocketServer } from './websocket';
 import { REMOTE_FS_SCHEME, RemoteFS as RemoteFilesystem } from './inox-fs';
-import { startLSPClient } from './lsp-client';
+import { createLSPClient } from './lsp-client';
 import { getConfiguration } from './configuration';
 
 let client: LanguageClient;
@@ -23,18 +23,26 @@ export function activate(context: vscode.ExtensionContext): void {
     return
   }
 
-  //configure & start LSP client
-  const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
-  const lspClient = startLSPClient({ serverOptions, outputChannel, traceOutputChannel })
-
   // create filesystem
   outputChannel.appendLine('create remote filesystem')
-  const fls = new RemoteFilesystem(lspClient, outputChannel);
+  const fls = new RemoteFilesystem(outputChannel);
   context.subscriptions.push(vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls, { isCaseSensitive: true }));
 
   outputChannel.appendLine('update workspace folders')
 
-  vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls)
+  vscode.workspace.updateWorkspaceFolders(0, 0, { uri: vscode.Uri.parse(`${REMOTE_FS_SCHEME}:/`), name: "Remote FS" });
+  const remoteWorkspaceFolder = vscode.workspace.workspaceFolders!.find(f => f.uri.scheme == REMOTE_FS_SCHEME)!
+
+  //configure & start LSP client
+  const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
+  const lspClient = createLSPClient({
+    serverOptions,
+    outputChannel,
+    traceOutputChannel,
+  })
+
+  fls.lspClient = lspClient
+  lspClient.start()
 }
 
 export function deactivate(): Thenable<void> | undefined {

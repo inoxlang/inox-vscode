@@ -7,12 +7,25 @@ export const REMOTE_FS_SCHEME = "remotefs"
 export class RemoteFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+	private _client: LanguageClient|undefined;
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
 
-	constructor(readonly lspClient: LanguageClient, readonly outputChannel: vscode.OutputChannel){
+	constructor(readonly outputChannel: vscode.OutputChannel){
 
+	}
+
+
+	set lspClient(client: LanguageClient){
+		this._client = client
+	}
+
+	get lspClient(){
+		if(this._client === undefined){
+			throw new Error('client not set')
+		}
+		return this._client
 	}
 
 	stat(uri: vscode.Uri): Promise<vscode.FileStat> {
