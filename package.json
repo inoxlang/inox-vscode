@@ -72,6 +72,11 @@
 			}
 		}
 	},
+	"capabilities": {
+		"virtualWorkspaces": {
+			"supported": true
+		}
+	},
 	"activationEvents": [
 		"workspaceContains:**/*.ix",
 		"onLanguage:ix"

@@ -4,72 +4,37 @@ import { listen, WebSocketMessageReader, WebSocketMessageWriter, toSocket, Conso
 
 import { WebSocket as _Websocket } from 'ws';
 import { inspect } from 'util';
+import { connectToWebsocketServer } from './websocket';
+import { REMOTE_FS_SCHEME, RemoteFS as RemoteFilesystem } from './inox-fs';
+import { startLSPClient } from './lsp-client';
+import { getConfiguration } from './configuration';
 
 let client: LanguageClient;
 let outputChannel: vscode.OutputChannel;
 let traceOutputChannel: vscode.OutputChannel;
 
-const USE_INOX_BINARY_CONFIG_ENTRY = 'useInoxBinary'
-const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 
 export function activate(context: vscode.ExtensionContext): void {
   outputChannel = vscode.window.createOutputChannel('Inox Extension');
   traceOutputChannel = vscode.window.createOutputChannel('Inox Extension (Trace)');
 
-  // read & check user settings
-  const config = vscode.workspace.getConfiguration('inox')
-  const useInoxBinary = config.get(USE_INOX_BINARY_CONFIG_ENTRY) === true
-  const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
-
-  if(typeof websocketEndpoint != 'string'){
-    let msg: string
-    if(!config.has(WS_ENDPOINT_CONFIG_ENTRY)){
-      msg = WS_ENDPOINT_CONFIG_ENTRY + ' not found in the extension\'s configuration'
-    } else {
-      msg = WS_ENDPOINT_CONFIG_ENTRY + '  provided in the extension\'s configuration is not a string, value is: ' + inspect(websocketEndpoint)
-    }
-
-    outputChannel.appendLine(msg)
-    vscode.window.showErrorMessage(msg)
+  const config = getConfiguration(outputChannel)
+  if (!config) {
     return
-  } else {
-    let errorMessage: string|undefined
-
-    try {
-      const url = new URL(websocketEndpoint)
-      if(url.protocol != 'wss:'){
-        errorMessage = WS_ENDPOINT_CONFIG_ENTRY + ' provided in the extension\'s configuration should have a [wss://] scheme, value is: ' + websocketEndpoint
-      }
-    } catch(err){
-      errorMessage = WS_ENDPOINT_CONFIG_ENTRY + ' provided in the extension\'s configuration is not a valid URL, value is: ' + websocketEndpoint
-    }
-
-    if(errorMessage){
-      outputChannel.appendLine(errorMessage)
-      vscode.window.showErrorMessage(errorMessage)
-      return
-    }
   }
 
-  //set server & client options
+  //configure & start LSP client
+  const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
+  const lspClient = startLSPClient({ serverOptions, outputChannel, traceOutputChannel })
 
-  const serverOptions = getLspServerOptions(useInoxBinary, websocketEndpoint)
+  // create filesystem
+  outputChannel.appendLine('create remote filesystem')
+  const fls = new RemoteFilesystem(lspClient, outputChannel);
+  context.subscriptions.push(vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls, { isCaseSensitive: true }));
 
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'inox' }],
-    synchronize: {
-      configurationSection: 'Inox',
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
-    },
-    outputChannel: outputChannel,
-    traceOutputChannel: traceOutputChannel,
-  };
-  
-  //create LSP client
+  outputChannel.appendLine('update workspace folders')
 
-  client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptions);
-  outputChannel.appendLine('start LSP client')
-  client.start();
+  vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls)
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -79,7 +44,8 @@ export function deactivate(): Thenable<void> | undefined {
   return client.stop();
 }
 
-function getLspServerOptions(useInoxBinary: boolean, websocketEndpoint: string): ServerOptions {
+
+function getLspServerOptions(useInoxBinary: boolean, websocketEndpoint: URL): ServerOptions {
   if (useInoxBinary) {
     outputChannel.appendLine('use inox binary')
     return {
@@ -89,44 +55,5 @@ function getLspServerOptions(useInoxBinary: boolean, websocketEndpoint: string):
   }
 
   outputChannel.appendLine('use websocket')
-  return connectToWebsocketServer(outputChannel, websocketEndpoint)
-}
-
-
-export function connectToWebsocketServer(outputChannel: vscode.OutputChannel, websocketEndpoint: string): () => Promise<MessageTransports> {
-  return async () => {
-    outputChannel.appendLine('create websocket')
-
-    const webSocket = new _Websocket(websocketEndpoint, {
-      rejectUnauthorized: false,
-    }) as any as WebSocket;
-
-    webSocket.onerror = ev => {
-      outputChannel.appendLine(inspect(ev))
-    }
-
-    return new Promise((resolve, reject) => {
-      let ok = false
-      setTimeout(() => {
-        if (!ok) {
-          outputChannel.appendLine('timeout')
-        }
-        reject()
-      }, 1000)
-
-      webSocket.onopen = () => {
-        ok = true
-        outputChannel.appendLine('websocket connected')
-        const socket = toSocket(webSocket);
-        const reader = new WebSocketMessageReader(socket);
-        const writer = new WebSocketMessageWriter(socket);
-        resolve({
-          reader,
-          writer,
-        })
-        traceOutputChannel.appendLine('after resolve')
-      }
-    })
-  }
-
+  return connectToWebsocketServer(outputChannel, traceOutputChannel, websocketEndpoint.toString())
 }
