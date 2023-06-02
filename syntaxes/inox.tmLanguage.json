@@ -664,15 +664,15 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "\\b(manifest|drop-perms|import|allow|as|const|var|assign|args|Mapping|udata|concat|supersys)\\b"
+					"match": "(?<![-_])\\b(manifest|drop-perms|import|allow|as|const|var|assign|args|Mapping|udata|concat|supersys)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",
-					"match": "\\b(if|else|switch|match|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received|preinit)\\b"
+					"match": "(?<![-_])\\b(if|else|switch|match|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received|preinit)\\b(?![-_])"
 				},
 				{
 					"name": "storage.type",
-					"match": "\\b(fn)\\b"
+					"match": "(?<![-_])\\b(fn)\\b(?![-_])"
 				}
 			]
 		},
