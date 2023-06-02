@@ -16,7 +16,7 @@ let traceOutputChannel: vscode.OutputChannel;
 
 export function activate(context: vscode.ExtensionContext): void {
   outputChannel = vscode.window.createOutputChannel('Inox Extension');
-  traceOutputChannel = vscode.window.createOutputChannel('Inox Extension (Trace)');
+  traceOutputChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
 
   const config = getConfiguration(outputChannel)
   if (!config) {
@@ -31,7 +31,6 @@ export function activate(context: vscode.ExtensionContext): void {
   outputChannel.appendLine('update workspace folders')
 
   vscode.workspace.updateWorkspaceFolders(0, 0, { uri: vscode.Uri.parse(`${REMOTE_FS_SCHEME}:/`), name: "Remote FS" });
-  const remoteWorkspaceFolder = vscode.workspace.workspaceFolders!.find(f => f.uri.scheme == REMOTE_FS_SCHEME)!
 
   //configure & start LSP client
   const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
