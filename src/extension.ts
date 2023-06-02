@@ -23,25 +23,44 @@ export function activate(context: vscode.ExtensionContext): void {
     return
   }
 
-  // create filesystem
-  outputChannel.appendLine('create remote filesystem')
-  const fls = new RemoteFilesystem(outputChannel);
-  context.subscriptions.push(vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls, { isCaseSensitive: true }));
+  const useWebsocket = !config.useInoxBinary
 
-  outputChannel.appendLine('update workspace folders')
+  if (useWebsocket) {
+    // create filesystem
+    outputChannel.appendLine('create remote filesystem')
+    const fls = new RemoteFilesystem(outputChannel);
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, fls, { isCaseSensitive: true }));
 
-  vscode.workspace.updateWorkspaceFolders(0, 0, { uri: vscode.Uri.parse(`${REMOTE_FS_SCHEME}:/`), name: "Remote FS" });
+    outputChannel.appendLine('update workspace folders')
 
-  //configure & start LSP client
-  const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
-  const lspClient = createLSPClient({
-    serverOptions,
-    outputChannel,
-    traceOutputChannel,
-  })
+    vscode.workspace.updateWorkspaceFolders(0, 0, { uri: vscode.Uri.parse(`${REMOTE_FS_SCHEME}:/`), name: "Remote FS" });
 
-  fls.lspClient = lspClient
-  lspClient.start()
+
+    //configure & start LSP client
+    const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
+    const lspClient = createLSPClient({
+      serverOptions,
+      outputChannel,
+      traceOutputChannel,
+      useInoxBinary: config.useInoxBinary,
+    })
+
+    fls.lspClient = lspClient
+    lspClient.start()
+
+  } else { //local inox binary
+
+    //configure & start LSP client
+    const serverOptions = getLspServerOptions(config.useInoxBinary, config.websocketEndpoint)
+    const lspClient = createLSPClient({
+      serverOptions,
+      outputChannel,
+      traceOutputChannel,
+      useInoxBinary: config.useInoxBinary,
+    })
+    lspClient.start()
+  }
+
 }
 
 export function deactivate(): Thenable<void> | undefined {
