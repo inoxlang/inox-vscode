@@ -1,10 +1,20 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
+import { InoxExtensionContext } from './inox-extension-context';
 
-export const REMOTE_FS_SCHEME = "remotefs"
+export const INOX_FS_SCHEME = "inox"
 
+export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
+	ctx.outputChannel.appendLine('create project filesystem')
+	const fs = new InoxFS(ctx.outputChannel);
+	ctx.base.subscriptions.push(vscode.workspace.registerFileSystemProvider(INOX_FS_SCHEME, fs, { isCaseSensitive: true }));
 
-export class RemoteFS implements vscode.FileSystemProvider {
+	ctx.debugOutputChannel.appendLine('update workspace folders')
+	vscode.workspace.updateWorkspaceFolders(1, 0, { uri: vscode.Uri.parse(`${INOX_FS_SCHEME}:/`), name: "Project FS" });
+	return fs
+}
+
+export class InoxFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 	private _client: LanguageClient | undefined;

@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
-import type { RemoteFS } from './inox-fs';
+import { InoxFS } from './inox-fs';
 import { Configuration } from './configuration';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS, needsToRecreateLspClient } from './lsp';
 
 type InoxExtensionContextArgs = {
     base: vscode.ExtensionContext,
     initialConfig: Configuration,
-    getCurrentConfig: (outputChannel: vscode.OutputChannel) => Configuration | undefined,
+    getCurrentConfig: (outputChannel: vscode.OutputChannel) => Promise<Configuration | undefined>,
     createLSPClient: (ctx: InoxExtensionContext) => LanguageClient
     needsToRecreateLspClient: (ctx: InoxExtensionContext, previousConfig: Configuration) => boolean
     outputChannel: vscode.OutputChannel
@@ -20,7 +20,7 @@ export class InoxExtensionContext {
     private _config: Configuration
     private _needsToRecreateLspClient = false
 
-    remoteFs: RemoteFS | undefined
+    inoxFS: InoxFS | undefined
     private _lspClient: LanguageClient | undefined
 
     readonly base: vscode.ExtensionContext
@@ -35,28 +35,32 @@ export class InoxExtensionContext {
         this.outputChannel = args.outputChannel
         this.debugOutputChannel = args.debugOutputChannel
 
-        vscode.workspace.onDidChangeConfiguration(() => {
-            const previousConfig = this.config
+        vscode.workspace.onDidChangeConfiguration(() => this.updateConfiguration())
+    }
 
-            const newConfig = this._args.getCurrentConfig(this.outputChannel)
-            if (newConfig != undefined) {
-                this._config = newConfig
-                this.debugOutputChannel.appendLine('configuration updated')
+    async updateConfiguration(){
+        const previousConfig = this.config
 
-                if (!this._needsToRecreateLspClient) {
-                    this._needsToRecreateLspClient = this._args.needsToRecreateLspClient(this, previousConfig)
-                    if (this._needsToRecreateLspClient) {
-                        this.debugOutputChannel.appendLine('the new configuration requires the LSP client to be recreated')
-                    }
+        const newConfig = await this._args.getCurrentConfig(this.outputChannel)
+        if (newConfig != undefined) {
+
+            this._config = newConfig
+            this.debugOutputChannel.appendLine('configuration updated')
+
+            if (!this._needsToRecreateLspClient) {
+                this._needsToRecreateLspClient = this._args.needsToRecreateLspClient(this, previousConfig)
+                if (this._needsToRecreateLspClient) {
+                    this.debugOutputChannel.appendLine('the new configuration requires the LSP client to be recreated')
                 }
             }
-        })
+        }
     }
 
     //start or restart the LSP client.
     async restartLSPClient(): Promise<void> {
         if (this._lspClient === undefined) {
             this._lspClient = this._args.createLSPClient(this)
+            this.base.subscriptions.push(this._lspClient)
         } else {
             const needsToRecreateLspClient = this._needsToRecreateLspClient
             this._needsToRecreateLspClient = false
@@ -78,11 +82,16 @@ export class InoxExtensionContext {
             if (needsToRecreateLspClient) {
                 this.debugOutputChannel.appendLine('recreate LSP client')
                 this._lspClient = this._args.createLSPClient(this)
+                this.base.subscriptions.push(this._lspClient)
             }
         }
 
-        if (this.remoteFs) {
-            this.remoteFs.lspClient = this._lspClient
+        if(this.config.project){
+            if(this.inoxFS){
+                this.inoxFS.lspClient = this._lspClient
+            }
+        } else if(this.inoxFS){
+            //TODO: remove filesystem.
         }
 
         this.debugOutputChannel.appendLine('Start / Restart LSP client')
@@ -91,6 +100,7 @@ export class InoxExtensionContext {
         } catch (err) {
             this.outputChannel.appendLine(String(err))
         }
+
     }
 
     get lspClient() {

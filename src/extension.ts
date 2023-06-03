@@ -1,24 +1,21 @@
 import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, MessageTransports, RevealOutputChannelOn } from 'vscode-languageclient/node';
+import { LanguageClient } from 'vscode-languageclient/node';
 
-import { WebSocket as _Websocket } from 'ws';
-import { inspect } from 'util';
-import { connectToWebsocketServer } from './websocket';
-import { REMOTE_FS_SCHEME, RemoteFS as RemoteFilesystem } from './inox-fs';
-import { createLSPClient, needsToRecreateLspClient } from './lsp';
 import { getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
+import { INOX_FS_SCHEME, InoxFS, createAndRegisterInoxFs } from './inox-fs';
+import { createLSPClient, needsToRecreateLspClient } from './lsp';
 
 let client: LanguageClient;
 let outputChannel: vscode.OutputChannel;
 let debugOutputChannel: vscode.OutputChannel;
 
-
-export function activate(context: vscode.ExtensionContext): void {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
   outputChannel = vscode.window.createOutputChannel('Inox Extension');
   debugOutputChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
+  outputChannel.appendLine('Inox extension activate()')
 
-  const config = getConfiguration(outputChannel)
+  const config = await getConfiguration(outputChannel)
   if (!config) {
     return
   }
@@ -34,22 +31,14 @@ export function activate(context: vscode.ExtensionContext): void {
     needsToRecreateLspClient: needsToRecreateLspClient,
   })
 
-  const useWebsocket = !config.useInoxBinary
-
-  if (useWebsocket) {
-    // create filesystem
-    outputChannel.appendLine('create remote filesystem')
-    ctx.remoteFs = new RemoteFilesystem(outputChannel);
-    ctx.base.subscriptions.push(vscode.workspace.registerFileSystemProvider(REMOTE_FS_SCHEME, ctx.remoteFs, { isCaseSensitive: true }));
-
-    outputChannel.appendLine('update workspace folders')
-
-    vscode.workspace.updateWorkspaceFolders(0, 0, { uri: vscode.Uri.parse(`${REMOTE_FS_SCHEME}:/`), name: "Remote FS" });
+  if(config.project){
+    ctx.inoxFS = createAndRegisterInoxFs(ctx)
   }
 
   ctx.restartLSPClient()
 
-  vscode.commands.registerCommand('lsp/restart', () => {
+  vscode.commands.registerCommand('lsp/restart', async () => {
+    await ctx.updateConfiguration()
     return ctx.restartLSPClient()
   })
 

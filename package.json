@@ -54,21 +54,19 @@
 		"configuration": {
 			"title": "Inox",
 			"properties": {
-				"inox.websocketEndpoint": {
+				"inox.enableProjectMode": {
 					"order": 0,
-					"type": "string",
-					"default": "wss://lsp.x.inox.run:7840",
-					"description": "the endpoint of the Websocket LSP server.",
-					"pattern": "^wss://.*$"
-				},
-				"inox.useInoxBinary": {
-					"order": 1,
 					"type": "boolean",
 					"default": false,
-					"description": "use the LSP server provided by the `inox` binary, `inox` should be in your $PATH for this to work.",
-					"markdownDescription": "use the LSP server provided by the `inox` binary, `inox` should be in your `$PATH` for this to work."
+					"description": "enable project mode, PLEASE RELOAD THE WINDOW AFTER THE CHANGE."
+				},
+				"inox.websocketEndpoint": {
+					"order": 1,
+					"type": "string",
+					"default": "wss://lsp.inox.run:7840",
+					"description": "the endpoint of the Websocket LSP server to use for project mode.",
+					"pattern": "^wss://.*$"
 				}
-				
 			}
 		},
 		"commands": [
@@ -87,7 +85,7 @@
 	},
 	"activationEvents": [
 		"workspaceContains:**/*.ix",
-		"onLanguage:ix"
+		"workspaceContains:inox-project.json"
 	],
 	"main": "./out/extension",
 	"scripts": {
