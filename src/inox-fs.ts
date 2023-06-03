@@ -7,22 +7,22 @@ export const REMOTE_FS_SCHEME = "remotefs"
 export class RemoteFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-	private _client: LanguageClient|undefined;
+	private _client: LanguageClient | undefined;
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
 
-	constructor(readonly outputChannel: vscode.OutputChannel){
+	constructor(readonly outputChannel: vscode.OutputChannel) {
 
 	}
 
 
-	set lspClient(client: LanguageClient){
+	set lspClient(client: LanguageClient) {
 		this._client = client
 	}
 
-	get lspClient(){
-		if(this._client === undefined){
+	get lspClient() {
+		if (this._client === undefined) {
 			throw new Error('client not set')
 		}
 		return this._client
@@ -32,7 +32,7 @@ export class RemoteFS implements vscode.FileSystemProvider {
 		return this.lspClient.sendRequest('fs/fileStat', {
 			uri: uri.toString(),
 		}).then((stats): vscode.FileStat => {
-			if(stats == 'not-found'){
+			if (stats == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
 			return stats as vscode.FileStat
@@ -43,17 +43,17 @@ export class RemoteFS implements vscode.FileSystemProvider {
 		return this.lspClient.sendRequest('fs/readDir', {
 			uri: uri.toString(),
 		}).then((entries) => {
-			if(entries == 'not-found'){
+			if (entries == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
 
-			if(! Array.isArray(entries) || entries.some(e => typeof e != 'object')){
+			if (!Array.isArray(entries) || entries.some(e => typeof e != 'object')) {
 				this.outputChannel.appendLine('invalid dir entries received: ' + JSON.stringify(entries))
 				return []
 			}
 
 			return entries.map(e => {
-				const {name, type} = e
+				const { name, type } = e
 				return [name, type]
 			})
 		})
@@ -63,7 +63,7 @@ export class RemoteFS implements vscode.FileSystemProvider {
 		return this.lspClient.sendRequest('fs/readFile', {
 			uri: uri.toString(),
 		}).then((contentB64): Uint8Array => {
-			if(contentB64 == 'not-found'){
+			if (contentB64 == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
 
@@ -100,7 +100,7 @@ export class RemoteFS implements vscode.FileSystemProvider {
 		})
 	}
 
-	
+
 	watch(_resource: vscode.Uri): vscode.Disposable {
 		// ignore, fires for all changes...
 		return new vscode.Disposable(() => { });

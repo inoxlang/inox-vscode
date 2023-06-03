@@ -1,3 +1,4 @@
+import { URL } from 'url';
 import { inspect } from 'util';
 import * as vscode from 'vscode';
 import { OutputChannel } from "vscode"
@@ -5,7 +6,7 @@ import { OutputChannel } from "vscode"
 const USE_INOX_BINARY_CONFIG_ENTRY = 'useInoxBinary'
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 
-export function getConfiguration(outputChannel: OutputChannel) {
+export function getConfiguration(outputChannel: OutputChannel): Configuration | undefined {
   // read & check user settings
   const config = vscode.workspace.getConfiguration('inox')
   const useInoxBinary = config.get(USE_INOX_BINARY_CONFIG_ENTRY) === true
@@ -43,4 +44,10 @@ export function getConfiguration(outputChannel: OutputChannel) {
   }
 
   return { useInoxBinary, websocketEndpoint: new URL(websocketEndpoint) }
+}
+
+
+export type Configuration = {
+  useInoxBinary: boolean
+  websocketEndpoint: URL
 }

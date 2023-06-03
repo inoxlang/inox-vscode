@@ -70,7 +70,15 @@
 				}
 				
 			}
-		}
+		},
+		"commands": [
+			{
+				"category": "Inox",
+				"command": "lsp/restart",
+				"title": "Restart LSP client",
+				"icon": "inox-128.png"
+			}
+		]
 	},
 	"capabilities": {
 		"virtualWorkspaces": {

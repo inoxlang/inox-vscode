@@ -3,6 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
+/// <reference lib="DOM" />
+
 import { MessageConnection, Logger } from 'vscode-jsonrpc';
 import { createWebSocketConnection } from './socket/connection.js';
 import { IWebSocket } from './socket/socket.js';
