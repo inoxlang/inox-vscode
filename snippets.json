@@ -55,8 +55,8 @@
 		"scope": "Inox",
 		"prefix": "for0n",
 		"body": [
-			"for (0 .. $$n) {",
-			"\t$1",
+			"for (0 .. $1) {",
+			"\t$2",
 			"}"
 		]
 	},
@@ -64,8 +64,8 @@
 		"scope": "Inox",
 		"prefix": "for1n",
 		"body": [
-			"for (1 .. $$n) {",
-			"\t$1",
+			"for (1 .. $1) {",
+			"\t$2",
 			"}"
 		]
 	},
@@ -80,14 +80,14 @@
 		"scope": "Inox",
 		"prefix": "1_n",
 		"body": [
-			"(1 .. \\$n)"
+			"(1 .. $1)"
 		]
 	},
     "0_n": {
 		"scope": "Inox",
 		"prefix": "0_n",
 		"body": [
-			"(0 .. \\$n)"
+			"(0 .. $1)"
 		]
 	},
     "switch": {
