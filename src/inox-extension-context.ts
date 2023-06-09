@@ -6,6 +6,7 @@ import { LSP_CLIENT_STOP_TIMEOUT_MILLIS, needsToRecreateLspClient } from './lsp'
 
 type InoxExtensionContextArgs = {
     base: vscode.ExtensionContext,
+    virtualWorkspace: boolean,
     initialConfig: Configuration,
     getCurrentConfig: (outputChannel: vscode.OutputChannel) => Promise<Configuration | undefined>,
     createLSPClient: (ctx: InoxExtensionContext) => LanguageClient
@@ -26,12 +27,14 @@ export class InoxExtensionContext {
     readonly base: vscode.ExtensionContext
     readonly outputChannel: vscode.OutputChannel
     readonly debugOutputChannel: vscode.OutputChannel
+    readonly virtualWorkspace: boolean
 
     constructor(args: InoxExtensionContextArgs) {
         this._args = args
 
         this.base = args.base
         this._config = args.initialConfig
+        this.virtualWorkspace = args.virtualWorkspace
         this.outputChannel = args.outputChannel
         this.debugOutputChannel = args.debugOutputChannel
 
