@@ -3,7 +3,7 @@ import { LanguageClient } from 'vscode-languageclient/node';
 
 import { getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
-import { INOX_FS_SCHEME, InoxFS, createAndRegisterInoxFs } from './inox-fs';
+import { createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, needsToRecreateLspClient } from './lsp';
 
 let client: LanguageClient;
@@ -31,7 +31,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     needsToRecreateLspClient: needsToRecreateLspClient,
   })
 
-  if(config.project){
+  if (config.project) {
     ctx.inoxFS = createAndRegisterInoxFs(ctx)
   }
 

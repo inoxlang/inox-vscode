@@ -1,10 +1,12 @@
+import { inspect } from "util";
+import * as vscode from 'vscode';
 import { LanguageClientOptions } from "vscode-languageclient";
 import { LanguageClient, ServerOptions } from "vscode-languageclient/node";
-import * as vscode from 'vscode';
-import { INOX_FS_SCHEME } from "./inox-fs";
-import { InoxExtensionContext } from "./inox-extension-context";
-import { connectToWebsocketServer } from "./websocket";
 import { Configuration } from "./configuration";
+import { InoxExtensionContext } from "./inox-extension-context";
+import { INOX_FS_SCHEME } from "./inox-fs";
+import { connectToWebsocketServer } from "./websocket";
+import { createStartInoxWorker } from "./lsp-worker";
 
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
@@ -15,13 +17,22 @@ export function needsToRecreateLspClient(ctx: InoxExtensionContext, previousConf
   return false
 }
 
+
+
 function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
   if (!ctx.config.project) {
-    ctx.outputChannel.appendLine(' inox binary')
-    return {
-      command: 'inox',
-      args: ['lsp'],
-    };
+    try {
+      ctx.outputChannel.appendLine('use vscode-inox')
+      return createStartInoxWorker(ctx)
+    } catch (err) {
+      ctx.outputChannel.appendLine('failed to start LSP worker: ' + inspect(err))
+      throw new Error('abort')
+    }
+    // ctx.outputChannel.appendLine('inox binary')
+    // return {
+    //   command: 'inox',
+    //   args: ['lsp'],
+    // };
   }
 
   ctx.outputChannel.appendLine('project mode: use websocket')
@@ -49,3 +60,4 @@ export function createLSPClient(ctx: InoxExtensionContext) {
   const client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptions);
   return client
 }
+
