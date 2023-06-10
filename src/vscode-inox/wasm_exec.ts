@@ -5,6 +5,13 @@ const crypto = new Crypto()
 
 import fetch from 'node-fetch';
 
+
+let printDebug: undefined|((...args: string[]) => any)
+
+export function setPrintDebug(fn: (...args: string[]) => any){
+	printDebug = fn
+}
+
 export const Go = (() => {
 	const enosys = () => {
 		const err = new Error("not implemented");
@@ -31,7 +38,7 @@ export const Go = (() => {
 			outputBuf += decoder.decode(buf);
 			const nl = outputBuf.lastIndexOf("\n");
 			if (nl != -1) {
-				console.log(outputBuf.substring(0, nl));
+				printDebug(outputBuf.substring(0, nl));
 				outputBuf = outputBuf.substring(nl + 1);
 			}
 			return buf.length;

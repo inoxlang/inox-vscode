@@ -1,21 +1,20 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { parentPort } from 'worker_threads'
 import { join } from 'path';
-import vscode from 'vscode'
 
-import { Go } from './wasm_exec';
+import { Go, setPrintDebug } from './wasm_exec';
 
 const parent = parentPort!
+const printDebug = (...args: string[]) => {
+  parent.postMessage({ method: 'print_debug', id: Math.random(), args: args })
+}
+setPrintDebug(printDebug)
+
 const go = new Go();
 const wasmBytes = readFileSync(join(__dirname, '../../vscode-inox.wasm'))
 
-/** @type {WebAssembly.Module} */
-let mod;
-
-/** @type {WebAssembly.Instance} */
-let inst;
-
-
+let mod: WebAssembly.Module;
+let inst: WebAssembly.Instance;
 let lastReadLSPTime = Date.now()
 
 type InoxExports = {
@@ -42,20 +41,14 @@ WebAssembly.instantiate(
   },
 );
 
-const print = (...args: string[]) => {
-  parent.postMessage({ method: 'print', id: Math.random(), args: args })
-}
 
-const print_debug = (...args: string[]) => {
-  parent.postMessage({ method: 'print_debug', id: Math.random(), args: args })
-}
 
 function setup() {
   let exports = go.exports as InoxExports;
 
   exports.setup({
     IWD: '/',
-    print_debug: print_debug
+    print_debug: printDebug
   })
 
   parent.postMessage('initialized')
