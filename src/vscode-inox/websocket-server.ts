@@ -184,10 +184,7 @@ export class WebsocketLanguageServer {
 
     if (("id" in json) && json.id !== undefined) { //requests have an id
       //request reponse
-      if (
-        ("result" in json && json.result != undefined) ||
-        (("error" in json) && json.error != undefined)
-      ) {
+      if (("result" in json) || ("error" in json)) {
         const id = String(json.id);
         const pendingRequest = this.pendingRequests[id];
         if (pendingRequest === undefined) {
@@ -197,7 +194,7 @@ export class WebsocketLanguageServer {
         delete this.pendingRequests[id];
 
         const error = json.error;
-        const result = json.result;
+        const result = json.result; //a null result is okay if error is not present or null
 
         if (error) {
           pendingRequest.reject(error)
