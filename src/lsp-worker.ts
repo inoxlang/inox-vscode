@@ -8,7 +8,7 @@ let currentWorker: Worker;
 
 export async function createWebsocketServerWorker(ctx: InoxExtensionContext): Promise<void> {
   if (currentWorker) {
-    ctx.debugOutputChannel.appendLine('terminate previous inox worker')
+    ctx.debugChannel.appendLine('terminate previous inox worker')
     await currentWorker.terminate()
   }
 
@@ -43,14 +43,16 @@ export async function createWebsocketServerWorker(ctx: InoxExtensionContext): Pr
 
       let { method, id, response } = data
 
-      if (method == 'print') {
-        ctx.outputChannel.appendLine(Array.from(data.args).join(' '))
-        return
-      }
-
-      if (method == 'print_debug') {
-        ctx.debugOutputChannel.appendLine(Array.from(data.args).join(' '))
-        return
+      switch (method) {
+        case 'print':
+          ctx.outputChannel.appendLine(Array.from(data.args).join(' '))
+          return
+        case 'print_debug':
+          ctx.debugChannel.appendLine(Array.from(data.args).join(' '))
+          return
+        case 'print_trace':
+          ctx.traceChannel.appendLine(Array.from(data.args).join(' '))
+          return
       }
 
       if (id !== undefined) { //response
@@ -59,7 +61,7 @@ export async function createWebsocketServerWorker(ctx: InoxExtensionContext): Pr
           delete responseCallbacks[id]
           callback(response)
         } else {
-          ctx.debugOutputChannel.appendLine('no response callback for request with id ' + id)
+          ctx.debugChannel.appendLine('no response callback for request with id ' + id)
         }
       } else { //notification 
 

@@ -7,12 +7,16 @@ import { createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, needsToRecreateLspClient } from './lsp';
 
 let outputChannel: vscode.OutputChannel;
-let debugOutputChannel: vscode.OutputChannel;
+let debugChannel: vscode.OutputChannel;
+let traceChannel: vscode.OutputChannel;
+
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   outputChannel = vscode.window.createOutputChannel('Inox Extension');
-  debugOutputChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
   outputChannel.appendLine('Inox extension activate()')
+
+  debugChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
+  traceChannel = vscode.window.createOutputChannel('Inox Extension (Trace)');
 
   const config = await getConfiguration(outputChannel)
   if (!config) {
@@ -34,7 +38,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     initialConfig: config,
     virtualWorkspace: isVirtualWorkspace,
     outputChannel: outputChannel,
-    debugOutputChannel: debugOutputChannel,
+    debugChannel: debugChannel,
+    traceChannel: traceChannel,
 
     getCurrentConfig: getConfiguration,
     createLSPClient: createLSPClient,

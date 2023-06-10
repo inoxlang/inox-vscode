@@ -43,7 +43,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, endpoint?: U
 
             webSocket.addEventListener('close', function(){
                 closed = true
-                ctx.debugOutputChannel.appendLine(`websocket with id ${websocketId} is now closed`)
+                ctx.debugChannel.appendLine(`websocket with id ${websocketId} is now closed`)
             })
 
             webSocket.addEventListener("open", function () {
@@ -59,7 +59,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, endpoint?: U
                         }
 
                         pingStart = new Date()
-                        ctx.debugOutputChannel.appendLine(`ping LSP server (websocket id ${websocketId})`)
+                        ctx.debugChannel.appendLine(`ping LSP server (websocket id ${websocketId})`)
                         webSocket.ping()
                     }, PING_INTERVAL_MILLIS)
                 }
@@ -67,7 +67,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, endpoint?: U
                 //log pongs.
                 webSocket.on('pong', () => {
                     let pingEnd = new Date()
-                    ctx.debugOutputChannel.appendLine(
+                    ctx.debugChannel.appendLine(
                         'LSP server sent a pong, time since ping: ' +
                         (pingEnd.getTime() - pingStart.getTime()) +
                         ` milliseconds (websocket id ${websocketId})`
@@ -82,7 +82,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, endpoint?: U
                     reader,
                     writer,
                 })
-                ctx.debugOutputChannel.appendLine('after resolve message transports')
+                ctx.debugChannel.appendLine('after resolve message transports')
             })
 
         })

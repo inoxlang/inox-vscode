@@ -65,7 +65,7 @@ export function createLSPClient(ctx: InoxExtensionContext) {
       fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
     },
     outputChannel: ctx.outputChannel,
-    traceOutputChannel: ctx.debugOutputChannel,
+    traceOutputChannel: ctx.debugChannel,
   };
 
   const client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptions);

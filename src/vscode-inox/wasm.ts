@@ -8,7 +8,7 @@ import {printDebug} from './debug'
 
 
 export type InoxExports = {
-	setup: (arg: { IWD: string, print_debug: Function }) => any,
+	setup: (arg: { IWD: string, print_debug: Function, print_trace: Function }) => any,
 	write_lsp_message: (s: string) => void,
 	read_lsp_message: () => string|null
   }

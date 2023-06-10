@@ -5,7 +5,7 @@ import { join } from 'path';
 
 
 import { Go, InoxExports } from './wasm';
-import { printDebug } from './debug';
+import { printDebug, printTrace } from './debug';
 import { WebsocketLanguageServer } from './websocket-server';
 
 const parent = parentPort!
@@ -39,7 +39,8 @@ function setup() {
 
   exports.setup({
     IWD: '/',
-    print_debug: printDebug
+    print_debug: printDebug,
+    print_trace: printTrace
   })
 
 

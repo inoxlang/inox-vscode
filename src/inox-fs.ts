@@ -7,10 +7,10 @@ const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
 
 export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
 	ctx.outputChannel.appendLine('create project filesystem')
-	const fs = new InoxFS(ctx.debugOutputChannel);
+	const fs = new InoxFS(ctx.debugChannel);
 	ctx.base.subscriptions.push(vscode.workspace.registerFileSystemProvider(INOX_FS_SCHEME, fs, { isCaseSensitive: true }));
 
-	ctx.debugOutputChannel.appendLine('update workspace folders')
+	ctx.debugChannel.appendLine('update workspace folders')
 	vscode.workspace.updateWorkspaceFolders(1, 0, { uri: vscode.Uri.parse(`${INOX_FS_SCHEME}:/`), name: "Project FS" });
 	return fs
 }
