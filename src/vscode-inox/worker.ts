@@ -32,6 +32,12 @@ WebAssembly.instantiate(
   async result => {
     mod = result.module;
     inst = result.instance;
+    let lastReadLSPTime = Date.now()
+
+
+    const print_debug = (...args: string[]) => {
+      parent.postMessage({ method: 'print_debug', id: Math.random(), args: args})
+    }
 
     go.run(inst);
 
@@ -40,9 +46,7 @@ WebAssembly.instantiate(
 
       exports.setup({
         IWD: '/',
-        print_debug(...args: string[]){
-          parent.postMessage({ method: 'print_debug', id: Math.random(), args: args})
-        }
+        print_debug: print_debug
       })
 
       parent.postMessage('initialized')
@@ -75,7 +79,16 @@ WebAssembly.instantiate(
             parent.postMessage({ method, response: null, error:  'missing .id in call to read_lsp_output'})
             break
           }
-          let output = exports.read_lsp_output()
+
+          let output = ''
+          const now = Date.now()
+          const timeSinceLastRead = now - lastReadLSPTime
+          lastReadLSPTime = now
+
+          if(timeSinceLastRead > 50){
+            output = exports.read_lsp_output()
+          }
+
           parent.postMessage({ method, id, response: output })
 
           break
