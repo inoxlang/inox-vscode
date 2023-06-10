@@ -54,18 +54,18 @@
 		"configuration": {
 			"title": "Inox",
 			"properties": {
-				"inox.enableProjectMode": {
+				"inox.disableProjectMode": {
 					"order": 0,
 					"type": "boolean",
 					"default": false,
-					"description": "enable project mode, PLEASE RELOAD THE WINDOW AFTER THE CHANGE."
+					"description": "disable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
 				},
 				"inox.websocketEndpoint": {
 					"order": 1,
 					"type": "string",
-					"default": "wss://lsp.inox.run:7840",
-					"description": "the endpoint of the Websocket LSP server to use for project mode.",
-					"pattern": "^wss://.*$"
+					"default": "",
+					"description": "the endpoint of the Websocket LSP server to use for project mode, if none is provided vscode-inox is used.",
+					"pattern": "^(|wss://.*)$"
 				}
 			}
 		},

@@ -15,6 +15,11 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
         ctx.outputChannel.appendLine(`create websocket (id ${websocketId})`)
 
         const endpoint = ctx.config.websocketEndpoint
+        if(!endpoint){
+            ctx.outputChannel.appendLine(`no websocket endpoint set`)
+            throw new Error(`no websocket endpoint set`)
+        }
+
         const webSocket = new _Websocket(endpoint, {
             rejectUnauthorized: false,
         })

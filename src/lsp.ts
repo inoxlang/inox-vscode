@@ -21,6 +21,15 @@ export function needsToRecreateLspClient(ctx: InoxExtensionContext, previousConf
 
 function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
   if (!ctx.config.project) {
+    ctx.outputChannel.appendLine('use inox binary')
+    return {
+      command: 'inox',
+      args: ['lsp'],
+    };
+  }
+
+  if(!ctx.config.websocketEndpoint){
+    ctx.outputChannel.appendLine('project mode: use vscode-inox (WASM)')
     try {
       ctx.outputChannel.appendLine('use vscode-inox')
       return createStartInoxWorker(ctx)
@@ -28,15 +37,10 @@ function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
       ctx.outputChannel.appendLine('failed to start LSP worker: ' + inspect(err))
       throw new Error('abort')
     }
-    // ctx.outputChannel.appendLine('inox binary')
-    // return {
-    //   command: 'inox',
-    //   args: ['lsp'],
-    // };
+  } else {
+    ctx.outputChannel.appendLine('project mode: use websocket')
+    return connectToWebsocketServer(ctx)
   }
-
-  ctx.outputChannel.appendLine('project mode: use websocket')
-  return connectToWebsocketServer(ctx)
 }
 
 export function createLSPClient(ctx: InoxExtensionContext) {

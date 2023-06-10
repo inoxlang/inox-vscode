@@ -4,14 +4,14 @@ import * as vscode from 'vscode';
 import { OutputChannel } from "vscode"
 
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
-const PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
+const DISABLE_PROJECT_MODE_CONFIG_ENTRY = 'disableProjectMode'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
 
 export async function getConfiguration(outputChannel: OutputChannel): Promise<Configuration | undefined> {
   // read & check user settings
   const config = vscode.workspace.getConfiguration('inox')
   const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
-  const inProjectMode = config.get(PROJECT_MODE_CONFIG_ENTRY) === true
+  const inProjectMode = config.get(DISABLE_PROJECT_MODE_CONFIG_ENTRY) === false
 
   if (typeof websocketEndpoint != 'string') {
     let msg: string
@@ -25,7 +25,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     outputChannel.appendLine(msg)
     vscode.window.showErrorMessage(msg)
     return
-  } else {
+  } else if(websocketEndpoint != '') {
     let errorMessage: string | undefined
 
     try {
@@ -95,13 +95,18 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
   }
 
-  return {
-    project: projectConfig,
-    websocketEndpoint: new URL(websocketEndpoint)
+  const result: Configuration = {
+    project: projectConfig
   }
+
+  if(websocketEndpoint !== ""){
+    result.websocketEndpoint = new URL(websocketEndpoint)
+  }
+
+  return result
 }
 
 export type Configuration = {
-  websocketEndpoint: URL
+  websocketEndpoint?: URL
   project?: {},
 }
