@@ -18,7 +18,12 @@ const MAX_PAYLOAD_BYTES = 1_000_000
 export class WebsocketLanguageServer {
 
   private closing = false
-  private pendingRequests: Record<string, { writer: MessageWriter, method: string, callback: () => void }> = {};
+  private pendingRequests: Record<string, { 
+    writer: MessageWriter, 
+    method: string, 
+    resolve: (result: unknown) => void,
+    reject: (error: unknown) => void
+  }> = {};
 
   private writer: MessageWriter | undefined;
 
@@ -111,13 +116,11 @@ export class WebsocketLanguageServer {
 
         setTimeout(() => reject(), 2000)
 
-        const callback = () => {
-          resolve(null);
-        };
         this.pendingRequests[requestId] = {
           method: method,
           writer: writer,
-          callback: callback,
+          resolve,
+          reject
         }
       });
 
@@ -179,7 +182,6 @@ export class WebsocketLanguageServer {
 
     const json = arg as Record<string, unknown>
 
-
     if (("id" in json) && json.id !== undefined) { //requests have an id
       //request reponse
       if (
@@ -197,17 +199,11 @@ export class WebsocketLanguageServer {
         const error = json.error;
         const result = json.result;
 
-        const response: ResponseMessage = {
-          jsonrpc: '2',
-          id: id,
-          result: result as any
-        }
         if (error) {
-          response.error = error as any
+          pendingRequest.reject(error)
+        } else {
+          pendingRequest.resolve(result)
         }
-
-        pendingRequest.callback()
-        pendingRequest.writer.write(response)
 
       } else { //request sent by the server
 
