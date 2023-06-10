@@ -24,11 +24,11 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
     
       //add listeners
       inoxWorker.on('error', (ev) => {
-        ctx.outputChannel.appendLine('worker: ' + inspect(ev))
+        ctx.outputChannel.appendLine('sent by worker: ' + inspect(ev))
       })
 
       inoxWorker.on('messageerror', (ev) => {
-        ctx.outputChannel.appendLine('worker: ' + inspect(ev))
+        ctx.outputChannel.appendLine('sent by worker: ' + inspect(ev))
       })
     
       inoxWorker.on('message', (data) => {
@@ -76,11 +76,13 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
       })
   
       const writer = new stream.Writable({
-        async write(chunk){
+        async write(chunk, _, callback){
           if(chunk instanceof Uint8Array){
             chunk = new TextDecoder().decode(chunk)
           }
-          await sendRequestToInoxWorker('write_lsp_input', {input: chunk})
+          //no await
+          sendRequestToInoxWorker('write_lsp_input', {input: chunk})
+          callback()
         }
       })
   
