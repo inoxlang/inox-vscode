@@ -18,7 +18,6 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
 
       ctx.outputChannel.appendLine('worker\'s path: ' + workerPath.toString())
     
-    
       //create worker
       const inoxWorker = new Worker(workerPath, {})
       currentWorker = inoxWorker
@@ -27,9 +26,18 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
       inoxWorker.on('error', (ev) => {
         ctx.outputChannel.appendLine('worker: ' + inspect(ev))
       })
+
+      inoxWorker.on('messageerror', (ev) => {
+        ctx.outputChannel.appendLine('worker: ' + inspect(ev))
+      })
     
       inoxWorker.on('message', (data) => {
         let {method, id, response} = data
+
+        if(method == 'print'){
+          ctx.outputChannel.appendLine(Array.from(data.args).join(' '))
+          return
+        }
 
         if(method == 'print_debug'){
           ctx.debugOutputChannel.appendLine(Array.from(data.args).join(' '))
@@ -47,10 +55,6 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
         } else { //notification 
     
         }
-      })
-    
-      inoxWorker.on('messageerror', (ev) => {
-        ctx.outputChannel.appendLine('worker: ' + inspect(ev))
       })
     
       const sendRequestToInoxWorker = async (method: string, args: unknown) => {
