@@ -44,13 +44,13 @@ export function createStartInoxWorker(ctx: InoxExtensionContext): () => Promise<
           return
         }
 
-        if(typeof id !== undefined){ //response
+        if(id !== undefined){ //response
           let callback = responseCallbacks[id]
           if(callback){
             delete responseCallbacks[id]
             callback(response)
           } else {
-            console.error('no response callback for reques with id', id)
+            ctx.debugOutputChannel.appendLine('no response callback for request with id ' + id)
           }
         } else { //notification 
     

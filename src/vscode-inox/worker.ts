@@ -96,7 +96,7 @@ function setup() {
         break
       }
       default:
-        parent.postMessage({ error: 'unknown method ' + method })
+        parent.postMessage({ error: 'unknown method ' + method, id })
     }
 
   })
