@@ -3,10 +3,11 @@ import { LanguageClient } from 'vscode-languageclient/node';
 import { InoxExtensionContext } from './inox-extension-context';
 
 export const INOX_FS_SCHEME = "inox"
+const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
 
 export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
 	ctx.outputChannel.appendLine('create project filesystem')
-	const fs = new InoxFS(ctx.outputChannel);
+	const fs = new InoxFS(ctx.debugOutputChannel);
 	ctx.base.subscriptions.push(vscode.workspace.registerFileSystemProvider(INOX_FS_SCHEME, fs, { isCaseSensitive: true }));
 
 	ctx.debugOutputChannel.appendLine('update workspace folders')
@@ -38,7 +39,17 @@ export class InoxFS implements vscode.FileSystemProvider {
 		return this._client
 	}
 
+
+	get lspClientPresenceSuffix(){
+		if(this._client === undefined){
+			return '(no LSP client)'
+		}
+		return ''
+	}
+
 	stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} stat ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/fileStat', {
 			uri: uri.toString(),
 		}).then((stats): vscode.FileStat => {
@@ -50,6 +61,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 	readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} read dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/readDir', {
 			uri: uri.toString(),
 		}).then((entries) => {
@@ -70,6 +83,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 	readFile(uri: vscode.Uri): Promise<Uint8Array> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} read file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/readFile', {
 			uri: uri.toString(),
 		}).then((contentB64): Uint8Array => {
@@ -82,6 +97,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 	writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} write file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/writeFile', {
 			uri: uri.toString(),
 			content: Buffer.from(content).toString('base64'),
@@ -91,6 +108,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 	rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} rename file ${oldUri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/renameFile', {
 			uri: oldUri.toString(),
 			newUri: newUri.toString(),
@@ -99,12 +118,16 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 	delete(uri: vscode.Uri): Promise<void> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} delete file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/deleteFile', {
 			uri: uri.toString(),
 		})
 	}
 
 	createDirectory(uri: vscode.Uri): Promise<void> {
+		this.outputChannel.appendLine(`${DEBUG_PREFIX} create dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
 		return this.lspClient.sendRequest('fs/createDir', {
 			uri: uri.toString(),
 		})
