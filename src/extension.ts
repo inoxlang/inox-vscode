@@ -6,7 +6,6 @@ import { InoxExtensionContext } from './inox-extension-context';
 import { createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, needsToRecreateLspClient } from './lsp';
 
-let client: LanguageClient;
 let outputChannel: vscode.OutputChannel;
 let debugOutputChannel: vscode.OutputChannel;
 
@@ -56,9 +55,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
-  }
-  return client.stop();
+  return
 }
 
