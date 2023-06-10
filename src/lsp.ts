@@ -1,12 +1,15 @@
 import { inspect } from "util";
 import * as vscode from 'vscode';
-import { LanguageClientOptions } from "vscode-languageclient";
+import { LanguageClientOptions, MessageTransports } from "vscode-languageclient";
 import { LanguageClient, ServerOptions } from "vscode-languageclient/node";
 import { Configuration } from "./configuration";
 import { InoxExtensionContext } from "./inox-extension-context";
 import { INOX_FS_SCHEME } from "./inox-fs";
-import { connectToWebsocketServer } from "./websocket";
-import { createStartInoxWorker } from "./lsp-worker";
+import { connectToWebsocketServer as createConnectToWebsocketServer } from "./websocket";
+import { createWebsocketServerWorker } from "./lsp-worker";
+import { PORT } from "./vscode-inox/const";
+import { URL } from 'url';
+
 
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
@@ -28,18 +31,22 @@ function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
     };
   }
 
+
   if(!ctx.config.websocketEndpoint){
-    ctx.outputChannel.appendLine('project mode: use vscode-inox (WASM)')
+    ctx.outputChannel.appendLine('project mode: use websocket with vscode-inox (WASM)')
     try {
       ctx.outputChannel.appendLine('use vscode-inox')
-      return createStartInoxWorker(ctx)
+      return async () => {
+        await createWebsocketServerWorker(ctx)
+        return createConnectToWebsocketServer(ctx, new URL('ws://localhost:' + PORT))()
+      }
     } catch (err) {
       ctx.outputChannel.appendLine('failed to start LSP worker: ' + inspect(err))
       throw new Error('abort')
     }
   } else {
     ctx.outputChannel.appendLine('project mode: use websocket')
-    return connectToWebsocketServer(ctx)
+    return createConnectToWebsocketServer(ctx)
   }
 }
 

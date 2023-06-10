@@ -3,18 +3,19 @@ import { MessageTransports } from 'vscode-languageclient/node';
 import { WebSocket as _Websocket } from 'ws';
 import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from './vscode-ws-jsonrpc/src/index';
 import { InoxExtensionContext } from './inox-extension-context';
+import { URL } from 'url';
 
 const PING_INTERVAL_MILLIS = 5000;
 
 let nextId = 0
 
-export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promise<MessageTransports> {
+export function connectToWebsocketServer(ctx: InoxExtensionContext, endpoint?: URL): () => Promise<MessageTransports> {
     return async () => {
         const websocketId = nextId++
 
         ctx.outputChannel.appendLine(`create websocket (id ${websocketId})`)
 
-        const endpoint = ctx.config.websocketEndpoint
+        endpoint = endpoint ?? ctx.config.websocketEndpoint
         if(!endpoint){
             ctx.outputChannel.appendLine(`no websocket endpoint set`)
             throw new Error(`no websocket endpoint set`)
@@ -81,7 +82,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
                     reader,
                     writer,
                 })
-                ctx.debugOutputChannel.appendLine('after resolve')
+                ctx.debugOutputChannel.appendLine('after resolve message transports')
             })
 
         })

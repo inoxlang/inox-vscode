@@ -4,13 +4,15 @@ import {Crypto} from '@peculiar/webcrypto'
 const crypto = new Crypto()
 
 import fetch from 'node-fetch';
+import {printDebug} from './debug'
 
 
-let printDebug: undefined|((...args: string[]) => any)
-
-export function setPrintDebug(fn: (...args: string[]) => any){
-	printDebug = fn
-}
+export type InoxExports = {
+	setup: (arg: { IWD: string, print_debug: Function }) => any,
+	write_lsp_message: (s: string) => void,
+	read_lsp_message: () => string|null
+  }
+  
 
 export const Go = (() => {
 	const enosys = () => {
