@@ -2,7 +2,6 @@ import { join } from "path";
 import { inspect } from "util";
 import { Worker } from 'worker_threads';
 import { InoxExtensionContext } from "./inox-extension-context";
-import stream from 'stream'
 
 let currentWorker: Worker;
 
@@ -19,7 +18,9 @@ export async function createWebsocketServerWorker(ctx: InoxExtensionContext): Pr
   ctx.outputChannel.appendLine('worker\'s path: ' + workerPath.toString())
 
   //create worker
-  const inoxWorker = new Worker(workerPath, {})
+  const inoxWorker = new Worker(workerPath, {
+    workerData: {localFilesystemDir: ctx.config.localFilesystemDir}
+  })
   currentWorker = inoxWorker
 
 

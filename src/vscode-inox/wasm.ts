@@ -6,9 +6,17 @@ const crypto = new Crypto()
 import fetch from 'node-fetch';
 import {printDebug} from './debug'
 
-
 export type InoxExports = {
-	setup: (arg: { IWD: string, print_debug: Function, print_trace: Function }) => any,
+	setup: (arg: { 
+		IWD: string, 
+		print_debug: Function, 
+		print_trace: Function 
+		get_file_content: (checksumSHA256: string) => [encoded: string, error: string]
+		get_filesystem_metadata: () => [metadata: unknown, error: string]
+
+		save_file_content: (checksumSHA256: string, encodedContent: string) => any
+		save_filesystem_metadata: (metadata: unknown) => any
+	}) => any,
 	write_lsp_message: (s: string) => void,
 	read_lsp_message: () => string|null
   }

@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { URL } from 'url';
 import { inspect } from 'util';
 import * as vscode from 'vscode';
@@ -25,7 +26,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     outputChannel.appendLine(msg)
     vscode.window.showErrorMessage(msg)
     return
-  } else if(websocketEndpoint != '') {
+  } else if (websocketEndpoint != '') {
     let errorMessage: string | undefined
 
     try {
@@ -47,20 +48,21 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
   let projectConfig: {} | undefined;
   let fileFsFolder: vscode.WorkspaceFolder | undefined
 
-  project_mode: if (inProjectMode) {
+  for (const folder of vscode.workspace.workspaceFolders || []) {
+    if (folder.uri.scheme != 'file') {
+      continue
+    }
+
+    fileFsFolder = folder
+  }
+
+  if (!fileFsFolder) {
+    vscode.window.showErrorMessage("no file:// folder")
+    return
+  }
+
+  if (inProjectMode) {
     projectConfig = {}
-
-    for (const folder of vscode.workspace.workspaceFolders || []) {
-      if (folder.uri.scheme != 'file') {
-        continue
-      }
-
-      fileFsFolder = folder
-    }
-
-    if (!fileFsFolder) {
-      break project_mode
-    }
 
     //create a watcher for the project file.
     const inoxProjectConfigURI = fileFsFolder.uri.with({ path: fileFsFolder.uri.path + '/' + INOX_PROJECT_FILENAME })
@@ -96,10 +98,11 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
   }
 
   const result: Configuration = {
-    project: projectConfig
+    project: projectConfig,
+    localFilesystemDir: join(fileFsFolder.uri.path, '.filesystem')
   }
 
-  if(websocketEndpoint !== ""){
+  if (websocketEndpoint !== "") {
     result.websocketEndpoint = new URL(websocketEndpoint)
   }
 
@@ -109,4 +112,5 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 export type Configuration = {
   websocketEndpoint?: URL
   project?: {},
+  localFilesystemDir: string
 }
