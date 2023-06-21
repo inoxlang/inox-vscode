@@ -7,7 +7,7 @@ import { join } from 'path';
 import { Go, InoxExports } from './wasm';
 import { printDebug, printTrace } from './debug';
 import { WebsocketLanguageServer } from './websocket-server';
-import { getFileContent, getFilesystemMetadata, saveEncodedFileContent, saveFilesystemMetadata } from './filesystem';
+import { deleteOldFileContents, getFileContent, getFilesystemMetadata, saveEncodedFileContent, saveFilesystemMetadata } from './filesystem';
 
 
 const parent = parentPort!
@@ -56,7 +56,12 @@ function setup() {
       saveEncodedFileContent(checksumSHA256, encodedContent, localFilesystemDir)
     },
     save_filesystem_metadata(metadata){
+      if(!Array.isArray(metadata)) {
+        printDebug('metadata of filesystem should be an array')
+        return
+      }
       saveFilesystemMetadata(metadata, localFilesystemDir)
+      deleteOldFileContents(metadata, localFilesystemDir)
     }
   })
 

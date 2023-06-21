@@ -1,11 +1,12 @@
 import * as fs from 'fs'
 import { join } from 'path'
 import { inspect } from 'util'
+import { printDebug, printTrace } from './debug'
 
 
 const FILESYSTEM_METADATA_FILENAME = 'metadata.json'
 
-export function saveFilesystemMetadata(metadata: unknown, localFilesystemDir: string){
+export function saveFilesystemMetadata(metadata: any[], localFilesystemDir: string){
     fs.mkdirSync(localFilesystemDir, {
         recursive: true
     })
@@ -13,6 +14,33 @@ export function saveFilesystemMetadata(metadata: unknown, localFilesystemDir: st
     const metadataFilePath = join(localFilesystemDir, FILESYSTEM_METADATA_FILENAME)
 
     fs.writeFileSync(metadataFilePath, JSON.stringify(metadata, null, " "))
+}
+
+
+export function deleteOldFileContents(metadata: any[], localFilesystemDir: string){
+    if(!fs.existsSync(localFilesystemDir)) {
+        return
+    }
+
+    const checksums = metadata.map(m => m.checksumSHA256).filter(m => m !== undefined)
+    if(checksums.every(e => typeof e == 'string')){
+        const entriesToDelete = fs.readdirSync(localFilesystemDir).filter(entry => !checksums.includes(entry) && !entry.endsWith('.json'))
+        
+        if(entriesToDelete.length == 0){
+            printTrace('no file contents to delete')
+        }
+
+        entriesToDelete.forEach(entry => {
+            if(checksums.includes(entry)){
+                return
+            }
+            const path = join(localFilesystemDir, entry)
+            printTrace('delete file content', path)
+            fs.rmSync(path)
+        })
+    } else {
+        printDebug('invalid checksums', JSON.stringify(checksums, null, ' '))
+    }
 }
 
 export function getFilesystemMetadata(localFilesystemDir: string): [metadata: unknown, err: string]{
@@ -42,6 +70,7 @@ export function saveEncodedFileContent(checksumSHA256: string, base64Content: st
 
     const filePath = join(localFilesystemDir, checksumSHA256)
 
+    printTrace('save file content', filePath)
 
     fs.writeFileSync(filePath,  Buffer.from(base64Content, 'base64'))
 }
