@@ -20,8 +20,6 @@ export function needsToRecreateLspClient(ctx: InoxExtensionContext, previousConf
   return false
 }
 
-
-
 function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
   if (!ctx.config.project) {
     ctx.outputChannel.appendLine('use inox binary')
@@ -30,7 +28,6 @@ function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
       args: ['lsp'],
     };
   }
-
 
   if(!ctx.config.websocketEndpoint){
     ctx.outputChannel.appendLine('project mode: use websocket with vscode-inox (WASM)')

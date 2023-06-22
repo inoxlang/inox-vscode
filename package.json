@@ -54,11 +54,11 @@
 		"configuration": {
 			"title": "Inox",
 			"properties": {
-				"inox.disableProjectMode": {
+				"inox.enableProjectMode": {
 					"order": 0,
 					"type": "boolean",
 					"default": false,
-					"description": "disable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
+					"description": "enable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
 				},
 				"inox.websocketEndpoint": {
 					"order": 1,
