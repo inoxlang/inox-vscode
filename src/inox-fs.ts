@@ -50,6 +50,10 @@ export class InoxFS implements vscode.FileSystemProvider {
 	stat(uri: vscode.Uri): Promise<vscode.FileStat> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} stat ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
+		if(this._client === undefined){
+			throw vscode.FileSystemError.FileNotFound(uri)
+		}
+
 		return this.lspClient.sendRequest('fs/fileStat', {
 			uri: uri.toString(),
 		}).then((stats): vscode.FileStat => {
@@ -62,6 +66,10 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 	readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
+		if(this._client === undefined){
+			return Promise.resolve([]) //in order to avoid some issues we pretend there is nothing.
+		}
 
 		return this.lspClient.sendRequest('fs/readDir', {
 			uri: uri.toString(),
@@ -84,6 +92,10 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 	readFile(uri: vscode.Uri): Promise<Uint8Array> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+
+		if(this._client === undefined){
+			throw vscode.FileSystemError.FileNotFound(uri)
+		}
 
 		return this.lspClient.sendRequest('fs/readFile', {
 			uri: uri.toString(),

@@ -64,12 +64,18 @@
 					"order": 1,
 					"type": "string",
 					"default": "",
-					"description": "the endpoint of the Websocket LSP server to use for project mode, if none is provided vscode-inox is used.",
+					"description": "the endpoint of the Websocket LSP server to use for project mode.",
 					"pattern": "^(|wss://.*)$"
 				}
 			}
 		},
 		"commands": [
+			{
+				"category": "Inox",
+				"command": "project/initialize",
+				"title": "Initialize new project in current folder",
+				"icon": "inox-128.png"
+			},
 			{
 				"category": "Inox",
 				"command": "lsp/restart",

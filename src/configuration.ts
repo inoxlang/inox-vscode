@@ -45,7 +45,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     }
   }
 
-  let projectConfig: {} | undefined;
+  let projectConfig: ProjectConfiguration | undefined;
   let fileFsFolder: vscode.WorkspaceFolder | undefined
 
   for (const folder of vscode.workspace.workspaceFolders || []) {
@@ -99,7 +99,8 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
   const result: Configuration = {
     project: projectConfig,
-    localFilesystemDir: join(fileFsFolder.uri.path, '.filesystem')
+    localFilesystemDir: join(fileFsFolder.uri.path, '.filesystem'),
+    localProjectRoot: fileFsFolder.uri.toString(),
   }
 
   if (websocketEndpoint !== "") {
@@ -111,6 +112,11 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
 export type Configuration = {
   websocketEndpoint?: URL
-  project?: {},
+  project?: ProjectConfiguration
   localFilesystemDir: string
+  localProjectRoot: string
+}
+
+export type ProjectConfiguration = {
+  id?: string
 }
