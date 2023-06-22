@@ -20,16 +20,19 @@ export class InoxExtensionContext {
     private _args: InoxExtensionContextArgs
     private _config: Configuration
     private _lspClient: LanguageClient | undefined
-
-    inoxFS: InoxFS | undefined
-
-    readonly base: vscode.ExtensionContext
+    private _projectOpen: boolean = false
+	private _projectOpenEmitter = new vscode.EventEmitter<void>();
 
     readonly outputChannel: vscode.OutputChannel
     readonly debugChannel: vscode.OutputChannel
     readonly traceChannel: vscode.OutputChannel
-
+    
+    readonly base: vscode.ExtensionContext
     readonly virtualWorkspace: boolean
+    readonly onProjectOpen = this._projectOpenEmitter.event
+    
+    inoxFS: InoxFS | undefined
+
 
     constructor(args: InoxExtensionContextArgs) {
         this._args = args
@@ -42,6 +45,8 @@ export class InoxExtensionContext {
         this.traceChannel = args.traceChannel
 
         vscode.workspace.onDidChangeConfiguration(() => this.updateConfiguration())
+
+        args.base.subscriptions.push(this)
     }
 
     async updateConfiguration(){
@@ -61,6 +66,8 @@ export class InoxExtensionContext {
             this._lspClient = this._args.createLSPClient(this, forceProjetMode)
             this.base.subscriptions.push(this._lspClient)
         } else {
+            this.projectOpen = false
+
             if (this.lspClient?.needsStop()) {
                 try {
                     this.debugChannel.appendLine('Stop LSP client')
@@ -78,7 +85,7 @@ export class InoxExtensionContext {
 
         if(this.config.project){
             if(this.inoxFS){
-                this.inoxFS.lspClient = this._lspClient
+                this.inoxFS.ctx = this
             }
         } else if(this.inoxFS){
             //TODO: remove filesystem.
@@ -101,7 +108,6 @@ export class InoxExtensionContext {
         return this._config
     }
 
-
     get fileWorkspaceFolder(){
         let fileFsFolder: vscode.WorkspaceFolder | undefined
 
@@ -119,5 +125,21 @@ export class InoxExtensionContext {
         }
 
         return fileFsFolder
+    }
+
+    get projectOpen() {
+        return this._projectOpen
+    }
+
+    set projectOpen(val: boolean) {
+        if(val){
+            this._projectOpenEmitter.fire()
+        }
+        this._projectOpen = val
+    }
+
+
+    dispose(){
+        this._projectOpenEmitter.dispose()
     }
 }

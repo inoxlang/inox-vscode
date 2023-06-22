@@ -15,3 +15,9 @@ export function stringifyCatchedValue(val: unknown){
 
     return msg
 }
+
+export function sleep(timeMillis: number){
+    return new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), timeMillis)
+    })
+}

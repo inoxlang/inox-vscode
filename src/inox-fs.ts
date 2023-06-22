@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { InoxExtensionContext } from './inox-extension-context';
+import { sleep } from './utils';
 
 export const INOX_FS_SCHEME = "inox"
+
 const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
 
 export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
@@ -18,7 +20,7 @@ export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
 export class InoxFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-	private _client: LanguageClient | undefined;
+	private _ctx: InoxExtensionContext | undefined;
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
@@ -28,30 +30,47 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 
-	set lspClient(client: LanguageClient) {
-		this._client = client
+	set ctx(context: InoxExtensionContext) {
+		this._ctx = context
+		context.onProjectOpen(() => {
+			//small hack
+			this._emitter.fire([
+				{type: vscode.FileChangeType.Created, uri: vscode.Uri.parse(INOX_FS_SCHEME+':/')
+			}])
+		})
+	}
+
+	get ctx() {
+		if (this._ctx === undefined) {
+			throw new Error('client not set')
+		}
+		return this._ctx
 	}
 
 	get lspClient() {
-		if (this._client === undefined) {
+		if (this._ctx?.lspClient === undefined) {
 			throw new Error('client not set')
 		}
-		return this._client
+		return this._ctx.lspClient
 	}
 
 
 	get lspClientPresenceSuffix(){
-		if(this._client === undefined){
+		if(this._ctx?.lspClient === undefined){
 			return '(no LSP client)'
 		}
 		return ''
 	}
 
-	stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+	get clientRunningAndProjectOpen(): boolean {
+		return (this._ctx?.lspClient !== undefined) && this._ctx.lspClient.isRunning() && this._ctx.projectOpen
+	}
+
+	async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} stat ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(this._client === undefined){
-			throw vscode.FileSystemError.FileNotFound(uri)
+		if(!this.clientRunningAndProjectOpen){
+			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
 		return this.lspClient.sendRequest('fs/fileStat', {
@@ -64,11 +83,11 @@ export class InoxFS implements vscode.FileSystemProvider {
 		})
 	}
 
-	readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+	async readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(this._client === undefined){
-			return Promise.resolve([]) //in order to avoid some issues we pretend there is nothing.
+		if(!this.clientRunningAndProjectOpen){
+			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
 		return this.lspClient.sendRequest('fs/readDir', {
@@ -90,11 +109,11 @@ export class InoxFS implements vscode.FileSystemProvider {
 		})
 	}
 
-	readFile(uri: vscode.Uri): Promise<Uint8Array> {
+	async readFile(uri: vscode.Uri): Promise<Uint8Array> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(this._client === undefined){
-			throw vscode.FileSystemError.FileNotFound(uri)
+		if(!this.clientRunningAndProjectOpen){
+			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
 		return this.lspClient.sendRequest('fs/readFile', {

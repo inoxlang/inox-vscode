@@ -78,6 +78,7 @@ export async function openProject(ctx: InoxExtensionContext) {
 
     try {
         await lspClient.sendRequest('project/open', {projectId: projectId})
+        ctx.projectOpen = true
     } catch(err){
         vscode.window.showErrorMessage(stringifyCatchedValue(err))
     }
