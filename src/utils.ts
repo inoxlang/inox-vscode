@@ -8,7 +8,8 @@ export function stringifyCatchedValue(val: unknown){
             msg += '\n' + val.stack
         }
     } else {
-        msg = inspect(val)
+        msg = inspect(val) + ' '
+
     }
 
     msg += Error().stack

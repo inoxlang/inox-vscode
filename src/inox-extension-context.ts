@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { LanguageClient } from 'vscode-languageclient/node';
+import { LanguageClient, State } from 'vscode-languageclient/node';
 import { InoxFS } from './inox-fs';
 import { Configuration } from './configuration';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp';
+import { stringifyCatchedValue } from './utils';
 
 type InoxExtensionContextArgs = {
     base: vscode.ExtensionContext,
@@ -20,6 +21,7 @@ export class InoxExtensionContext {
     private _args: InoxExtensionContextArgs
     private _config: Configuration
     private _lspClient: LanguageClient | undefined
+    private _lspClientFailedStart = false
     private _projectOpen: boolean = false
 	private _projectOpenEmitter = new vscode.EventEmitter<void>();
 
@@ -62,13 +64,17 @@ export class InoxExtensionContext {
 
     //start or restart the LSP client.
     async restartLSPClient(forceProjetMode: boolean): Promise<void> {
+        this.projectOpen = false
+
         if (this._lspClient === undefined) {
             this._lspClient = this._args.createLSPClient(this, forceProjetMode)
             this.base.subscriptions.push(this._lspClient)
+        } else if(this._lspClientFailedStart) {
+            //note: no need to call this._lspClient.dispose() because close() will be called.
+            this._lspClient = this._args.createLSPClient(this, forceProjetMode)
+            this.base.subscriptions.push(this._lspClient)
         } else {
-            this.projectOpen = false
-
-            if (this.lspClient?.needsStop()) {
+            if (this._lspClient.needsStop()) {
                 try {
                     this.debugChannel.appendLine('Stop LSP client')
                     await this._lspClient.stop(LSP_CLIENT_STOP_TIMEOUT_MILLIS)
@@ -93,11 +99,14 @@ export class InoxExtensionContext {
 
         this.debugChannel.appendLine('Start / Restart LSP client')
         try {
-            return this._lspClient.restart()
+            await this._lspClient.restart()
         } catch (err) {
-            this.outputChannel.appendLine(String(err))
+            const msg = stringifyCatchedValue(err)
+            this.outputChannel.appendLine(msg)
+            this.debugChannel.appendLine(msg)
+        } finally {
+            this._lspClientFailedStart = this._lspClient.state == State.Stopped
         }
-
     }
 
     get lspClient() {
