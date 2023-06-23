@@ -42,17 +42,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     getCurrentConfig: getConfiguration,
     createLSPClient: createLSPClient,
+    openProject: openProject
   })
 
   if (config.project) {
     ctx.inoxFS = createAndRegisterInoxFs(ctx)
   }
 
-  ctx.restartLSPClient(false).then(() => {
-    if(ctx.config.project?.id){
-      openProject(ctx)
-    }
-  })
+  ctx.restartLSPClient(false)
 
   vscode.commands.registerCommand('lsp/restart', async () => {
     await ctx.updateConfiguration()
