@@ -6,6 +6,7 @@ import { OutputChannel } from "vscode"
 
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
+const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
 
 export async function getConfiguration(outputChannel: OutputChannel): Promise<Configuration | undefined> {
@@ -13,6 +14,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
   const config = vscode.workspace.getConfiguration('inox')
   const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
   const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
+  const localProjectServerCommand = String(config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY))
 
   if (typeof websocketEndpoint != 'string') {
     let msg: string
@@ -99,22 +101,23 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
   const result: Configuration = {
     project: projectConfig,
-    localFilesystemDir: join(fileFsFolder.uri.path, '.filesystem'),
     localProjectRoot: fileFsFolder.uri.toString(),
+    localProjectServerCommand: localProjectServerCommand,
   }
 
   if (websocketEndpoint !== "") {
     result.websocketEndpoint = new URL(websocketEndpoint)
   }
 
+  outputChannel.appendLine(JSON.stringify(result, null, ' '))
   return result
 }
 
 export type Configuration = {
   websocketEndpoint?: URL
   project?: ProjectConfiguration
-  localFilesystemDir: string
   localProjectRoot: string
+  localProjectServerCommand: string
 }
 
 export type ProjectConfiguration = {

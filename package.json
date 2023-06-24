@@ -66,6 +66,12 @@
 					"default": "",
 					"description": "the endpoint of the Websocket LSP server to use for project mode.",
 					"pattern": "^(|wss://.*)$"
+				},
+				"inox.localProjectServerCommand": {
+					"order": 1,
+					"type": "string",
+					"default": "",
+					"description": "the command to start a local Inox project server."
 				}
 			}
 		},
@@ -73,7 +79,7 @@
 			{
 				"category": "Inox",
 				"command": "project/initialize",
-				"title": "Initialize new project in current folder",
+				"title": "Initialize new Project in Current Folder",
 				"icon": "inox-128.png"
 			},
 			{
