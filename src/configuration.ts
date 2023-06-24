@@ -49,6 +49,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
   let projectConfig: ProjectConfiguration | undefined;
   let fileFsFolder: vscode.WorkspaceFolder | undefined
+  let projectFilePresent = false
 
   for (const folder of vscode.workspace.workspaceFolders || []) {
     if (folder.uri.scheme != 'file') {
@@ -63,19 +64,20 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     return
   }
 
+  //check project config file even if not in project mode
+  const inoxProjectConfigURI = fileFsFolder.uri.with({ path: fileFsFolder.uri.path + '/' + INOX_PROJECT_FILENAME })
+
+  //try to read the project configuration file.
+  let configDocument: vscode.TextDocument | undefined;
+  try {
+    configDocument = await vscode.workspace.openTextDocument(inoxProjectConfigURI)
+    projectFilePresent = true
+  } catch {
+
+  }
+
   if (inProjectMode) {
     projectConfig = {}
-
-    //create a watcher for the project file.
-    const inoxProjectConfigURI = fileFsFolder.uri.with({ path: fileFsFolder.uri.path + '/' + INOX_PROJECT_FILENAME })
-
-    //try to read the project configuration file.
-    let configDocument: vscode.TextDocument | undefined;
-    try {
-      configDocument = await vscode.workspace.openTextDocument(inoxProjectConfigURI)
-    } catch {
-
-    }
 
     //try to parse the project configuration file.
     if (configDocument) {
@@ -101,6 +103,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
   const result: Configuration = {
     project: projectConfig,
+    projectFilePresent: projectFilePresent,
     localProjectRoot: fileFsFolder.uri.toString(),
     localProjectServerCommand: localProjectServerCommand,
   }
@@ -115,6 +118,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 export type Configuration = {
   websocketEndpoint?: URL
   project?: ProjectConfiguration
+  projectFilePresent: boolean
   localProjectRoot: string
   localProjectServerCommand: string[]
 }

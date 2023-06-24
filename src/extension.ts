@@ -5,6 +5,8 @@ import { InoxExtensionContext } from './inox-extension-context';
 import { createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
+import { sleep } from './utils';
+import { State } from 'vscode-languageclient';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -58,13 +60,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   })
 
   vscode.commands.registerCommand('project/initialize', async () => {
-    debugChannel.appendLine('restart LSP client in project mode')
     await ctx.updateConfiguration()
-    await ctx.restartLSPClient(true) //restart LSP client in project mode
 
-    if(ctx.lspClient?.isRunning()){
-      await initializeNewProject(ctx)
+    if(ctx.config.projectFilePresent){
+      const msg = '[project/initialize] project is already initialized'
+      vscode.window.showWarningMessage(msg)
+      ctx.debugChannel.appendLine(msg)
+      return
     }
+
+    debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
+
+    await ctx.restartLSPClient(true) //restart LSP client in project mode
+    await sleep(3000) //TODO: replace sleep
+    await initializeNewProject(ctx)
   })
 
 }

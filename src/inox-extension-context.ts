@@ -113,7 +113,9 @@ export class InoxExtensionContext {
         this.debugChannel.appendLine('Start / Restart LSP client')
         try {
             await this._lspClient.restart()
-            await this._args.openProject(this)
+            if(this.config.project){
+                await this._args.openProject(this)
+            }
         } catch (err) {
             const msg = stringifyCatchedValue(err)
             this.outputChannel.appendLine(msg)
