@@ -11,6 +11,7 @@ type InoxExtensionContextArgs = {
     initialConfig: Configuration,
     getCurrentConfig: (outputChannel: vscode.OutputChannel) => Promise<Configuration | undefined>,
     createLSPClient: (ctx: InoxExtensionContext, forceProjetMode: boolean) => LanguageClient
+    startLocalProjectServerIfNecessary: (ctx: InoxExtensionContext) => Promise<void>
     openProject: (ctx: InoxExtensionContext) => Promise<void>
     outputChannel: vscode.OutputChannel
     debugChannel: vscode.OutputChannel
@@ -66,6 +67,8 @@ export class InoxExtensionContext {
     //start or restart the LSP client.
     async restartLSPClient(forceProjetMode: boolean): Promise<void> {
         this.projectOpen = false
+
+        await this._args.startLocalProjectServerIfNecessary(this)
 
         if (this._lspClient === undefined) {
             this._lspClient = this._args.createLSPClient(this, forceProjetMode)

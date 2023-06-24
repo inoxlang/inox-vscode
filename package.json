@@ -69,8 +69,11 @@
 				},
 				"inox.localProjectServerCommand": {
 					"order": 1,
-					"type": "string",
-					"default": "",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
 					"description": "the command to start a local Inox project server."
 				}
 			}

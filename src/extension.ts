@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
 import { createAndRegisterInoxFs } from './inox-fs';
-import { createLSPClient } from './lsp';
+import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
 
 let outputChannel: vscode.OutputChannel;
@@ -42,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     getCurrentConfig: getConfiguration,
     createLSPClient: createLSPClient,
+    startLocalProjectServerIfNecessary: startLocalProjectServerIfNecessary,
     openProject: openProject
   })
 

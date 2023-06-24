@@ -14,7 +14,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
   const config = vscode.workspace.getConfiguration('inox')
   const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
   const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
-  const localProjectServerCommand = String(config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY))
+  const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
 
   if (typeof websocketEndpoint != 'string') {
     let msg: string
@@ -109,7 +109,6 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     result.websocketEndpoint = new URL(websocketEndpoint)
   }
 
-  outputChannel.appendLine(JSON.stringify(result, null, ' '))
   return result
 }
 
@@ -117,7 +116,7 @@ export type Configuration = {
   websocketEndpoint?: URL
   project?: ProjectConfiguration
   localProjectRoot: string
-  localProjectServerCommand: string
+  localProjectServerCommand: string[]
 }
 
 export type ProjectConfiguration = {
