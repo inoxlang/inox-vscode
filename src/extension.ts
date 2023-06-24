@@ -69,11 +69,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       return
     }
 
-    debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
 
+    debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
     await ctx.restartLSPClient(true) //restart LSP client in project mode
-    await sleep(3000) //TODO: replace sleep
-    await initializeNewProject(ctx)
+
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Window,
+        cancellable: false,
+        title: 'Creating Inox project in current folder'
+    }, async (progress) => {
+        progress.report({  increment: 0 });
+
+        //wait for LSP client
+        await sleep(3000) //TODO: replace sleep
+
+        await initializeNewProject(ctx)
+    
+        progress.report({ increment: 100 });
+    });
   })
 
 }
