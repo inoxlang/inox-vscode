@@ -26,6 +26,7 @@ export class InoxExtensionContext {
     private _lspClientFailedStart = false
     private _projectOpen: boolean = false
 	private _projectOpenEmitter = new vscode.EventEmitter<void>();
+    private _restartingClient = false
 
     readonly outputChannel: vscode.OutputChannel
     readonly debugChannel: vscode.OutputChannel
@@ -66,10 +67,15 @@ export class InoxExtensionContext {
 
     //start or restart the LSP client.
     async restartLSPClient(forceProjetMode: boolean): Promise<void> {
+        if(this._restartingClient){
+            return
+        }
         this.projectOpen = false
+        this._restartingClient = true
 
         if(! await this._args.startLocalProjectServerIfNecessary(this)){
             this.debugChannel.appendLine('LSP server is not running, abort client restart')
+            this._restartingClient = false
             return 
         }
 
@@ -114,6 +120,7 @@ export class InoxExtensionContext {
             this.debugChannel.appendLine(msg)
         } finally {
             this._lspClientFailedStart = this._lspClient.state == State.Stopped
+            this._restartingClient = false
         }
     }
 
