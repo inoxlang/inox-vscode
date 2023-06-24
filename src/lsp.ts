@@ -6,6 +6,7 @@ import { INOX_FS_SCHEME } from "./inox-fs";
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
 import child_process from 'child_process'
 import { sleep } from './utils';
+import { LOCAL_PROJECT_SERVER_COMMAND_ENTRY } from './configuration';
 
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
@@ -23,19 +24,27 @@ function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
   }
 }
 
-export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionContext){
+export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionContext): Promise<boolean> {
   //if there is no websocket endpoint nor a command to start a local project server we do nothing
-  if(ctx.config.websocketEndpoint == undefined || ctx.config.localProjectServerCommand.length == 0){
-    return
+  if(ctx.config.websocketEndpoint == undefined){
+    return true
   }
 
   let isRunning = await isWebsocketServerRunning(ctx, ctx.config.websocketEndpoint)
   if(isRunning){
     ctx.debugChannel.appendLine('LSP server is running')
-    return
+    return true
   }
 
   const command = ctx.config.localProjectServerCommand
+  if(command.length == 0) {
+    vscode.window.showWarningMessage(
+      `No Inox LSP server is running on ${ctx.config.websocketEndpoint} and the setting ${LOCAL_PROJECT_SERVER_COMMAND_ENTRY} is not set.` +
+      ` Either set the command to start a local Inox LSP server or manually start a server on ${ctx.config.websocketEndpoint}.`
+    )
+    return false
+  }
+
   const msg = LOCAL_LSP_SERVER_LOG_PREFIX + 'LSP server is not running, execute command to start local server: ' + command.join(' ')
   ctx.outputChannel.appendLine(msg)
   ctx.debugChannel.appendLine(msg)
@@ -73,7 +82,7 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
       const msg = LOCAL_LSP_SERVER_LOG_PREFIX + 'local LSP server is running'
       ctx.outputChannel.appendLine(msg)
       ctx.debugChannel.appendLine(msg)
-      return
+      return true
     }
   }
 
@@ -97,6 +106,7 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
     ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + 'child process exit code: ' + child.exitCode)
   }
  
+  return false
 }
 
 export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: boolean) {

@@ -6,7 +6,7 @@ import { OutputChannel } from "vscode"
 
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
-const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
+export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
 
 export async function getConfiguration(outputChannel: OutputChannel): Promise<Configuration | undefined> {

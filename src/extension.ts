@@ -61,7 +61,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     debugChannel.appendLine('restart LSP client in project mode')
     await ctx.updateConfiguration()
     await ctx.restartLSPClient(true) //restart LSP client in project mode
-    await initializeNewProject(ctx)
+
+    if(ctx.lspClient?.isRunning()){
+      await initializeNewProject(ctx)
+    }
   })
 
 }
