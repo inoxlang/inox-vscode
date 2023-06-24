@@ -40,21 +40,24 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
   ctx.outputChannel.appendLine(msg)
   ctx.debugChannel.appendLine(msg)
 
-  //execute the command in a detached process
-  //see: https://nodejs.org/api/child_process.html#optionsdetached
-
-
-  const child = child_process.spawn(command[0], command.slice(1), {
-    detached: true,
-    stdio: 'ignore'
-  })
-
-  //allow parent to not wait for child to exit.
-  child.unref()
+  const child = child_process.spawn(command[0], command.slice(1))
 
   child.on('error', (err) => {
     ctx.outputChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + String(err))
     ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + String(err))
+  })
+ 
+  child.stdout.setEncoding('utf8')
+  child.stdout.on('data', data => {
+    ctx.debugChannel.appendLine(
+      LOCAL_LSP_SERVER_LOG_PREFIX + "\n-----------------\n" + 
+      data.toString() +
+      "-----------------\n")
+  })
+
+  child.stderr.setEncoding('utf8')
+  child.stderr.on('data', data => {
+    ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + data.toString())
   })
 
   //check if the websocket server is running
