@@ -91,6 +91,41 @@
 				"title": "Restart LSP client",
 				"icon": "inox-128.png"
 			}
+		],
+		"breakpoints": [
+			{
+				"language": "inox"
+			}
+		],
+		"debuggers": [
+			{
+				"type": "inox",
+				"label": "Inox Debug",
+				"languages": [
+					"inox"
+				],
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "The program to debug."
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"type": "inox",
+						"request": "launch",
+						"name": "Launch Inox Program",
+						"program": "${workspaceFolder:Project FS}/main.ix"
+					}
+				]
+			}
 		]
 	},
 	"capabilities": {
@@ -116,7 +151,9 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.3",
+		"@vscode/debugadapter": "^1.61.0",
 		"node-fetch": "^2.6.11",
+		"vscode-debugprotocol": "^1.51.0",
 		"vscode-jsonrpc": "^8.1.0",
 		"vscode-languageclient": "^8.1.0",
 		"web-worker": "^1.2.0",

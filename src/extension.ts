@@ -6,7 +6,7 @@ import { createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
 import { sleep } from './utils';
-import { State } from 'vscode-languageclient';
+import { InlineDebugAdapterFactory } from './debug';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -54,6 +54,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   ctx.restartLSPClient(false)
 
+
+  //register debug adapter
+
+  context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', new InlineDebugAdapterFactory()));
+
+  //register commands
+
   vscode.commands.registerCommand('lsp/restart', async () => {
     await ctx.updateConfiguration()
     return ctx.restartLSPClient(false)
@@ -68,7 +75,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       ctx.debugChannel.appendLine(msg)
       return
     }
-
 
     debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
     await ctx.restartLSPClient(true) //restart LSP client in project mode
