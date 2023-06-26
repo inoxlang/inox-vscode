@@ -4,7 +4,7 @@ import {
     Logger, logger,
     DebugSession,
     InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
-    Thread, StackFrame, Scope, Source, Handles, Breakpoint
+    Thread, StackFrame, Scope, Source, Handles, Breakpoint, ExitedEvent
 } from '@vscode/debugadapter';
 
 import { DebugProtocol } from '@vscode/debugprotocol'
@@ -74,6 +74,18 @@ class InoxDebugSession extends DebugSession {
      */
     protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
         const lsp = this.lspClient;
+
+        lsp.onNotification("debug/terminated", () => {
+            this.sendEvent(new TerminatedEvent())
+        })
+
+        lsp.onNotification("debug/exited", () => {
+            this.sendEvent(new ExitedEvent(0))
+        })
+
+        lsp.onNotification("debug/output", event => {
+            this.sendEvent(event as DebugProtocol.OutputEvent)
+        })
 
         const initRequest: DebugProtocol.InitializeRequest = {
             type: 'request',
