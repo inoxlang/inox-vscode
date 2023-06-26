@@ -57,7 +57,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   //register debug adapter
 
-  context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', new InlineDebugAdapterFactory()));
+  context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', new InlineDebugAdapterFactory(ctx)));
 
   //register commands
 
