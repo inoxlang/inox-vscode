@@ -238,4 +238,26 @@ class InoxDebugSession extends DebugSession {
         })
     }
 
+
+    protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const continueRequest: DebugProtocol.ContinueRequest = {
+            type: 'request',
+            command: "continue",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/continue', {
+            sessionID: this.sessionID,
+            request: continueRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.ContinueResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
 }
