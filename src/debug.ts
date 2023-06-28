@@ -87,6 +87,10 @@ class InoxDebugSession extends DebugSession {
             this.sendEvent(event as DebugProtocol.OutputEvent)
         })
 
+        lsp.onNotification("debug/stopped", event => {
+            this.sendEvent(event as DebugProtocol.StoppedEvent)
+        })
+
         const initRequest: DebugProtocol.InitializeRequest = {
             type: 'request',
             command: "initialize",
@@ -136,6 +140,50 @@ class InoxDebugSession extends DebugSession {
         })
     }
 
+    protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const setBreakpointsRequest: DebugProtocol.SetBreakpointsRequest = {
+            type: 'request',
+            command: "setBreakpoints",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/setBreakpoints', {
+            sessionID: this.sessionID,
+            request: setBreakpointsRequest
+        }).then(() => {
+            response.seq = 0
+            this.sendResponse(response)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
+    protected threadsRequest(response: DebugProtocol.ThreadsResponse, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const threadsRequest: DebugProtocol.ThreadsRequest = {
+            type: 'request',
+            command: "threads",
+            seq: this.nextSeq++,
+            arguments: {}
+        }
+
+        this.ctx.debugChannel.appendLine('SEND THREADS REQUEST')
+        lsp.sendRequest('debug/threads', {
+            sessionID: this.sessionID,
+            request: threadsRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.ThreadsResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
     protected async launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments) {
         const lsp = this.lspClient;
 
@@ -166,4 +214,27 @@ class InoxDebugSession extends DebugSession {
             this.sendError(response, reason)
         })
     }
+
+    protected pauseRequest(response: DebugProtocol.PauseResponse, args: DebugProtocol.PauseArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const launchRequest: DebugProtocol.PauseRequest = {
+            type: 'request',
+            command: "pause",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/pause', {
+            sessionID: this.sessionID,
+            request: launchRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.PauseResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
 }
