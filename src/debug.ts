@@ -326,4 +326,26 @@ class InoxDebugSession extends DebugSession {
             this.sendError(response, reason)
         })
     }
+
+    protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const continueRequest: DebugProtocol.DisconnectRequest = {
+            type: 'request',
+            command: "disconnect",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/disconnect', {
+            sessionID: this.sessionID,
+            request: continueRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.DisassembleResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
 }
