@@ -206,6 +206,29 @@ class InoxDebugSession extends DebugSession {
         })
     }
 
+    protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const scopesRequest: DebugProtocol.VariablesRequest = {
+            type: 'request',
+            command: "variables",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/variables', {
+            sessionID: this.sessionID,
+            request: scopesRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.VariablesResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+
+    }
+
     protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments, request?: DebugProtocol.Request | undefined): void {
         const lsp = this.lspClient;
 
