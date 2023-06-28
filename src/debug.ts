@@ -153,9 +153,10 @@ class InoxDebugSession extends DebugSession {
         lsp.sendRequest('debug/setBreakpoints', {
             sessionID: this.sessionID,
             request: setBreakpointsRequest
-        }).then(() => {
-            response.seq = 0
-            this.sendResponse(response)
+        }).then(response => {
+            const resp = response as DebugProtocol.SetBreakpointsResponse
+            resp.seq = 0
+            this.sendResponse(resp)
         }, reason => {
             this.sendError(response, reason)
         })
