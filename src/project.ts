@@ -17,6 +17,15 @@ export async function initializeNewProject(ctx: InoxExtensionContext){
         return
     }
 
+    let initialLaunchConfigurations: any[]
+    try {
+        initialLaunchConfigurations = 
+            ctx.base.extension.packageJSON.contributes.debuggers[0].initialConfigurations
+    } catch {
+        vscode.window.showWarningMessage('failed to get initial launch configurations')
+        return
+    }
+
     const workspaceFileContent = {
         "folders": [
             {
@@ -29,8 +38,13 @@ export async function initializeNewProject(ctx: InoxExtensionContext){
         ],
         "settings": {
             "inox.enableProjectMode": true
+        },
+        "launch": {
+            "version": "0.2.0",
+            "configurations": initialLaunchConfigurations
         }
     }
+
 
     const inoxProjectFileContent: Record<string, unknown> = {}
 
@@ -40,7 +54,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext){
 
 
     if(! fs.existsSync(workspaceFile)){
-        fs.writeFileSync(workspaceFile, JSON.stringify(workspaceFileContent, null, ' '))
+        fs.writeFileSync(workspaceFile, JSON.stringify(workspaceFileContent, null, '  '))
     }
     
     if(! fs.existsSync(inoxProjectFile)){
