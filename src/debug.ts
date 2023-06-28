@@ -172,12 +172,55 @@ class InoxDebugSession extends DebugSession {
             arguments: {}
         }
 
-        this.ctx.debugChannel.appendLine('SEND THREADS REQUEST')
         lsp.sendRequest('debug/threads', {
             sessionID: this.sessionID,
             request: threadsRequest
         }).then(async response => {
             const resp = response as DebugProtocol.ThreadsResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
+    protected scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const scopesRequest: DebugProtocol.ScopesRequest = {
+            type: 'request',
+            command: "scopes",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/scopes', {
+            sessionID: this.sessionID,
+            request: scopesRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.ScopesResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
+    protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const scopesRequest: DebugProtocol.StackTraceRequest = {
+            type: 'request',
+            command: "stackTrace",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/stackTrace', {
+            sessionID: this.sessionID,
+            request: scopesRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.StackTraceResponse
             resp.seq = 0
             this.sendResponse(resp)
         }, reason => {
