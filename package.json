@@ -82,14 +82,12 @@
 			{
 				"category": "Inox",
 				"command": "project/initialize",
-				"title": "Initialize new Project in Current Folder",
-				"icon": "inox-128.png"
+				"title": "Initialize new Project in Current Folder"
 			},
 			{
 				"category": "Inox",
 				"command": "lsp/restart",
-				"title": "Restart LSP client",
-				"icon": "inox-128.png"
+				"title": "Restart LSP client"
 			}
 		],
 		"breakpoints": [
