@@ -3,7 +3,7 @@
 	"displayName": "inox",
 	"description": "",
 	"version": "0.0.4",
-	"icon": "inox-128.png",
+	"icon": "assets/inox-128.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/inoxlang/inox-vscode"
