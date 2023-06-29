@@ -33,6 +33,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 	set ctx(context: InoxExtensionContext) {
 		this._ctx = context
 		context.onProjectOpen(() => {
+			vscode.workspace.textDocuments
+
+			//if the active tab is a file in the current filesystem we re-open the document
+			//because the tab could show an error related to the filesystem not being directly available. 
+			const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab
+			if(activeTab != undefined && (activeTab.input instanceof vscode.TabInputText)){
+				const input = activeTab.input;
+				if(input.uri.scheme == INOX_FS_SCHEME){
+					vscode.window.showTextDocument(input.uri)
+				}
+			}
+
 			//small hack
 			this._emitter.fire([
 				{type: vscode.FileChangeType.Created, uri: vscode.Uri.parse(INOX_FS_SCHEME+':/')
