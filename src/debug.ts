@@ -261,6 +261,9 @@ class InoxDebugSession extends DebugSession {
             arguments: args
         }
 
+        // wait until configuration has finished (and configurationDoneRequest has been called)
+        await this._configurationDone.wait(1000);
+
         lsp.sendRequest('debug/launch', {
             sessionID: this.sessionID,
             request: launchRequest
@@ -269,13 +272,12 @@ class InoxDebugSession extends DebugSession {
 
             resp.seq = 0
             this.sendResponse(resp)
-            
-            if(!resp.success){
+
+            if (!resp.success) {
                 return
             }
 
-            // wait until configuration has finished (and configurationDoneRequest has been called)
-            await this._configurationDone.wait(1000);
+
             this.sendResponse(resp);
         }, reason => {
             this.sendError(response, reason)
