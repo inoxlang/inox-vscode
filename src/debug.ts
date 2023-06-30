@@ -75,19 +75,19 @@ class InoxDebugSession extends DebugSession {
     protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
         const lsp = this.lspClient;
 
-        lsp.onNotification("debug/terminated", () => {
+        lsp.onNotification("debug/terminatedEvent", () => {
             this.sendEvent(new TerminatedEvent())
         })
 
-        lsp.onNotification("debug/exited", () => {
+        lsp.onNotification("debug/exitedEvent", () => {
             this.sendEvent(new ExitedEvent(0))
         })
 
-        lsp.onNotification("debug/output", event => {
+        lsp.onNotification("debug/outputEvent", event => {
             this.sendEvent(event as DebugProtocol.OutputEvent)
         })
 
-        lsp.onNotification("debug/stopped", event => {
+        lsp.onNotification("debug/stoppedEvent", event => {
             this.sendEvent(event as DebugProtocol.StoppedEvent)
         })
 
