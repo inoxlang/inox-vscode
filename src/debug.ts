@@ -162,6 +162,28 @@ class InoxDebugSession extends DebugSession {
         })
     }
 
+    protected setExceptionBreakPointsRequest(response: DebugProtocol.SetExceptionBreakpointsResponse, args: DebugProtocol.SetExceptionBreakpointsArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const setBreakpointsRequest: DebugProtocol.SetExceptionBreakpointsRequest = {
+            type: 'request',
+            command: "setExceptionBreakpoints",
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/setExceptionBreakpoints', {
+            sessionID: this.sessionID,
+            request: setBreakpointsRequest
+        }).then(response => {
+            const resp = response as DebugProtocol.SetExceptionBreakpointsResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
     protected threadsRequest(response: DebugProtocol.ThreadsResponse, request?: DebugProtocol.Request | undefined): void {
         const lsp = this.lspClient;
 
