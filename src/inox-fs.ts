@@ -173,6 +173,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 		return this.lspClient.sendRequest('fs/deleteFile', {
 			uri: uri.toString(),
+			recursive: true
 		})
 	}
 
