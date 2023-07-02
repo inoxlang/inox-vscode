@@ -63,7 +63,7 @@
 				"inox.websocketEndpoint": {
 					"order": 1,
 					"type": "string",
-					"default": "",
+					"default": "wss://localhost:8305",
 					"description": "the endpoint of the Websocket LSP server to use for project mode.",
 					"pattern": "^(|wss://.*)$"
 				},
