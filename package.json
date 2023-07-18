@@ -26,7 +26,8 @@
 				"extensions": [
 					".ix"
 				],
-				"configuration": "./language-configuration.json"
+				"configuration": "./language-configuration.json",
+				"firstLine": "(\\s*#!.*\\binox\\b.*|manifest\\s*[{])"
 			}
 		],
 		"grammars": [
