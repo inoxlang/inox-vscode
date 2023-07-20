@@ -21,6 +21,14 @@
 		],
 		"description": "empty manifest"
 	},
+    "includable-chunk": {
+		"scope": "Inox",
+		"prefix": "includable-chunk",
+		"body": [
+			"includable-chunk"
+		],
+		"description": "empty manifest"
+	},
     "walk": {
         "scope": "Inox",
 		"prefix": "walk",
