@@ -2,11 +2,12 @@ import * as vscode from 'vscode';
 
 import { getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
-import { createAndRegisterInoxFs } from './inox-fs';
+import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
 import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
 import { sleep } from './utils';
 import { InlineDebugAdapterFactory } from './debug';
+import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -53,6 +54,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }
 
   ctx.restartLSPClient(false)
+
+  //register formatting provider
+
+  vscode.languages.registerDocumentFormattingEditProvider([{ scheme: INOX_FS_SCHEME, language: 'inox' }], {
+		provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
+      if(ctx.lspClient === undefined){
+        return []
+      }
+
+      const params: DocumentFormattingParams = {
+        textDocument: TextDocumentIdentifier.create(document.uri.toString()),
+        options: options,
+      }
+
+      return ctx.lspClient.sendRequest('textDocument/formatting', params)
+    }
+  })
 
 
   //register debug adapter
