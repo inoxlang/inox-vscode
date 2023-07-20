@@ -667,7 +667,7 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "(?<![-_])\\b(manifest|drop-perms|import|allow|as|const|var|assign|args|Mapping|udata|concat|supersys)\\b(?![-_])"
+					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|allow|as|const|var|assign|args|Mapping|udata|concat|supersys)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",
