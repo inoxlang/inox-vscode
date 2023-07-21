@@ -262,7 +262,6 @@
             "<html>",
             "<head>",
             "\t<meta charset=\"utf-8\"/>",
-            "\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/>",
             "\t<title>Inox IDE debugger</title>",
             "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>",
             "</head>",
