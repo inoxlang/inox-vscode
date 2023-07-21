@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { LanguageClientOptions } from "vscode-languageclient";
-import { LanguageClient, ServerOptions } from "vscode-languageclient/node";
+import { ApplyWorkspaceEditParams, LanguageClientOptions } from "vscode-languageclient";
+import { LanguageClient, ServerOptions, Range } from "vscode-languageclient/node";
 import { InoxExtensionContext } from "./inox-extension-context";
 import { INOX_FS_SCHEME } from "./inox-fs";
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
@@ -128,6 +128,15 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
   };
 
   const client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptions);
+  client.onRequest('cursor/setPosition', (params: Range) => {
+    const editor = vscode.window.activeTextEditor;
+    if(!editor) {
+      return
+    }
+    const newCursorPosition = new vscode.Position(params.start.line, params.start.character)
+    const newSelection = new vscode.Selection(newCursorPosition, newCursorPosition);
+    editor.selections = [newSelection]
+  })
   return client
 }
 
