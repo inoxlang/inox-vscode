@@ -455,6 +455,12 @@
 		"pattern-content": {
 			"patterns": [
 				{
+					"include": "#constants"
+				},
+				{
+					"include": "#keywords"
+				},
+				{
 					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![?]?:)",
 					"name": "entity.name.type.inox"
 				},
@@ -511,7 +517,13 @@
 			"patterns": [
 				{
 					"begin": "%\\(",
+					"beginCaptures": {
+						"0":  {"name" :"punctuation.begin.bracket.inox"}
+					},
 					"end": "\\)",
+					"endCaptures": {
+						"0":  {"name" :"punctuation.end.bracket.inox"}
+					},
 					"patterns": [
 						{"include": "$self"}
 					]
@@ -532,11 +544,7 @@
 						"3": {
 							"patterns": [
 								{
-									"match": "([a-zA-Z_][a-zA-Z0-9._-]*)\\b",
-									"name": "entity.name.type.inox"
-								},
-								{
-									"include": "#named-patterns"
+									"include": "#pattern-content"
 								}
 							]
 						}
