@@ -373,7 +373,53 @@ class InoxDebugSession extends DebugSession {
         })
     }
 
-    protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request | undefined): void {
+    protected stepInRequest(response: DebugProtocol.StepInResponse, args: DebugProtocol.StepInArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const stepInRequest: DebugProtocol.StepInRequest = {
+            type: 'request',
+            command: 'stepIn',
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/stepIn', {
+            sessionID: this.sessionID,
+            request: stepInRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.StepInResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+    }
+
+
+   protected stepOutRequest(response: DebugProtocol.StepOutResponse, args: DebugProtocol.StepOutArguments, request?: DebugProtocol.Request | undefined): void {
+        const lsp = this.lspClient;
+
+        const stepOutRequest: DebugProtocol.StepOutRequest = {
+            type: 'request',
+            command: 'stepOut',
+            seq: this.nextSeq++,
+            arguments: args
+        }
+
+        lsp.sendRequest('debug/stepOut', {
+            sessionID: this.sessionID,
+            request: stepOutRequest
+        }).then(async response => {
+            const resp = response as DebugProtocol.StepOutResponse
+            resp.seq = 0
+            this.sendResponse(resp)
+        }, reason => {
+            this.sendError(response, reason)
+        })
+   }
+
+
+   protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request | undefined): void {
         const lsp = this.lspClient;
 
         const continueRequest: DebugProtocol.DisconnectRequest = {
