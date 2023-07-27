@@ -91,6 +91,10 @@ class InoxDebugSession extends DebugSession {
             this.sendEvent(event as DebugProtocol.StoppedEvent)
         })
 
+        lsp.onNotification("debug/threadEvent", event => {
+            this.sendEvent(event as DebugProtocol.ThreadEvent)
+        })
+
         const initRequest: DebugProtocol.InitializeRequest = {
             type: 'request',
             command: "initialize",
