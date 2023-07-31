@@ -679,7 +679,7 @@
 				},
 				{
 					"name": "keyword.control.inox",
-					"match": "(?<![-_])\\b(if|else|switch|match|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received|preinit)\\b(?![-_])"
+					"match": "(?<![-_])\\b(if|else|switch|match|defaultcase|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received|preinit)\\b(?![-_])"
 				},
 				{
 					"name": "storage.type",
