@@ -120,7 +120,13 @@
 					{
 						"type": "inox",
 						"request": "launch",
-						"name": "Launch Inox Program",
+						"name": "Launch Main Inox Program",
+						"program": "/main.ix"
+					},
+					{
+						"type": "inox",
+						"request": "launch",
+						"name": "Launch Current Inox Program",
 						"program": "${file}"
 					}
 				]
