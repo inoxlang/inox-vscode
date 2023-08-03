@@ -262,11 +262,11 @@
             "<html>",
             "<head>",
             "\t<meta charset=\"utf-8\"/>",
-            "\t<title>Inox IDE debugger</title>",
+            "\t<title>$1</title>",
             "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>",
             "</head>",
             "<body>",
-            "\t$1",
+            "\t$2",
             "</body>",
             "</html>"
         ]
