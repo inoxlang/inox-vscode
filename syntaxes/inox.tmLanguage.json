@@ -612,74 +612,58 @@
 			"patterns": [
 				{
 					"comment": "Function declarations",
-					"match": "(\\bfn)\\b\\s+(\\w+)\\s*\\(([^\\)]+)\\)",
-					"captures": {
+					"begin": "(\\bfn)\\b\\s+(\\w+)\\s*\\(",
+					"beginCaptures": {
 						"1": {
 							"name": "keyword.function.inox"
 						},
 						"2": {
 							"name": "entity.name.function.inox"
-						},
-						"3": {
-							"patterns": [
-								{
-									"match": "(\\w+)\\s+(\\w+)",
-									"captures": {
-										"1": {
-											"name": "variable.name.inox"
-										},
-										"2": {
-											"name": "entity.name.type.inox"
-										}
-									}
-								},
-								{
-									"match": "(\\w+)",
-									"name": "variable.name.inox"
-								},
-								{
-									"include": "#named-patterns"
-								}
-							]
 						}
-					}
+					},
+					"patterns": [
+						{
+							"match": "(?<=[(,]\\s*)\\b([a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
+							"name": "variable.name.inox"
+						}, 
+						{
+							"match": "\\|"
+						},
+						{
+
+							"include": "#pattern-content"
+						},
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\)"
 				},
 				{
 					"comment": "Function expressions",
-					"match": "(\\bfn)\\s*\\(([^\\)]+)\\)",
-					"captures": {
+					"begin": "(\\bfn)\\s*\\(",
+					"beginCaptures": {
 						"1": {
 							"name": "keyword.function.inox"
-						},
-						"2": {
-							"patterns": [
-								{
-									"match": "(\\w+)\\s+(\\w+)",
-									"captures": {
-										"1": {
-											"name": "variable.name.inox"
-										},
-										"2": {
-											"name": "entity.name.type.inox"
-										}
-									}
-								},
-								{
-									"match": "(\\w+)",
-									"name": "variable.name.inox"
-								},
-								{
-									"include": "#unprefixed-list-patterns"
-								},
-								{
-									"include": "#unprefixed-object-patterns"
-								},
-								{
-									"include": "#named-patterns"
-								}
-							]
 						}
-					}
+					},
+					"patterns": [
+						{
+							"match": "(?<=[(,]\\s*)\\b([a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
+							"name": "variable.name.inox"
+						}, 
+						{
+							"match": "\\|"
+						},
+						{
+
+							"include": "#pattern-content"
+						},
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\)"
 				}
 			]
 		},
