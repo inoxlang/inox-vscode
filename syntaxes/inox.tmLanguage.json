@@ -101,11 +101,11 @@
 			"patterns": [
 				{
 					"name": "variable.name",
-					"match": "[$][a-zA-Z-]*\\b"
+					"match": "[$][_a-zA-Z-]*\\b"
 				},
 				{
 					"name": "variable.name.global",
-					"match": "[$][$][a-zA-Z-]*\\b"
+					"match": "[$][$][_a-zA-Z-]*\\b"
 				}
 			]
 		},
@@ -623,7 +623,7 @@
 					},
 					"patterns": [
 						{
-							"match": "(?<=[(,]\\s*)\\b([a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
+							"match": "(?<=[(,]\\s*)\\b([_a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
 							"name": "variable.name.inox"
 						}, 
 						{
@@ -649,7 +649,7 @@
 					},
 					"patterns": [
 						{
-							"match": "(?<=[(,]\\s*)\\b([a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
+							"match": "(?<=[(,]\\s*)\\b([_a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
 							"name": "variable.name.inox"
 						}, 
 						{
