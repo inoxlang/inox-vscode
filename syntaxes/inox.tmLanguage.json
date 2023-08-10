@@ -30,6 +30,9 @@
 			"include": "#local-var-declarations"
 		},
 		{
+			"include": "#return-type"
+		},
+		{
 			"include": "#functions"
 		},
 		{
@@ -459,6 +462,16 @@
 					"name": "entity.name.type.inox"
 				},
 				{
+					"begin": "\\(",
+					"patterns": [
+						{"include": "#pattern-content"}
+					],
+					"end": "\\)"
+				},
+				{
+					"match": "\\|"
+				},
+				{
 					"include": "#unprefixed-list-patterns"
 				},
 				{
@@ -607,6 +620,16 @@
 					]
 				}
 			}
+		},
+		"return-type": {
+			"begin": "(?<=\\))\\s*(?=[a-zA-Z_%#\\{\\[\\(\\]])",
+			"patterns": [
+				{
+
+					"include": "#pattern-content"
+				}
+			],
+			"end": "(?=\\{)"
 		},
 		"functions": {
 			"patterns": [
