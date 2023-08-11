@@ -115,7 +115,7 @@
 		"numbers": {
 			"patterns": [
 				{
-					"comment" : "date literals",
+					"comment": "date literals",
 					"match": "(\\d+y)(-\\d{1,2}mt)?(-\\d{1,2}d)?(-\\d{1,2}h)?(-\\d{1,2}m)?(-\\d{1,2}s)?(-\\d{1,2}ms)?(-\\d{1,2}us)?(-[a-zA-Z_/]+[a-zA-Z_])",
 					"name": "constant.numeric"
 				},
@@ -386,14 +386,20 @@
 				{
 					"begin": "%\\{",
 					"beginCaptures": {
-						"0": {"name" :"punctuation.begin.bracket.curly.inox"}
+						"0": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
 					},
 					"end": "\\}",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				}
 			]
@@ -403,14 +409,20 @@
 				{
 					"begin": "\\{",
 					"beginCaptures": {
-						"0": {"name" :"punctuation.begin.bracket.curly.inox"}
+						"0": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
 					},
 					"end": "\\}",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				}
 			]
@@ -420,14 +432,20 @@
 				{
 					"begin": "%\\[",
 					"beginCaptures": {
-						"0": {"name" :"punctuation.begin.bracket.inox"}
+						"0": {
+							"name": "punctuation.begin.bracket.inox"
+						}
 					},
 					"end": "\\]",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				}
 			]
@@ -437,14 +455,20 @@
 				{
 					"begin": "\\[",
 					"beginCaptures": {
-						"0": {"name" :"punctuation.begin.bracket.inox"}
+						"0": {
+							"name": "punctuation.begin.bracket.inox"
+						}
 					},
 					"end": "\\]",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				}
 			]
@@ -464,7 +488,9 @@
 				{
 					"begin": "\\(",
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					],
 					"end": "\\)"
 				},
@@ -491,14 +517,20 @@
 						"1": {
 							"name": "entity.name.type.inox"
 						},
-						"2": {"name" :"punctuation.begin.bracket.curly.inox"}
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
 					},
 					"end": "\\}",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.curly.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				},
 				{
@@ -508,14 +540,20 @@
 						"1": {
 							"name": "entity.name.type.inox"
 						},
-						"2": {"name" :"punctuation.begin.bracket.inox"}
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
 					},
 					"end": "\\]",
 					"endCaptures": {
-						"0": {"name" :"punctuation.end.bracket.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
 					},
 					"patterns": [
-						{"include": "#pattern-content"}
+						{
+							"include": "#pattern-content"
+						}
 					]
 				}
 			]
@@ -525,14 +563,20 @@
 				{
 					"begin": "%\\(",
 					"beginCaptures": {
-						"0":  {"name" :"punctuation.begin.bracket.inox"}
+						"0": {
+							"name": "punctuation.begin.bracket.inox"
+						}
 					},
 					"end": "\\)",
 					"endCaptures": {
-						"0":  {"name" :"punctuation.end.bracket.inox"}
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
 					},
 					"patterns": [
-						{"include": "$self"}
+						{
+							"include": "$self"
+						}
 					]
 				}
 			]
@@ -602,7 +646,7 @@
 				}
 			]
 		},
-		"single-local-var-declaration":	{
+		"single-local-var-declaration": {
 			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
 			"captures": {
 				"1": {
@@ -622,14 +666,21 @@
 			}
 		},
 		"return-type": {
-			"begin": "(?<=\\))\\s*(?=[a-zA-Z_%#\\{\\[\\(\\]])",
 			"patterns": [
 				{
-
-					"include": "#pattern-content"
+					"comment": "no return type",
+					"match": "(?<=\\))\\s*(?=\\{)"
+				},
+				{
+					"begin": "(?<=\\))\\s*(?=[a-zA-Z_%#\\{\\[\\(\\]])",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?=\\{)"
 				}
-			],
-			"end": "(?=\\{)"
+			]
 		},
 		"functions": {
 			"patterns": [
@@ -648,12 +699,11 @@
 						{
 							"match": "(?<=[(,]\\s*)\\b([_a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
 							"name": "variable.name.inox"
-						}, 
+						},
 						{
 							"match": "\\|"
 						},
 						{
-
 							"include": "#pattern-content"
 						},
 						{
@@ -674,12 +724,11 @@
 						{
 							"match": "(?<=[(,]\\s*)\\b([_a-zA-Z-]+)(\\s*(?=[),])|\\s+(?!=[),]))",
 							"name": "variable.name.inox"
-						}, 
+						},
 						{
 							"match": "\\|"
 						},
 						{
-
 							"include": "#pattern-content"
 						},
 						{
