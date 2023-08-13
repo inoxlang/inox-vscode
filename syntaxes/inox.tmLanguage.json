@@ -584,7 +584,7 @@
 		"local-var-declarations": {
 			"patterns": [
 				{
-					"match": "(?:^[ \t]+)(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(?:^[ \t]+)(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -602,7 +602,7 @@
 					}
 				},
 				{
-					"match": "(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -647,7 +647,7 @@
 			]
 		},
 		"single-local-var-declaration": {
-			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
+			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
 			"captures": {
 				"1": {
 					"name": "variable.name.inox"
