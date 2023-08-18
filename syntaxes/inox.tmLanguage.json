@@ -482,7 +482,7 @@
 					"include": "#keywords"
 				},
 				{
-					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![?]?:)",
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![-a-zA-Z0-9_]*[?]?:)",
 					"name": "entity.name.type.inox"
 				},
 				{
@@ -748,6 +748,10 @@
 				{
 					"name": "keyword.control.inox",
 					"match": "(?<![-_])\\b(if|else|switch|match|defaultcase|for|walk|in|return|break|continue|prune|go|do|lifetimejob|assert|comp|testsuite|testcase|on|received|preinit)\\b(?![-_])"
+				},
+				{
+					"name": "keyword.operator.expression.inox",
+					"match": "(?<![-_])\\b(and|or|not-in|keyof|match|not-match|substrof|is|is-not)\\b(?![-_])"
 				},
 				{
 					"name": "storage.type",
