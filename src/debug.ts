@@ -302,9 +302,6 @@ class InoxDebugSession extends DebugSession {
             if (!resp.success) {
                 return
             }
-
-
-            this.sendResponse(resp);
         }, reason => {
             this.sendError(response, reason)
         })
