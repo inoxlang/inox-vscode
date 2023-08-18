@@ -672,6 +672,10 @@
 					"match": "(?<=\\))\\s*(?=\\{)"
 				},
 				{
+					"match": "(?<=\\))\\s*(?=(and|or|not-in|keyof|match|not-match|substrof|is|is-not)[^-_])",
+					"comment": "ignore binary expressions"
+				},
+				{
 					"begin": "(?<=\\))\\s*(?=[a-zA-Z_%#\\{\\[\\(\\]])",
 					"patterns": [
 						{
