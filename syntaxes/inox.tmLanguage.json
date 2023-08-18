@@ -30,6 +30,9 @@
 			"include": "#local-var-declarations"
 		},
 		{
+			"include": "#multiline-concatenation"
+		},
+		{
 			"include": "#return-type"
 		},
 		{
@@ -1102,7 +1105,7 @@
 				}
 			]
 		},
-		"function-calls": {
+		"function-call-expressions": {
 			"patterns": [
 				{
 					"begin": "\\b([a-zA-Z_][a-zA-Z0-9_-]*!?)(\\()",
@@ -1142,20 +1145,6 @@
 					"endCaptures": {}
 				},
 				{
-					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*\\$)",
-					"beginCaptures": {
-						"1": {
-							"name": "entity.name.function"
-						}
-					},
-					"patterns": [
-						{
-							"include": "$self"
-						}
-					],
-					"end": "\n"
-				},
-				{
 					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=\\{)",
 					"beginCaptures": {
 						"1": {
@@ -1168,6 +1157,13 @@
 						}
 					],
 					"end": "}"
+				}
+			]
+		},
+		"function-calls": {
+			"patterns": [
+				{
+					"include": "#function-call-expressions"
 				},
 				{
 					"begin": "(?:^|\\|)[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(?!([-+*/]?[=]|\\s))",
@@ -1638,6 +1634,106 @@
 		"xml-tag-attributes-illegal": {
 			"name": "invalid.illegal.attribute.inox",
 			"match": "\\S+"
+		},
+		"multiline-concatenation": {
+			"begin": "(?<=\\(\\s*concat)",
+			"patterns": [
+				{
+					"include": "#expressions-and-comments"
+				}
+			],
+			"end": "\\)"
+		},
+		"expressions-and-comments": {
+			"patterns": [
+				{
+					"include": "#xml-expression"
+				},
+				{
+					"include": "#css-selectors"
+				},
+				{
+					"include": "#url-patterns"
+				},
+				{
+					"include": "#option-patterns"
+				},
+				{
+					"include": "#object-patterns"
+				},
+				{
+					"include": "#list-patterns"
+				},
+				{
+					"include": "#pattern-conversions"
+				},
+				{
+					"include": "#functions"
+				},
+				{
+					"include": "#keywords"
+				},
+				{
+					"include": "#function-call-expressions"
+				},
+				{
+					"include": "#variables"
+				},
+				{
+					"include": "#numbers"
+				},
+				{
+					"include": "#constants"
+				},
+				{
+					"include": "#property-names"
+				},
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#host-patterns"
+				},
+				{
+					"include": "#hosts"
+				},
+				{
+					"include": "#urls"
+				},
+				{
+					"include": "#path-patterns"
+				},
+				{
+					"include": "#paths"
+				},
+				{
+					"include": "#regex"
+				},
+				{
+					"include": "#option-names"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#template-literals"
+				},
+				{
+					"include": "#runes"
+				},
+				{
+					"include": "#named-patterns"
+				},
+				{
+					"include": "#identifiers"
+				},
+				{
+					"include": "#lists"
+				},
+				{
+					"include": "#objects"
+				}
+			]
 		}
 	},
 	"scopeName": "source.inox"
