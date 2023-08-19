@@ -102,7 +102,7 @@
 			"include": "#lists"
 		},
 		{
-			"include": "#objects"
+			"include": "#objects-blocks"
 		}
 	],
 	"repository": {
@@ -1108,7 +1108,7 @@
 				}
 			]
 		},
-		"objects": {
+		"objects-blocks": {
 			"begin": "\\{",
 			"beginCaptures": {
 				"0": {
