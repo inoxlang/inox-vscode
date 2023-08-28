@@ -1,12 +1,14 @@
-import { join } from 'path';
 import { URL } from 'url';
 import { inspect } from 'util';
 import * as vscode from 'vscode';
+import * as fs from 'fs'
 import { OutputChannel } from "vscode"
+import { InoxExtensionContext } from './inox-extension-context';
 
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
+const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
 const ACCOUNT_ID_FIELD = 'account-id'
 
@@ -17,8 +19,9 @@ export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 export type Configuration = {
     websocketEndpoint?: URL
     project?: ProjectConfiguration
+    tempTokens?: TempTokens //not present if project is undefined
     projectFilePresent: boolean
-    localProjectRoot: string
+    localProjectRoot: vscode.Uri
     localProjectServerCommand: string[]
 }
 
@@ -28,6 +31,10 @@ export type ProjectConfiguration = {
         "additional-tokens-api-token": string
         "account-id": string
     }
+}
+
+export type TempTokens = {
+    r2Token?: string
 }
 
 
@@ -70,8 +77,10 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     }
 
     let projectConfig: ProjectConfiguration | undefined;
+    let tempTokens: TempTokens | undefined
     let fileFsFolder: vscode.WorkspaceFolder | undefined
     let projectFilePresent = false
+
 
     for (const folder of vscode.workspace.workspaceFolders || []) {
         if (folder.uri.scheme != 'file') {
@@ -88,12 +97,16 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
     //check project config file even if not in project mode
     const inoxProjectConfigURI = fileFsFolder.uri.with({ path: fileFsFolder.uri.path + '/' + INOX_PROJECT_FILENAME })
+    const tempTokensURI = getTempTokensURI(fileFsFolder.uri)
 
     //try to read the project configuration file.
     let configDocument: vscode.TextDocument | undefined;
+    let tempTokensFileContent: string = '';
+
     try {
         configDocument = await vscode.workspace.openTextDocument(inoxProjectConfigURI)
         projectFilePresent = true
+        tempTokensFileContent = new TextDecoder().decode(await fs.promises.readFile(tempTokensURI.path))
     } catch {
 
     }
@@ -101,8 +114,8 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     if (inProjectMode) {
         projectConfig = {}
 
-        //try to parse the project configuration file.
         if (configDocument) {
+            //try to parse the project configuration file
             try {
                 const text = configDocument.getText()
                 if (text.trim() == '') {
@@ -110,23 +123,41 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
                 } else {
                     const parsed = JSON.parse(text)
                     if ((typeof parsed != 'object') || parsed == null) {
-                        vscode.window.showErrorMessage('invalid inox-project.json')
+                        vscode.window.showErrorMessage('invalid ' + INOX_PROJECT_FILENAME)
                         return
                     }
                     projectConfig = parsed
                 }
             } catch (err) {
-                vscode.window.showErrorMessage('failed to parse inox-project.json: ' + String(err))
+                vscode.window.showErrorMessage(`failed to parse ${INOX_PROJECT_FILENAME}: ` + String(err))
                 return
             }
-        }
 
+            if (tempTokensFileContent != '') {
+                //try to parse the temporary tokens file
+                try {
+                    if (tempTokensFileContent.trim() != '') {
+                        const parsed = JSON.parse(tempTokensFileContent)
+                        const e= typeof parsed
+                        if ((typeof parsed != 'object') || parsed == null) {
+                            vscode.window.showErrorMessage('invalid ' + TEMP_TOKENS_FILENAME)
+                            return
+                        }
+                        tempTokens = parsed
+                    }
+                } catch (err) {
+                    vscode.window.showErrorMessage(`failed to parse ${TEMP_TOKENS_FILENAME}: ` + String(err))
+                    return
+                }
+            }
+        }
     }
 
     const result: Configuration = {
         project: projectConfig,
+        tempTokens: tempTokens,
         projectFilePresent: projectFilePresent,
-        localProjectRoot: fileFsFolder.uri.toString(),
+        localProjectRoot: fileFsFolder.uri,
         localProjectServerCommand: localProjectServerCommand,
     }
 
@@ -134,7 +165,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
         result.websocketEndpoint = new URL(websocketEndpoint)
     }
 
-    if(result.project !== undefined && !checkProjectConfig(result.project)){
+    if (result.project !== undefined && !checkProjectConfig(result.project)) {
         return
     }
 
@@ -145,7 +176,7 @@ function checkProjectConfig(config: ProjectConfiguration): boolean {
     const ERR_PREFIX = 'invalid project configuration: '
 
     if (config.cloudflare !== undefined) {
-       if (config.cloudflare === null || typeof config.cloudflare != 'object') {
+        if (config.cloudflare === null || typeof config.cloudflare != 'object') {
             vscode.window.showErrorMessage(ERR_PREFIX + 'top-level cloudflare property should be an object')
             return false
         }
@@ -164,4 +195,16 @@ function checkProjectConfig(config: ProjectConfiguration): boolean {
     }
 
     return true
+}
+
+
+function getTempTokensURI(fileFsFolder: vscode.Uri) {
+    return fileFsFolder.with({ path: fileFsFolder.path + '/' + TEMP_TOKENS_FILENAME })
+}
+
+export async function saveTempTokens(ctx: InoxExtensionContext, arg: unknown) {
+    const uri = getTempTokensURI(ctx.config.localProjectRoot)
+    const json = JSON.stringify(arg)
+    const data = new TextEncoder().encode(json)
+    return fs.promises.writeFile(uri.path, data)
 }

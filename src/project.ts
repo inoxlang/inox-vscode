@@ -4,6 +4,7 @@ import * as vscode from 'vscode'
 import { InoxExtensionContext } from "./inox-extension-context";
 import { join } from 'path';
 import { stringifyCatchedValue } from './utils';
+import { saveTempTokens } from './configuration';
 
 
 export async function initializeNewProject(ctx: InoxExtensionContext){
@@ -91,7 +92,18 @@ export async function openProject(ctx: InoxExtensionContext) {
     }
 
     try {
-        await lspClient.sendRequest('project/open', {projectId: projectId, config: ctx.config.project ?? {}})
+        const resp = await lspClient.sendRequest('project/open', {
+            projectId: projectId, 
+            config: ctx.config.project ?? {},
+            tempTokens: ctx.config.tempTokens
+        })
+
+        if((typeof resp != 'object') || resp === null){
+            vscode.window.showErrorMessage('invalid response from project server (method: project/open)')
+            return
+        }
+        await saveTempTokens(ctx, (resp as Record<string,unknown>).tempTokens)
+
         ctx.projectOpen = true
     } catch(err){
         vscode.window.showErrorMessage(stringifyCatchedValue(err))
