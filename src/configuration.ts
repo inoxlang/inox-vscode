@@ -8,6 +8,8 @@ const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
+const ACCOUNT_ID_FIELD = 'account-id'
+
 
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 
@@ -23,7 +25,8 @@ export type Configuration = {
 export type ProjectConfiguration = {
     id?: string
     cloudflare?: {
-        "additional-tokens-api-token"?: string
+        "additional-tokens-api-token": string
+        "account-id": string
     }
 }
 
@@ -142,9 +145,7 @@ function checkProjectConfig(config: ProjectConfiguration): boolean {
     const ERR_PREFIX = 'invalid project configuration: '
 
     if (config.cloudflare !== undefined) {
-        if (config.cloudflare === null) {
-            config.cloudflare = {}
-        } else if (typeof config.cloudflare != 'object') {
+       if (config.cloudflare === null || typeof config.cloudflare != 'object') {
             vscode.window.showErrorMessage(ERR_PREFIX + 'top-level cloudflare property should be an object')
             return false
         }
@@ -152,6 +153,12 @@ function checkProjectConfig(config: ProjectConfiguration): boolean {
         const additionalTokensApiToken = config.cloudflare[ADDITIONAL_TOKENS_API_TOKEN_FIELD]
         if ((typeof additionalTokensApiToken != 'string') || additionalTokensApiToken == '') {
             vscode.window.showErrorMessage(ERR_PREFIX + `cloudflare.${ADDITIONAL_TOKENS_API_TOKEN_FIELD} property should be a non-empty string`)
+            return false
+        }
+
+        const accountId = config.cloudflare[ACCOUNT_ID_FIELD]
+        if ((typeof accountId != 'string') || accountId == '') {
+            vscode.window.showErrorMessage(ERR_PREFIX + `cloudflare.${ACCOUNT_ID_FIELD} property should be a non-empty string`)
             return false
         }
     }
