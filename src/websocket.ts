@@ -53,7 +53,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
 
         return new Promise((resolve, reject) => {
             let ok = false
-            let closed = false
+            let closed = {val: false}
 
             //reject after timeout.
             setTimeout(() => {
@@ -64,7 +64,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
             }, 1000)
 
             webSocket.addEventListener('close', function(){
-                closed = true
+                closed.val = true
                 ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `websocket with id ${websocketId} is now closed`)
             })
 
@@ -72,29 +72,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
                 ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `websocket connected (id:${websocketId})`)
                 ok = true
 
-                //send ping periodically.
-                let pingStart = new Date()
-                {
-                    const handle = setInterval(() => {
-                        if(closed){
-                            clearTimeout(handle)
-                        }
-
-                        pingStart = new Date()
-                        ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `ping LSP server (websocket id ${websocketId})`)
-                        webSocket.ping()
-                    }, PING_INTERVAL_MILLIS)
-                }
-              
-                //log pongs.
-                webSocket.on('pong', () => {
-                    let pingEnd = new Date()
-                    ctx.debugChannel.appendLine(
-                        WEBSOCKET_LOG_PREFIX + 'LSP server sent a pong, time since ping: ' +
-                        (pingEnd.getTime() - pingStart.getTime()) +
-                        ` milliseconds (websocket id ${websocketId})`
-                    )
-                })
+                sendPingPeriodically(ctx, webSocket, websocketId, closed)
                 
                 //create an object implementing MessageTransports and "return" it.
                 const socket = toSocket(webSocket as any);
@@ -112,6 +90,32 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
 
 }
 
+
+function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, websocketId: number, closed: {val: boolean}){
+    //send ping periodically.
+    let pingStart = new Date()
+    {
+        const handle = setInterval(() => {
+            if(closed.val){
+                clearTimeout(handle)
+            }
+
+            pingStart = new Date()
+            ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `ping LSP server (websocket id ${websocketId})`)
+            webSocket.ping()
+        }, PING_INTERVAL_MILLIS)
+    }
+    
+    //log pongs.
+    webSocket.on('pong', () => {
+        let pingEnd = new Date()
+        ctx.debugChannel.appendLine(
+            WEBSOCKET_LOG_PREFIX + 'LSP server sent a pong, time since ping: ' +
+            (pingEnd.getTime() - pingStart.getTime()) +
+            ` milliseconds (websocket id ${websocketId})`
+        )
+    })
+}
 
 function getWebsocketOptions(endpoint: URL){
     return {
