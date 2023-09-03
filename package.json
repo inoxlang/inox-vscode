@@ -89,8 +89,21 @@
 				"category": "Inox",
 				"command": "lsp/restart",
 				"title": "Restart LSP client"
+			},
+			{
+				"command": "secretKeeper.addEntry",
+				"title": "Add Secret"
 			}
 		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "secretKeeper.addEntry",
+					"when": "view == secretKeeper",
+					"group": "navigation"
+				}
+			]
+		},
 		"breakpoints": [
 			{
 				"language": "inox"
@@ -130,6 +143,30 @@
 						"program": "${file}"
 					}
 				]
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "inox-project",
+					"title": "Inox Project",
+					"icon": "assets/inox-no-padding-modified.svg"
+				}
+			]
+		},
+		"views": {
+			"inox-project": [
+				{
+					"id": "secretKeeper",
+					"name": "Secrets",
+					"contextualTitle": "Secrets"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "secretKeeper",
+				"contents": "No secrets found.\n[Add Secret](command:secretKeeper.addEntry)"
 			}
 		]
 	},

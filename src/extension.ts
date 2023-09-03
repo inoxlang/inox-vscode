@@ -8,6 +8,7 @@ import { initializeNewProject, openProject } from './project';
 import { sleep } from './utils';
 import { InlineDebugAdapterFactory } from './debug';
 import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
+import { SecretKeeper } from './project/secret-keeper';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -30,7 +31,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.workspace.workspaceFolders != undefined &&
     vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file');
 
-  if(isVirtualWorkspace){
+  if (isVirtualWorkspace) {
     vscode.window.showErrorMessage('virtual workspaces not supported yet')
     return
   }
@@ -51,6 +52,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   if (config.project) {
     ctx.inoxFS = createAndRegisterInoxFs(ctx)
+    const secretKeeper = new SecretKeeper(ctx);
+    vscode.window.registerTreeDataProvider('secretKeeper', secretKeeper);
+    vscode.commands.registerCommand('secretKeeper.addEntry', secretKeeper.addSecret.bind(secretKeeper))
   }
 
   ctx.restartLSPClient(false)
@@ -58,8 +62,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   //register formatting provider
 
   vscode.languages.registerDocumentFormattingEditProvider([{ scheme: INOX_FS_SCHEME, language: 'inox' }], {
-		provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
-      if(ctx.lspClient === undefined){
+    provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
+      if (ctx.lspClient === undefined) {
         return []
       }
 
@@ -87,7 +91,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   vscode.commands.registerCommand('project/initialize', async () => {
     await ctx.updateConfiguration()
 
-    if(ctx.config.projectFilePresent){
+    if (ctx.config.projectFilePresent) {
       const msg = '[project/initialize] project is already initialized'
       vscode.window.showWarningMessage(msg)
       ctx.debugChannel.appendLine(msg)
@@ -98,18 +102,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await ctx.restartLSPClient(true) //restart LSP client in project mode
 
     await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Window,
-        cancellable: false,
-        title: 'Creating Inox project in current folder'
+      location: vscode.ProgressLocation.Window,
+      cancellable: false,
+      title: 'Creating Inox project in current folder'
     }, async (progress) => {
-        progress.report({  increment: 0 });
+      progress.report({ increment: 0 });
 
-        //wait for LSP client
-        await sleep(3000) //TODO: replace sleep
+      //wait for LSP client
+      await sleep(3000) //TODO: replace sleep
 
-        await initializeNewProject(ctx)
-    
-        progress.report({ increment: 100 });
+      await initializeNewProject(ctx)
+
+      progress.report({ increment: 100 });
     });
   })
 
