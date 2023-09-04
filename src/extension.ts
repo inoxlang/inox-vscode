@@ -8,7 +8,7 @@ import { initializeNewProject, openProject } from './project';
 import { sleep } from './utils';
 import { InlineDebugAdapterFactory } from './debug';
 import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
-import { SecretKeeper } from './project/secret-keeper';
+import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -55,6 +55,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const secretKeeper = new SecretKeeper(ctx);
     vscode.window.registerTreeDataProvider('secretKeeper', secretKeeper);
     vscode.commands.registerCommand('secretKeeper.addEntry', secretKeeper.addSecret.bind(secretKeeper))
+    vscode.commands.registerCommand('secretKeeper.deleteEntry', (entry: SecretEntry) => secretKeeper.deleteSecret(entry.label))
+    vscode.commands.registerCommand('secretKeeper.updateEntry', (entry: SecretEntry) => secretKeeper.updateSecret(entry.label))
   }
 
   ctx.restartLSPClient(false)

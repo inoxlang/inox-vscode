@@ -93,6 +93,14 @@
 			{
 				"command": "secretKeeper.addEntry",
 				"title": "Add Secret"
+			},
+			{
+				"command": "secretKeeper.deleteEntry",
+				"title": "Delete"
+			},
+			{
+				"command": "secretKeeper.updateEntry",
+				"title": "Update"
 			}
 		],
 		"menus": {
@@ -101,6 +109,18 @@
 					"command": "secretKeeper.addEntry",
 					"when": "view == secretKeeper",
 					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "secretKeeper.deleteEntry",
+					"when": "view == secretKeeper && viewItem == secret",
+					"group": "inline"
+				},
+				{
+					"command": "secretKeeper.updateEntry",
+					"when": "view == secretKeeper && viewItem == secret",
+					"group": "inline"
 				}
 			]
 		},
@@ -166,7 +186,8 @@
 		"viewsWelcome": [
 			{
 				"view": "secretKeeper",
-				"contents": "No secrets found.\n[Add Secret](command:secretKeeper.addEntry)"
+				"contents": "No secrets found.\n[Add Secret](command:secretKeeper.addEntry)",
+				"when": "view.loaded"
 			}
 		]
 	},
