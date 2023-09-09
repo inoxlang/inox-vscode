@@ -69,13 +69,22 @@
 					"pattern": "^(|wss://.*)$"
 				},
 				"inox.localProjectServerCommand": {
-					"order": 1,
+					"order": 2,
 					"type": "array",
 					"items": {
 						"type": "string"
 					},
 					"default": [],
 					"description": "the command to start a local Inox project server."
+				},
+				"inox.localProjectServerEnv": {
+					"order": 3,
+					"type": "object",
+					"properties": {
+
+					},
+					"default": [],
+					"description": "environment variables passed to the command, values that are not strings are converted to JSON"
 				}
 			}
 		},

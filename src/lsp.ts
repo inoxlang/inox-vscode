@@ -49,7 +49,11 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
   ctx.outputChannel.appendLine(msg)
   ctx.debugChannel.appendLine(msg)
 
-  const child = child_process.spawn(command[0], command.slice(1))
+  const child = child_process.spawn(command[0], command.slice(1), {
+    env: {
+      ...ctx.config.localProjectServerEnv
+    }
+  })
 
   child.on('error', (err) => {
     ctx.outputChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + String(err))

@@ -14,6 +14,8 @@ const ACCOUNT_ID_FIELD = 'account-id'
 
 
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
+const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
+
 
 
 export type Configuration = {
@@ -23,6 +25,8 @@ export type Configuration = {
     projectFilePresent: boolean
     localProjectRoot: vscode.Uri
     localProjectServerCommand: string[]
+    localProjectServerEnv: Record<string, string>
+
 }
 
 export type ProjectConfiguration = {
@@ -44,6 +48,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
+    const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
 
     if (typeof websocketEndpoint != 'string') {
         let msg: string
@@ -138,7 +143,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
                 try {
                     if (tempTokensFileContent.trim() != '') {
                         const parsed = JSON.parse(tempTokensFileContent)
-                        const e= typeof parsed
+                        const e = typeof parsed
                         if ((typeof parsed != 'object') || parsed == null) {
                             vscode.window.showErrorMessage('invalid ' + TEMP_TOKENS_FILENAME)
                             return
@@ -153,12 +158,23 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
         }
     }
 
+    const localProjectServerEnv: Record<string, string> = {}
+
+    for (let [entryName, entryValue] of Object.entries(localProjectServerEnvEntries)) {
+        if(typeof entryValue != 'string'){
+            entryValue = JSON.stringify(entryValue)
+        }
+     
+        localProjectServerEnv[entryName] = String(entryValue)
+    }
+
     const result: Configuration = {
         project: projectConfig,
         tempTokens: tempTokens,
         projectFilePresent: projectFilePresent,
         localProjectRoot: fileFsFolder.uri,
         localProjectServerCommand: localProjectServerCommand,
+        localProjectServerEnv: localProjectServerEnv,
     }
 
     if (websocketEndpoint !== "") {
