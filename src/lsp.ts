@@ -51,6 +51,7 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
 
   const child = child_process.spawn(command[0], command.slice(1), {
     env: {
+      ...process.env,
       ...ctx.config.localProjectServerEnv
     }
   })
