@@ -9,6 +9,9 @@
 			"include": "#css-selectors"
 		},
 		{
+			"include": "#complex-string-patterns"
+		},
+		{
 			"include": "#url-patterns"
 		},
 		{
@@ -1343,6 +1346,64 @@
 				}
 			]
 		},
+		"complex-string-patterns": {
+			"patterns": [
+				{
+					"begin": "(?<!\\w)(%str)([(])",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#complex-string-pattern-content"	
+						}
+					],
+					"end": "[)]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					}
+				}
+			]
+		},
+		"complex-string-pattern-content": {
+			"patterns": [
+				{
+					"begin": "\\(",
+					"patterns": [
+						{
+							"include": "#complex-string-pattern-content"
+						}
+					],
+					"end": "\\)"
+				},
+				{
+					"include": "#named-patterns"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#runes"
+				},
+				{
+					"include": "#numbers"
+				},
+				{
+					"include": "#regex"
+				},
+				{
+					"match": "[a-zA-Z_][a-zA-Z0-9_-]*:",
+					"comment": "group name"
+				}
+			]
+		},
 		"named-patterns": {
 			"patterns": [
 				{
@@ -1673,6 +1734,9 @@
 				},
 				{
 					"include": "#css-selectors"
+				},
+				{
+					"include": "#complex-string-patterns"
 				},
 				{
 					"include": "#url-patterns"
