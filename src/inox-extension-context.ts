@@ -15,7 +15,6 @@ type InoxExtensionContextArgs = {
     openProject: (ctx: InoxExtensionContext) => Promise<void>
     outputChannel: vscode.OutputChannel
     debugChannel: vscode.OutputChannel
-    traceChannel: vscode.OutputChannel
 }
 
 export class InoxExtensionContext {
@@ -30,7 +29,6 @@ export class InoxExtensionContext {
 
     readonly outputChannel: vscode.OutputChannel
     readonly debugChannel: vscode.OutputChannel
-    readonly traceChannel: vscode.OutputChannel
 
     readonly base: vscode.ExtensionContext
     readonly virtualWorkspace: boolean
@@ -47,7 +45,6 @@ export class InoxExtensionContext {
         this.virtualWorkspace = args.virtualWorkspace
         this.outputChannel = args.outputChannel
         this.debugChannel = args.debugChannel
-        this.traceChannel = args.traceChannel
 
         vscode.workspace.onDidChangeConfiguration(() => this.updateConfiguration())
 

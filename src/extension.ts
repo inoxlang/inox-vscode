@@ -12,7 +12,6 @@ import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
-let traceChannel: vscode.OutputChannel;
 
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -20,7 +19,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   outputChannel.appendLine('Inox extension activate()')
 
   debugChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
-  traceChannel = vscode.window.createOutputChannel('Inox Extension (Trace)');
 
   const config = await getConfiguration(outputChannel)
   if (!config) {
@@ -42,7 +40,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     virtualWorkspace: isVirtualWorkspace,
     outputChannel: outputChannel,
     debugChannel: debugChannel,
-    traceChannel: traceChannel,
 
     getCurrentConfig: getConfiguration,
     createLSPClient: createLSPClient,
