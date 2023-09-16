@@ -41,6 +41,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 			//related to the filesystem not being directly available. 
 			for(const group of vscode.window.tabGroups.all){
 				for(const tab of group.tabs){
+					const viewColumn = group.viewColumn
+
 					if(tab != undefined && (tab.input instanceof vscode.TabInputText)){
 						const input = tab.input;
 						if(input.uri.scheme != INOX_FS_SCHEME){
@@ -48,11 +50,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 						}
 						//note: openTextDocument fires a didOpen event
 						vscode.workspace.openTextDocument(input.uri).then(() => {
+							vscode.window.showTextDocument(input.uri, {
+								viewColumn: viewColumn,
+								preserveFocus: false,
+							})
+
 							if(activeTab == tab){
-								vscode.window.showTextDocument(input.uri, {
-									viewColumn: vscode.window.tabGroups.activeTabGroup.viewColumn,
-									preserveFocus: false,
-								})
+								setTimeout(() => {
+									vscode.window.showTextDocument(input.uri, {
+										viewColumn: viewColumn,
+										preserveFocus: false,
+									})
+								}, 100)
 							}
 						})
 					}

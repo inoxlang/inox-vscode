@@ -92,6 +92,7 @@ export async function openProject(ctx: InoxExtensionContext) {
     }
 
     try {
+        ctx.debugChannel.appendLine("Send 'project/open' request")
         const resp = await lspClient.sendRequest('project/open', {
             projectId: projectId, 
             config: ctx.config.project ?? {},
