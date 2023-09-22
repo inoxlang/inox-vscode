@@ -45,6 +45,9 @@
 			"include": "#functions"
 		},
 		{
+			"include": "#binary-match-rhs"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -791,6 +794,24 @@
 						}
 					],
 					"end": "\\)"
+				}
+			]
+		},
+		"binary-match-rhs": {
+			"patterns": [
+				{
+					"begin": "\\b(match|not-match)\\s*(?=[a-zA-Z{\\[\\(])",
+					"beginCaptures": {
+						"1": {
+					"name": "keyword.operator.expression.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?=\\))"
 				}
 			]
 		},
