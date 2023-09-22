@@ -730,7 +730,25 @@
 					"comment": "ignore binary expressions"
 				},
 				{
-					"begin": "(?<=\\))\\s*(?=[a-zA-Z_%#\\{\\[\\(\\]])",
+					"begin": "(?<=\\))\\s*(?=#\\[)",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?<=\\])(?=\\s*\\{)"
+				},
+				{
+					"begin": "(?<=\\))\\s*(?=#\\{)",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?<=\\})(?=\\s*\\{)"
+				},
+				{
+					"begin": "(?<=\\))\\s*(?=[a-zA-Z_%\\{\\[\\(\\]])",
 					"patterns": [
 						{
 							"include": "#pattern-content"
