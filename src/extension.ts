@@ -9,6 +9,7 @@ import { sleep } from './utils';
 import { InlineDebugAdapterFactory } from './debug';
 import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
+import { TutorialCodeLensProvider, registerLearningCodeLensAndCommands } from './learn/learn';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -81,12 +82,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', new InlineDebugAdapterFactory(ctx)));
 
-  //register commands
 
-  vscode.commands.registerCommand('lsp/restart', async () => {
-    await ctx.updateConfiguration()
-    return ctx.restartLSPClient(false)
-  })
+    //
+    registerLearningCodeLensAndCommands(ctx)
 
     //register commands
     {
