@@ -91,43 +91,43 @@
 		"commands": [
 			{
 				"category": "Inox",
-				"command": "project/initialize",
+				"command": "inox.project.initialize",
 				"title": "Initialize new Project in Current Folder"
 			},
 			{
 				"category": "Inox",
-				"command": "lsp/restart",
+				"command": "inox.lsp.restart",
 				"title": "Restart LSP client"
 			},
 			{
-				"command": "secretKeeper.addEntry",
+				"command": "inox.secretKeeper.addEntry",
 				"title": "Add Secret"
 			},
 			{
-				"command": "secretKeeper.deleteEntry",
+				"command": "inox.secretKeeper.deleteEntry",
 				"title": "Delete"
 			},
 			{
-				"command": "secretKeeper.updateEntry",
+				"command": "inox.secretKeeper.updateEntry",
 				"title": "Update"
 			}
 		],
 		"menus": {
 			"view/title": [
 				{
-					"command": "secretKeeper.addEntry",
+					"command": "inox.secretKeeper.addEntry",
 					"when": "view == secretKeeper",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "secretKeeper.deleteEntry",
+					"command": "inox.secretKeeper.deleteEntry",
 					"when": "view == secretKeeper && viewItem == secret",
 					"group": "inline"
 				},
 				{
-					"command": "secretKeeper.updateEntry",
+					"command": "inox.secretKeeper.updateEntry",
 					"when": "view == secretKeeper && viewItem == secret",
 					"group": "inline"
 				}
