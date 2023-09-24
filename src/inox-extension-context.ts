@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 
 import { LanguageClient, State } from 'vscode-languageclient/node';
-import { InoxFS } from './inox-fs';
 import { Configuration } from './configuration';
+import { InoxFS } from './inox-fs';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp';
 import { stringifyCatchedValue } from './utils';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 
 const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'
 
@@ -159,8 +158,6 @@ export class InoxExtensionContext {
         return this._projectOpen
     }
 
-    
-
     set projectOpen(val: boolean) {
         if (val) {
             this._projectOpenEmitter.fire()
@@ -168,20 +165,20 @@ export class InoxExtensionContext {
         this._projectOpen = val
     }
 
-    getStateValue(key: string){
+    getStateValue(key: string) {
         return this.base.globalState.get(GLOBAL_STATE_ENTRY_PREFIX + key)
     }
 
-    setStateValue(key: string, value: unknown){
+    setStateValue(key: string, value: unknown) {
         const serialized = JSON.stringify(value)
-        if(JSON.stringify(JSON.parse(serialized)) != serialized){
+        if (JSON.stringify(JSON.parse(serialized)) != serialized) {
             throw new Error('value is not properly serializable')
         }
 
         return this.base.globalState.update(GLOBAL_STATE_ENTRY_PREFIX + key, value)
     }
 
-    clearState(){
+    clearState() {
         //remove all keys
         this.base.globalState.keys().forEach(key => this.base.globalState.update(key, undefined))
     }
@@ -190,5 +187,5 @@ export class InoxExtensionContext {
         this._projectOpenEmitter.dispose()
     }
 
-    
+
 }

@@ -32,7 +32,7 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
 
   let isRunning = await isWebsocketServerRunning(ctx, ctx.config.websocketEndpoint)
   if(isRunning){
-    ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + 'server is running')
+    ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + 'Local server is running')
     return true
   }
 
@@ -57,8 +57,10 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
   })
 
   child.on('error', (err) => {
-    ctx.outputChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + String(err))
-    ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + String(err))
+    const msg = LOCAL_LSP_SERVER_LOG_PREFIX + String(err)
+    ctx.outputChannel.appendLine(msg)
+    ctx.debugChannel.appendLine(msg)
+    vscode.window.showErrorMessage(msg)
   })
  
   child.stdout.setEncoding('utf8')
