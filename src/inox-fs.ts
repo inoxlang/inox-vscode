@@ -22,6 +22,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 	private _ctx: InoxExtensionContext | undefined;
+	private _projectOpenDisposable?: vscode.Disposable
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
@@ -33,7 +34,9 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 	set ctx(context: InoxExtensionContext) {
 		this._ctx = context
-		context.onProjectOpen(() => {
+		this._projectOpenDisposable?.dispose()
+
+		this._projectOpenDisposable = context.onProjectOpen(() => {
 			this._ctx?.debugChannel.appendLine?.(DEBUG_PREFIX + ' re-open documents')
 			const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab
 
@@ -68,12 +71,12 @@ export class InoxFS implements vscode.FileSystemProvider {
 				}
 			}
 
-
 			//small hack
 			this._emitter.fire([
 				{
 					type: vscode.FileChangeType.Created, uri: vscode.Uri.parse(INOX_FS_SCHEME + ':/')
-				}])
+				}
+			])
 		})
 	}
 
