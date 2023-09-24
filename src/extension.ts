@@ -10,6 +10,7 @@ import { InlineDebugAdapterFactory } from './debug';
 import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { TutorialCodeLensProvider, registerLearningCodeLensAndCommands } from './learn/learn';
+import { computeSuggestions } from './suggestions';
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -88,6 +89,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     //register commands
     {
+        vscode.commands.registerCommand('inox.clear-global-state', async () => {
+            ctx.clearState()
+        })
+
         vscode.commands.registerCommand('inox.lsp.restart', async () => {
             await ctx.updateConfiguration()
             return ctx.restartLSPClient(false)
@@ -123,6 +128,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         })
     }
 
+    computeSuggestions(ctx, 2).forEach(suggestion => {
+        suggestion.show()
+    })
 
 }
 
