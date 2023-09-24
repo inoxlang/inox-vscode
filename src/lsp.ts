@@ -32,7 +32,7 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
 
   let isRunning = await isWebsocketServerRunning(ctx, ctx.config.websocketEndpoint)
   if(isRunning){
-    ctx.debugChannel.appendLine('LSP server is running')
+    ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + 'server is running')
     return true
   }
 

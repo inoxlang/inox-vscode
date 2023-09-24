@@ -1,19 +1,17 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 
+import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languageclient';
 import { getConfiguration } from './configuration';
+import { InlineDebugAdapterFactory } from './debug';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
+import { registerLearningCodeLensAndCommands } from './learn/learn';
 import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
-import { sleep } from './utils';
-import { InlineDebugAdapterFactory } from './debug';
-import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
-import { TutorialCodeLensProvider, registerLearningCodeLensAndCommands } from './learn/learn';
 import { computeSuggestions } from './suggestions';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './error-messages';
+import { sleep } from './utils';
 const PROJECT_NAME_REGEX = /^[a-z0-9_-]+$/i
 
 let outputChannel: vscode.OutputChannel;

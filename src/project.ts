@@ -5,12 +5,13 @@ import { InoxExtensionContext } from "./inox-extension-context";
 import { join } from 'path';
 import { stringifyCatchedValue } from './utils';
 import { saveTempTokens } from './configuration';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 
 
 export async function initializeNewProject(ctx: InoxExtensionContext, projectName: string){
     const lspClient = ctx.lspClient
     if(!lspClient || !lspClient.isRunning()){
-        throw new Error("LSP client not running")
+        throw new Error(LSP_CLIENT_NOT_RUNNING_MSG)
     }
 
     if(ctx.config.project?.id){
@@ -81,7 +82,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext, projectNam
 export async function openProject(ctx: InoxExtensionContext) {
     const lspClient = ctx.lspClient
     if(!lspClient || !lspClient.isRunning()){
-        throw new Error("LSP client not running")
+        throw new Error(LSP_CLIENT_NOT_RUNNING_MSG)
     }
 
     const projectId = ctx.config.project?.id

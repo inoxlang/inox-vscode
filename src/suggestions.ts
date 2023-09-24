@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 import { InoxExtensionContext } from "./inox-extension-context";
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './error-messages';
 
 const SUGGESTION_COMPUTATON_INTERVAL_MILLIS = 3_000
 const USER_IDLE_THRESHOLD_MILLIS = 5_000

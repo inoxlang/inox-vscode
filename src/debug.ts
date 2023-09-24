@@ -9,6 +9,7 @@ import {
 
 import { DebugProtocol } from '@vscode/debugprotocol'
 import { InoxExtensionContext } from './inox-extension-context';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 const { Subject } = require('await-notify')
 
 
@@ -54,7 +55,7 @@ class InoxDebugSession extends DebugSession {
 
     private get lspClient() {
         if (this.ctx.lspClient === undefined || !this.ctx.lspClient.isRunning()) {
-            throw new Error('LSP client is not running')
+            throw new Error(LSP_CLIENT_NOT_RUNNING_MSG)
         }
 
         return this.ctx.lspClient
