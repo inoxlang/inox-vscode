@@ -1,6 +1,3 @@
-
-----------------------------
-
 **👉 Once the extension is installed 👈** 
 
 - Create a folder (example: `inox-web-app`)
