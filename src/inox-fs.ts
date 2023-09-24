@@ -4,6 +4,7 @@ import { InoxExtensionContext } from './inox-extension-context';
 import { sleep } from './utils';
 
 export const INOX_FS_SCHEME = "inox"
+const CANCELLATION_TOKEN_TIMEOUT = 5000
 
 const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
 
@@ -33,19 +34,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 	set ctx(context: InoxExtensionContext) {
 		this._ctx = context
 		context.onProjectOpen(() => {
-			vscode.workspace.textDocuments
-
+			this._ctx?.debugChannel.appendLine?.(DEBUG_PREFIX + ' re-open documents')
 			const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab
 
 			//re-open documents in the inox filesystem because there could be errors 
 			//related to the filesystem not being directly available. 
-			for(const group of vscode.window.tabGroups.all){
-				for(const tab of group.tabs){
+			for (const group of vscode.window.tabGroups.all) {
+				for (const tab of group.tabs) {
 					const viewColumn = group.viewColumn
 
-					if(tab != undefined && (tab.input instanceof vscode.TabInputText)){
+					if (tab != undefined && (tab.input instanceof vscode.TabInputText)) {
 						const input = tab.input;
-						if(input.uri.scheme != INOX_FS_SCHEME){
+						if (input.uri.scheme != INOX_FS_SCHEME) {
 							continue
 						}
 						//note: openTextDocument fires a didOpen event
@@ -55,7 +55,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 								preserveFocus: false,
 							})
 
-							if(activeTab == tab){
+							if (activeTab == tab) {
 								setTimeout(() => {
 									vscode.window.showTextDocument(input.uri, {
 										viewColumn: viewColumn,
@@ -71,8 +71,9 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 			//small hack
 			this._emitter.fire([
-				{type: vscode.FileChangeType.Created, uri: vscode.Uri.parse(INOX_FS_SCHEME+':/')
-			}])
+				{
+					type: vscode.FileChangeType.Created, uri: vscode.Uri.parse(INOX_FS_SCHEME + ':/')
+				}])
 		})
 	}
 
@@ -91,8 +92,8 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 
-	get lspClientPresenceSuffix(){
-		if(this._ctx?.lspClient === undefined){
+	get lspClientPresenceSuffix() {
+		if (this._ctx?.lspClient === undefined) {
 			return '(no LSP client)'
 		}
 		return ''
@@ -102,16 +103,27 @@ export class InoxFS implements vscode.FileSystemProvider {
 		return (this._ctx?.lspClient !== undefined) && this._ctx.lspClient.isRunning() && this._ctx.projectOpen
 	}
 
+	createTokenSource() {
+		const tokenSource = new vscode.CancellationTokenSource()
+		setTimeout(() => {
+			tokenSource.cancel()
+			tokenSource.dispose()
+		}, CANCELLATION_TOKEN_TIMEOUT)
+		return tokenSource
+	}
+
 	async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} stat ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(!this.clientRunningAndProjectOpen){
+		if (!this.clientRunningAndProjectOpen) {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		const tokenSource = this.createTokenSource()
+
 		return this.lspClient.sendRequest('fs/fileStat', {
 			uri: uri.toString(),
-		}).then((stats): vscode.FileStat => {
+		}, tokenSource.token).then((stats): vscode.FileStat => {
 			if (stats == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
@@ -122,13 +134,15 @@ export class InoxFS implements vscode.FileSystemProvider {
 	async readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(!this.clientRunningAndProjectOpen){
+		if (!this.clientRunningAndProjectOpen) {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		const tokenSource = this.createTokenSource()
+
 		return this.lspClient.sendRequest('fs/readDir', {
 			uri: uri.toString(),
-		}).then((entries) => {
+		}, tokenSource.token).then(entries => {
 			if (entries == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
@@ -148,13 +162,15 @@ export class InoxFS implements vscode.FileSystemProvider {
 	async readFile(uri: vscode.Uri): Promise<Uint8Array> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 
-		if(!this.clientRunningAndProjectOpen){
+		if (!this.clientRunningAndProjectOpen) {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		const tokenSource = this.createTokenSource()
+
 		return this.lspClient.sendRequest('fs/readFile', {
 			uri: uri.toString(),
-		}).then((contentB64): Uint8Array => {
+		}, tokenSource.token).then((contentB64): Uint8Array => {
 			if (contentB64 == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
@@ -163,42 +179,48 @@ export class InoxFS implements vscode.FileSystemProvider {
 		})
 	}
 
-	writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
+	async writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} write file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+		const base64Content = Buffer.from(content).toString('base64')
+		const lspClient = this.lspClient
+		const tokenSource = this.createTokenSource()
 
-		return this.lspClient.sendRequest('fs/writeFile', {
+		await lspClient.sendRequest('fs/writeFile', {
 			uri: uri.toString(),
-			content: Buffer.from(content).toString('base64'),
+			content: base64Content,
 			create: options.create,
-			overwrite: options.overwrite
-		})
+			overwrite: options.overwrite,
+		}, tokenSource.token)
 	}
 
 	rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} rename file ${oldUri.toString()} ${this.lspClientPresenceSuffix}`)
+		const tokenSource = this.createTokenSource()
 
 		return this.lspClient.sendRequest('fs/renameFile', {
 			uri: oldUri.toString(),
 			newUri: newUri.toString(),
 			overwrite: options.overwrite
-		})
+		}, tokenSource.token)
 	}
 
 	delete(uri: vscode.Uri): Promise<void> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} delete file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+		const tokenSource = this.createTokenSource()
 
 		return this.lspClient.sendRequest('fs/deleteFile', {
 			uri: uri.toString(),
 			recursive: true
-		})
+		}, tokenSource.token)
 	}
 
 	createDirectory(uri: vscode.Uri): Promise<void> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} create dir ${uri.toString()} ${this.lspClientPresenceSuffix}`)
+		const tokenSource = this.createTokenSource()
 
 		return this.lspClient.sendRequest('fs/createDir', {
 			uri: uri.toString(),
-		})
+		}, tokenSource.token)
 	}
 
 
