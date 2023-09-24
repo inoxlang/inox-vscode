@@ -192,6 +192,7 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
     }
 
     if (e.newState == State.Running && ctx.config.project) {
+      ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + ' client is now running, open project')
       openProject(ctx)
       return
     }
