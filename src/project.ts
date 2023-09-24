@@ -31,15 +31,17 @@ export async function initializeNewProject(ctx: InoxExtensionContext, projectNam
     const workspaceFileContent = {
         "folders": [
             {
-                "path": "."
+                "name": "Project Filesystem",
+                "uri": "inox:/"
             },
             {
-                "name": "Project FS",
-                "uri": "inox:/"
+                "path": ".",
+                "name": `Local Folder '${ctx.fileWorkspaceFolder.name}' - do not add or change files`
             }
         ],
         "settings": {
-            "inox.enableProjectMode": true
+            "inox.enableProjectMode": true,
+            "files.autoSave": "afterDelay"
         },
         "launch": {
             "version": "0.2.0",
