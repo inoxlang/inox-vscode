@@ -1,9 +1,13 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { InoxExtensionContext } from "./inox-extension-context";
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './error-messages';
 
 const SUGGESTION_COMPUTATON_INTERVAL_MILLIS = 3_000
 const USER_IDLE_THRESHOLD_MILLIS = 5_000
 const ONBOARDING_KEY_PREFIX = 'onboarding.'
+const NEVER_SHOW_AGAIN_STATUS = 'never-show-again'
+const DISMISSED_ONCE_STATUS = 'dismissed-once'
 
 
 let isWindowFocused = true
@@ -98,23 +102,35 @@ function computeOnboardingSuggestions(ctx: InoxExtensionContext): Suggestion[] {
 
     const suggestions: Suggestion[] = []
 
-    {
+    suggest_first_folder: {
         const FIRST_FOLDER_SUGGESTION_STATUS = 'first-folder-suggestion-status'
         const status = getStateValue(FIRST_FOLDER_SUGGESTION_STATUS)
 
-        if (status === undefined || status == 'ignored-once') {
+        if (ctx.config.project) {
+            setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
+            break suggest_first_folder
+        }
+
+        if (status === undefined || status == DISMISSED_ONCE_STATUS) {
             suggestions.push(new Suggestion({
                 importance: SuggestionImportance.CRUCIAL,
-                message: 'The Inox Extension has been installed.',
-                items: ['Create Workspace'],
-                async onAction(e) {
-                    setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, 'done')
+                message:
+                    "The Inox Extension is installed. You can now create a new folder (example: my-web-app), open it with VSCode " +
+                    "and execute the command `Inox: Initialize new Project in Current Folder`.",
+                items: ['Got it'],
+                async onAction() {
+                    if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
+                        vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
+                        return
+                    }
+
+                    setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
                 },
                 async onDismissed() {
                     if (status === undefined) {
-                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, 'ignored-once')
+                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, DISMISSED_ONCE_STATUS)
                     } else {
-                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, 'never-show-again')
+                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
                     }
                 },
             }))

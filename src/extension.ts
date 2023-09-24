@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
@@ -7,10 +9,12 @@ import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject, openProject } from './project';
 import { sleep } from './utils';
 import { InlineDebugAdapterFactory } from './debug';
-import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier } from 'vscode-languageclient';
+import { DocumentFormattingParams, DocumentFormattingRequest, TextDocumentIdentifier, VersionedTextDocumentIdentifier } from 'vscode-languageclient';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { TutorialCodeLensProvider, registerLearningCodeLensAndCommands } from './learn/learn';
 import { computeSuggestions } from './suggestions';
+import { LSP_CLIENT_NOT_RUNNING_MSG } from './error-messages';
+const PROJECT_NAME_REGEX = /^[a-z0-9_-]+$/i
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -108,6 +112,38 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                 return
             }
 
+
+            let projectName: string
+            {
+
+                let input: string | undefined
+                let tries = 2
+
+                while (tries > 0 && input === undefined) {
+                    tries--
+                    input = await vscode.window.showInputBox({
+                        placeHolder: 'Examples: learn-inox, my-web-app',
+                        prompt: `Name of the project`,
+                        async validateInput(value) {
+                            if (PROJECT_NAME_REGEX.test(value)) {
+                                return null
+                            } else {
+                                return {
+                                    message: "The project's name should only contains letters, digits, '-' and '_'",
+                                    severity: vscode.InputBoxValidationSeverity.Error
+                                }
+                            }
+                        },
+                    })
+                }
+
+                if (input === undefined) {
+                    return
+                }
+                projectName = input
+            }
+
+
             debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
             await ctx.restartLSPClient(true) //restart LSP client in project mode
 
@@ -119,9 +155,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                 progress.report({ increment: 0 });
 
                 //wait for LSP client
-                await sleep(3000) //TODO: replace sleep
+                for (let i = 0; i < 3; i++) {
+                    if (!ctx.lspClient?.isRunning()) {
+                        await sleep(1000)
+                    }
+                }
 
-                await initializeNewProject(ctx)
+                if (!ctx.lspClient?.isRunning()) {
+                    progress.report({ increment: 100 });
+                    vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
+                }
+
+                await initializeNewProject(ctx, projectName)
+
+                vscode.window.showInformationMessage(
+                    "The project should have been created on the server. You can open it by clicking 'Open Workspace' in the `.code-workspace` file."
+                )
 
                 progress.report({ increment: 100 });
             });

@@ -110,6 +110,11 @@
 			{
 				"command": "inox.secretKeeper.updateEntry",
 				"title": "Update"
+			},
+			{
+				"category": "Inox",
+				"command": "inox.clear-global-state",
+				"title": "Clear Extension's Global State (Irreversible)"
 			}
 		],
 		"menus": {

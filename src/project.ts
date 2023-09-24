@@ -7,7 +7,7 @@ import { stringifyCatchedValue } from './utils';
 import { saveTempTokens } from './configuration';
 
 
-export async function initializeNewProject(ctx: InoxExtensionContext){
+export async function initializeNewProject(ctx: InoxExtensionContext, projectName: string){
     const lspClient = ctx.lspClient
     if(!lspClient || !lspClient.isRunning()){
         throw new Error("LSP client not running")
@@ -60,7 +60,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext){
     
     if(! fs.existsSync(inoxProjectFile)){
         try {
-            const projectId = await lspClient.sendRequest('project/create', {name: ctx.fileWorkspaceFolder.name})
+            const projectId = await lspClient.sendRequest('project/create', {name: projectName})
             if(typeof projectId != 'string'){
                 throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
             }
