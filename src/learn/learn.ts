@@ -24,7 +24,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
     isTutorialLoading = false
 
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
-        if(this.isTutorialLoading){
+        if (this.isTutorialLoading) {
             return []
         }
 
@@ -36,7 +36,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
             arguments: [document]
         }
 
-        const chooseSeriesCommandLens = new vscode.CodeLens(topOfDocument, chooseSeriesCommand)
+        const chooseSeriesLens = new vscode.CodeLens(topOfDocument, chooseSeriesCommand)
 
         const nextTutorialCommand: vscode.Command = {
             command: NEXT_TUTORIAL_CMD_NAME,
@@ -44,30 +44,45 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
             arguments: [document]
         }
 
-        const nextTutorialCommandLens = new vscode.CodeLens(topOfDocument, nextTutorialCommand)
+        const nextTutorialLens = new vscode.CodeLens(topOfDocument, nextTutorialCommand)
         const lenses: vscode.CodeLens[] = []
 
         const text = document.getText()
-        const metadata = getTutFileMetadata(text)
+        const current = getCurrentTutorialAndSeries(document)
         const helpMessage = formatHelpMessage(chooseSeriesCommand.title)
 
-        // if there is no metadata we cannot know the current tutorial so we delete 
-        // all the file's content and add the help message
-        if (metadata == MetadataCommentError.NotFound && !text.includes(helpMessage)) {
-            const editor = vscode.window.activeTextEditor
-            if (editor?.document == document) {
-                await editor.edit(edit => {
-                    const position = new vscode.Position(0, 0)
-                    edit.delete(getDocRange(document))
-                    edit.insert(position, formatHelpMessage(chooseSeriesCommand.title))
-                })
-                await document.save()
-            }
-        } else if(text.includes(helpMessage) && text.length){
-            lenses.push(chooseSeriesCommandLens)
-        } else {
-            lenses.push(chooseSeriesCommandLens, nextTutorialCommandLens)
+        switch (current) {
+            case MetadataCommentError.NotFound: case MetadataCommentError.UnknownSeries:
+                // if there is no metadata (or the series is unknown) we cannot know the current tutorial so we delete 
+                // all the file's content and add the help message
+                if (!text.includes(helpMessage)) {
+                    const editor = vscode.window.activeTextEditor
+                    if (editor?.document == document) {
+                        await editor.edit(edit => {
+                            const position = new vscode.Position(0, 0)
+                            edit.delete(getDocRange(document))
+                            edit.insert(position, formatHelpMessage(chooseSeriesCommand.title))
+                        })
+                        await document.save()
+                    }
+                } else {
+                    lenses.push(chooseSeriesLens)
+                }
+                break
+            case MetadataCommentError.UnknownTutorial:
+                lenses.push(chooseSeriesLens)
+                break
+            default:
+                const { series, tutorial } = current
+                const indexCurrentTutorial = series.tutorials.findIndex(tut => tut.id == tutorial.id)
+
+                if (indexCurrentTutorial == series.tutorials.length - 1) {  // last tutorial
+                    lenses.push(chooseSeriesLens)
+                } else {
+                    lenses.push(chooseSeriesLens, nextTutorialLens)
+                }
         }
+
 
         return lenses
     }
@@ -97,23 +112,8 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
     ctx.base.subscriptions.push(codeLensProviderDisposable)
 
     vscode.commands.registerCommand(CHOOSE_TUTORIAL_SERIES_CMD_NAME, async (tutDoc: vscode.TextDocument) => {
-        const lspClient = ctx.lspClient
-
-        //make sure we have the data
-        {
-            if (!lspClient?.isRunning()) {
-                vscode.window.showWarningMessage(LEARNING_PREFIX + LSP_CLIENT_NOT_RUNNING_MSG)
-                return
-            }
-
-            if (learningInfo === undefined || tutorialSeries.length === 0) {
-                await tryUpdatingData(ctx)
-            }
-
-            if (learningInfo === undefined || tutorialSeries.length === 0) {
-                vscode.window.showWarningMessage(LEARNING_PREFIX + 'failed to get learning data')
-                return
-            }
+        if (! await tryLoadingData(ctx)) {
+            return
         }
 
         type QuickPickItem = vscode.QuickPickItem & {
@@ -131,8 +131,9 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
         const quickPick = vscode.window.createQuickPick()
         quickPick.items = quickPickItems
         quickPick.canSelectMany = false
+        quickPick.show()
 
-        quickPick.onDidAccept(() => {
+        const disposable = quickPick.onDidAccept(() => {
             const editor = vscode.window.activeTextEditor
             if (!editor || editor.document != tutDoc) {
                 return
@@ -142,9 +143,12 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
             if (selectedItem === undefined) {
                 return
             }
-            quickPick.hide()
 
             const series = selectedItem.series
+
+            quickPick.hide()
+            quickPick.dispose()
+            disposable.dispose()
 
             //load first tutorial of the series
             provider.isTutorialLoading = true
@@ -156,20 +160,57 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
             })
         })
 
-        quickPick.show()
+        return new vscode.Disposable(() => {
+            disposable.dispose()
+            quickPick.dispose()
+        })
     })
 
-    // const metadata = getTutFileMetadata(tutDoc.getText())
+    vscode.commands.registerCommand(NEXT_TUTORIAL_CMD_NAME, async (tutDoc: vscode.TextDocument) => {
+        if (! await tryLoadingData(ctx)) {
+            return
+        }
 
-    // switch(metadata){
-    // case MetadataCommentError.NotFound:
-    // case MetadataCommentError.UnknownSeries:
-    // case MetadataCommentError.UnknownTutorial:
-    // default:
+        const current = getCurrentTutorialAndSeries(tutDoc)
+        if (typeof current != 'object') {
+            return
+        }
 
-    // }
+        const { series, tutorial } = current
+        const indexOfCurrentTutorial = series.tutorials.findIndex(tut => tut.id == tutorial.id)
+
+        // not found or last tutorial
+        if (indexOfCurrentTutorial < 0 || indexOfCurrentTutorial == series.tutorials.length - 1) {
+            return
+        }
+
+        const editor = vscode.window.activeTextEditor
+        if (!editor || editor.document != tutDoc) {
+            return
+        }
+
+        const nextTutorial = series.tutorials[indexOfCurrentTutorial + 1]
+        return loadTutorialInDocument(editor, series, nextTutorial)
+    })
 }
 
+async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
+    if (!ctx.lspClient?.isRunning()) {
+        vscode.window.showWarningMessage(LEARNING_PREFIX + LSP_CLIENT_NOT_RUNNING_MSG)
+        return false
+    }
+
+    if (learningInfo === undefined || tutorialSeries.length === 0) {
+        await tryUpdatingData(ctx)
+    }
+
+    if (learningInfo === undefined || tutorialSeries.length === 0) {
+        vscode.window.showWarningMessage(LEARNING_PREFIX + 'failed to get learning data')
+        return false
+    }
+
+    return true
+}
 
 function loadTutorialInDocument(editor: vscode.TextEditor, series: TutorialSeries, tutorial: Tutorial) {
     const comment = formatMetadataComment(series, tutorial)
@@ -186,7 +227,7 @@ function loadTutorialInDocument(editor: vscode.TextEditor, series: TutorialSerie
     })
 }
 
-interface Metadata {
+interface Current {
     series: TutorialSeries
     tutorial: Tutorial
 }
@@ -232,8 +273,8 @@ function parseTutFileMetadata(content: string): PersistedMetadata | MetadataComm
     return { seriesId, seriesName, tutorialId, tutorialName }
 }
 
-function getTutFileMetadata(content: string): Metadata | MetadataCommentError {
-    const parsed = parseTutFileMetadata(content)
+function getCurrentTutorialAndSeries(doc: vscode.TextDocument): Current | MetadataCommentError {
+    const parsed = parseTutFileMetadata(doc.getText())
 
     if (parsed == MetadataCommentError.NotFound) {
         return parsed
