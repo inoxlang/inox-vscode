@@ -7,6 +7,15 @@ import { stringifyCatchedValue } from './utils';
 import { saveTempTokens } from './configuration';
 import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 
+const PROJECT_KEY_PREFIX = 'project/'
+
+function getStateValue(ctx: InoxExtensionContext, key: string) {
+    return ctx.getStateValue(PROJECT_KEY_PREFIX + key)
+}
+
+function setStateValue(ctx: InoxExtensionContext, key: string, value: unknown) {
+    return ctx.setStateValue(PROJECT_KEY_PREFIX + key, value)
+}
 
 export async function initializeNewProject(ctx: InoxExtensionContext, projectName: string) {
     const lspClient = ctx.lspClient
@@ -66,22 +75,28 @@ export async function initializeNewProject(ctx: InoxExtensionContext, projectNam
     const inoxProjectFileContent: Record<string, unknown> = {}
 
     if (!fs.existsSync(workspaceFile)) {
-        fs.writeFileSync(workspaceFile, JSON.stringify(workspaceFileContent, null, '  '))
+        await fs.promises.writeFile(workspaceFile, JSON.stringify(workspaceFileContent, null, '  '))
     }
 
     if (!fs.existsSync(readmeFile)) {
-        fs.writeFileSync(readmeFile, readmeFileContent)
+        await fs.promises.writeFile(readmeFile, readmeFileContent)
     }
 
     if (!fs.existsSync(inoxProjectFile)) {
+        const isFirstProject = getStateValue(ctx, 'first-created') !== true
+
         try {
-            const projectId = await lspClient.sendRequest('project/create', { name: projectName })
+            const projectId = await lspClient.sendRequest('project/create', { 
+                name: projectName,
+                addTutFile: isFirstProject
+            })
             if (typeof projectId != 'string') {
                 throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
             }
             inoxProjectFileContent.id = projectId
-            fs.writeFileSync(inoxProjectFile, JSON.stringify(inoxProjectFileContent, null, ' '))
+            await fs.promises.writeFile(inoxProjectFile, JSON.stringify(inoxProjectFileContent, null, ' '))
 
+            await setStateValue(ctx, 'first-created', true)
         } catch (err) {
             const msg = stringifyCatchedValue(err)
             ctx.outputChannel.appendLine(msg)

@@ -123,13 +123,13 @@ function computeOnboardingSuggestions(ctx: InoxExtensionContext): Suggestion[] {
                         return
                     }
 
-                    setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
+                    await setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
                 },
                 async onDismissed() {
                     if (status === undefined) {
-                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, DISMISSED_ONCE_STATUS)
+                        await setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, DISMISSED_ONCE_STATUS)
                     } else {
-                        setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
+                        await setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
                     }
                 },
             }))
