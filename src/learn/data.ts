@@ -1,7 +1,7 @@
 import { InoxExtensionContext } from "../inox-extension-context"
 import { LEARNING_PREFIX } from "./const"
 
-const LIST_TUTORIALS_METHOD = "learn/listTutorialSeries"
+const GET_TUTORIAL_SERIES_METHOD = "learn/getTutorialSeries"
 const GET_LEARN_INFO_METHOD = "learn/getInfo"
 
 
@@ -36,16 +36,16 @@ export async function tryUpdatingData(ctx: InoxExtensionContext) {
     }
 
     get_tutorials: {
-        const result = await ctx.lspClient.sendRequest(LIST_TUTORIALS_METHOD, {})
+        const result = await ctx.lspClient.sendRequest(GET_TUTORIAL_SERIES_METHOD, {})
 
         if (typeof result != 'object' || result === null) {
-            ctx.debugChannel.appendLine(LEARNING_PREFIX + LIST_TUTORIALS_METHOD + ': invalid result: ' + JSON.stringify(result))
+            ctx.debugChannel.appendLine(LEARNING_PREFIX + GET_TUTORIAL_SERIES_METHOD + ': invalid result: ' + JSON.stringify(result))
             break get_tutorials
         }
 
         const record = result as Record<string, unknown>
         if (!('tutorialSeries' in record)) {
-            ctx.debugChannel.appendLine(LEARNING_PREFIX + LIST_TUTORIALS_METHOD + ': missing tutorialSeries property in result: ' + JSON.stringify(result))
+            ctx.debugChannel.appendLine(LEARNING_PREFIX + GET_TUTORIAL_SERIES_METHOD + ': missing tutorialSeries property in result: ' + JSON.stringify(result))
             break get_tutorials
         }
 
