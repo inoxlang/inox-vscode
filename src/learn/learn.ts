@@ -11,7 +11,7 @@ export const NEXT_TUTORIAL_CMD_NAME = 'inox.learn.next-tutorial'
 
 const DATA_FETCHING_INTERVAL_MILLIS = 300_000
 const METADATA_COMMENT_FORMAT = '# Series: series [series_id]\n# Tutorial: tutorial [tutorial_id]'
-const METADATA_COMMENT_REGEX = /^#[ \t]+Series: (?<series_name>.*?) \[(?<series_id>.*)\]\s*\n#[ \t]+Tutorial: (?<tutorial_name>.*) \[(?<tutorial_id>.*?)\]\s*$/u
+const METADATA_COMMENT_REGEX = /#[ \t]+Series: (?<series_name>.*?) \[(?<series_id>.*)\]\s*\n#[ \t]+Tutorial: (?<tutorial_name>.*) \[(?<tutorial_id>.*?)\]\s*\n/u
 
 enum MetadataCommentError {
     NotFound,
@@ -20,43 +20,56 @@ enum MetadataCommentError {
 }
 
 export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
+
+    isTutorialLoading = false
+
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
+        if(this.isTutorialLoading){
+            return []
+        }
+
         let topOfDocument = new vscode.Range(0, 0, 0, 0)
 
-        let chooseCommand: vscode.Command = {
+        const chooseSeriesCommand: vscode.Command = {
             command: CHOOSE_TUTORIAL_SERIES_CMD_NAME,
             title: 'Select Tutorial Series',
             arguments: [document]
         }
 
-        let nextTutorialCommand: vscode.Command = {
+        const chooseSeriesCommandLens = new vscode.CodeLens(topOfDocument, chooseSeriesCommand)
+
+        const nextTutorialCommand: vscode.Command = {
             command: NEXT_TUTORIAL_CMD_NAME,
             title: 'Next Tutorial',
             arguments: [document]
         }
 
+        const nextTutorialCommandLens = new vscode.CodeLens(topOfDocument, nextTutorialCommand)
+        const lenses: vscode.CodeLens[] = []
+
         const text = document.getText()
         const metadata = getTutFileMetadata(text)
+        const helpMessage = formatHelpMessage(chooseSeriesCommand.title)
 
-        if (metadata == MetadataCommentError.NotFound && text.length < 100) {
-            const metadata = getTutFileMetadata(text)
-
+        // if there is no metadata we cannot know the current tutorial so we delete 
+        // all the file's content and add the help message
+        if (metadata == MetadataCommentError.NotFound && !text.includes(helpMessage)) {
             const editor = vscode.window.activeTextEditor
             if (editor?.document == document) {
                 await editor.edit(edit => {
                     const position = new vscode.Position(0, 0)
                     edit.delete(getDocRange(document))
-                    edit.insert(position, formatHelpMessage(chooseCommand.title))
+                    edit.insert(position, formatHelpMessage(chooseSeriesCommand.title))
                 })
                 await document.save()
             }
+        } else if(text.includes(helpMessage) && text.length){
+            lenses.push(chooseSeriesCommandLens)
+        } else {
+            lenses.push(chooseSeriesCommandLens, nextTutorialCommandLens)
         }
 
-
-        return [
-            new vscode.CodeLens(topOfDocument, chooseCommand),
-            new vscode.CodeLens(topOfDocument, nextTutorialCommand),
-        ]
+        return lenses
     }
 }
 
@@ -134,7 +147,13 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
             const series = selectedItem.series
 
             //load first tutorial of the series
-            loadTutorialInDocument(editor, selectedItem.series, series.tutorials[0])
+            provider.isTutorialLoading = true
+            loadTutorialInDocument(editor, selectedItem.series, series.tutorials[0]).then(() => {
+
+                setTimeout(() => {
+                    provider.isTutorialLoading = false
+                }, 100)
+            })
         })
 
         quickPick.show()
