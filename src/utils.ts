@@ -22,3 +22,9 @@ export function sleep(timeMillis: number){
         setTimeout(() => resolve(), timeMillis)
     })
 }
+
+export function assertNotNil<T>(v: T): asserts v is NonNullable<T> {
+    if(v === undefined || v === null){
+        throw new Error("value is nil or undefined")
+    } 
+}
