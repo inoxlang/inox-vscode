@@ -8,6 +8,7 @@ import { INOX_FS_SCHEME } from "./inox-fs";
 import { sleep } from './utils';
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
 import { openProject } from './project';
+import { fmtLspServerNotRunning } from './errors';
 
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
@@ -41,14 +42,11 @@ export async function startLocalProjectServerIfNecessary(ctx: InoxExtensionConte
 
   const command = ctx.config.localProjectServerCommand
   if (command.length == 0) {
-    vscode.window.showWarningMessage(
-      `No Inox LSP server is running on ${ctx.config.websocketEndpoint} and the setting ${LOCAL_PROJECT_SERVER_COMMAND_ENTRY} is not set.` +
-      ` Either set the command to start a local Inox LSP server or manually start a server on ${ctx.config.websocketEndpoint}.`
-    )
+    vscode.window.showErrorMessage(fmtLspServerNotRunning(ctx))
     return false
   }
 
-  const msg = LOCAL_LSP_SERVER_LOG_PREFIX + 'LSP server is not running, execute command to start local server: ' + command.join(' ')
+  const msg = LOCAL_LSP_SERVER_LOG_PREFIX + 'LSP server is not running, executing command to start local server: ' + command.join(' ')
   ctx.outputChannel.appendLine(msg)
   ctx.debugChannel.appendLine(msg)
 
