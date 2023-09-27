@@ -39,6 +39,9 @@
 			"include": "#multiline-concatenation"
 		},
 		{
+			"include": "#extend-statement-heads"
+		},
+		{
 			"include": "#return-type"
 		},
 		{
@@ -718,6 +721,23 @@
 					]
 				}
 			}
+		},
+		"extend-statement-heads": {
+			"begin": "(\\bextend)[ \t]+",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#pattern-content"
+				},
+				{
+					"include": "$self"
+				}
+			],
+			"end": "(?<!\\bextend\\s+)(?=\\{)"
 		},
 		"return-type": {
 			"patterns": [
