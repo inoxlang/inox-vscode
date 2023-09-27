@@ -328,7 +328,7 @@
 			"patterns": [
 				{
 					"name": "string.regexp.path-pattern",
-					"begin": "%\\.{0,2}/[-a-zA-Z0-9_+@/.]*(?=\\{)",
+					"begin": "%\\.{0,2}/[^\\s\\[\\]{}(),;:|]*(?=\\{)",
 					"patterns": [
 						{
 							"begin": "\\{",
@@ -350,7 +350,7 @@
 							}
 						},
 						{
-							"match": "[-a-zA-Z0-9_+@/.]+",
+							"match": "[^\\s\\[\\]{}(),;:|]+",
 							"name": "string.regexp.path-pattern-slice"
 						}
 					],
@@ -358,7 +358,7 @@
 				},
 				{
 					"name": "string.regexp.path-pattern",
-					"match": "%\\.{0,2}/[-a-zA-Z0-9_+/.*?\\[\\]]*"
+					"match": "%\\.{0,2}/[^\\s\\[\\]{}(),;:|]*"
 				}
 			]
 		},
@@ -366,7 +366,7 @@
 			"patterns": [
 				{
 					"name": "string.interpolated.path-expression",
-					"begin": "\\.{0,2}/[-a-zA-Z0-9_+@/.]*(?=\\{)",
+					"begin": "\\.{0,2}/[^\\s\\[\\]{}(),;:|]*(?=\\{)",
 					"patterns": [
 						{
 							"begin": "\\{",
@@ -388,7 +388,7 @@
 							}
 						},
 						{
-							"match": "[-a-zA-Z0-9_+@/.]+",
+							"match": "[^\\s\\[\\]{}(),;:|]+",
 							"name": "string.unquoted.string-slice"
 						}
 					],
@@ -396,7 +396,7 @@
 				},
 				{
 					"name": "string.unquoted",
-					"match": "\\.{0,2}/[-a-zA-Z0-9_+@/.]*"
+					"match": "\\.{0,2}/[^\\s\\[\\]{}(),;:|]*"
 				}
 			]
 		},
