@@ -1076,7 +1076,11 @@
 					"name": "string.unquoted.inox"
 				},
 				{
-					"match": "-+",
+					"match": "-{3,}[a-zA-Z0-9_+@./~^-](?![>])",
+					"name": "string.unquoted.inox"
+				},
+				{
+					"match": "-{1,2}(?!\\s*[a-zA-Z0-9_$(])",
 					"name": "string.unquoted.inox"
 				}
 			]
@@ -1169,7 +1173,7 @@
 					"name": "string.unquoted"
 				},
 				{
-					"match": "-[a-zA-Z_-]+\\b",
+					"match": "-[a-zA-Z_-]+\\b(?!\\s*[a-zA-Z0-9_$(])",
 					"name": "string.unquoted"
 				}
 			]
