@@ -1169,7 +1169,7 @@
 					"name": "string.unquoted"
 				},
 				{
-					"match": "-[a-zA-Z_-]\\b",
+					"match": "-[a-zA-Z_-]+\\b",
 					"name": "string.unquoted"
 				}
 			]
