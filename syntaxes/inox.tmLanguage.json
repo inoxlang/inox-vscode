@@ -723,7 +723,7 @@
 			}
 		},
 		"extend-statement-heads": {
-			"begin": "(\\bextend)[ \t]+",
+			"begin": "^\\s*(extend)[ \t]+",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.other.inox"
