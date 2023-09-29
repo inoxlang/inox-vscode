@@ -30,6 +30,9 @@
 			"include": "#pattern-declarations"
 		},
 		{
+			"include": "#pattern-namespace-declarations"
+		},
+		{
 			"include": "#pattern-conversions"
 		},
 		{
@@ -569,12 +572,15 @@
 			"patterns": [
 				{
 					"comment": "declaration for an object pattern",
-					"begin": "(%[a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\{)",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\{)",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.name.type.inox"
+							"name": "keyword.other.inox"
 						},
 						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
 							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
@@ -592,13 +598,16 @@
 				},
 				{
 					"comment": "declaration for a list pattern",
-					"begin": "(%[a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\[)",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\[)",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.name.type.inox"
+							"name": "keyword.other.inox"
 						},
 						"2": {
-							"name": "punctuation.begin.bracket.inox"
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
 					"end": "\\]",
@@ -615,13 +624,16 @@
 				},
 				{
 					"comment": "declaration for a parenthesized pattern",
-					"begin": "(%[a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\()",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\()",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.name.type.inox"
+							"name": "keyword.other.inox"
 						},
 						"2": {
-							"name": "punctuation.begin.bracket.inox"
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
 					"end": "\\)",
@@ -635,6 +647,38 @@
 							"include": "#pattern-content"
 						}
 					]
+				},
+				{
+					"match": "^\\s*(pattern)(?:[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)?",
+					"captures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					}
+				}
+			]
+		},
+		"pattern-namespace-declarations": {
+			"patterns": [
+				{
+					"match": "^\\s*(pnamespace)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*[.]?)?[ \t]*",
+					"captures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					}
 				}
 			]
 		},
@@ -880,7 +924,7 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|assign|Mapping|udata|concat|self)\\b(?![-_])"
+					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|assign|Mapping|udata|concat|self|pnamespace)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",
