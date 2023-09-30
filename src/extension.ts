@@ -12,7 +12,7 @@ import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
 import { sleep } from './utils';
-const PROJECT_NAME_REGEX = /^[a-z0-9_-]+$/i
+const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]+$/i
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -126,7 +126,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                                 return null
                             } else {
                                 return {
-                                    message: "The project's name should only contains letters, digits, '-' and '_'",
+                                    message: "The project's name should starts with a letter and should only contains letters, digits, '-' and '_'",
                                     severity: vscode.InputBoxValidationSeverity.Error
                                 }
                             }
