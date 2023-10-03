@@ -12,6 +12,10 @@ import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
 
+
+// after this duration the local file cache is used as a fallack
+const LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = 3000;
+
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
 
@@ -50,6 +54,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     if (config.project) {
         ctx.inoxFS = createAndRegisterInoxFs(ctx)
+        ctx.inoxFS.ctx = ctx
+        setTimeout(() => {
+            if(!ctx.lspClient?.isRunning()){
+                ctx.inoxFS?.fallbackOnLocalFileCache()
+            }
+        }, LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS)
 
         const secretKeeper = new SecretKeeper(ctx);
         vscode.window.registerTreeDataProvider('secretKeeper', secretKeeper);
@@ -78,12 +88,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
 
 
-    //register debug adapter
 
-    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', new InlineDebugAdapterFactory(ctx)));
-
-
-    //
+    const debug = new InlineDebugAdapterFactory(ctx)
+    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', debug));
     registerLearningCodeLensAndCommands(ctx)
 
     //register commands

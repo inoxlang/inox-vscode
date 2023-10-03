@@ -102,11 +102,7 @@ export class InoxExtensionContext {
             }
         }
 
-        if (this.config.project) {
-            if (this.inoxFS) {
-                this.inoxFS.ctx = this
-            }
-        } else if (this.inoxFS) {
+        if (! this.config.project) {
             //TODO: remove filesystem.
         }
 

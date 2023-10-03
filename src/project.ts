@@ -63,7 +63,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
 
 
     ctx.debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
-    await ctx.restartLSPClient(true) //restart LSP client in project mode
+    await ctx.restartLSPClient(true)
 
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Window,
