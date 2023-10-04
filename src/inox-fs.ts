@@ -120,16 +120,20 @@ export class InoxFS implements vscode.FileSystemProvider {
 	}
 
 
-	set ctx(context: InoxExtensionContext) {
+	set ctx(ctx: InoxExtensionContext) {
 		if (this._ctx !== undefined) {
 			throw new Error('context already set')
 		}
 
-		this._ctx = context
+		this._ctx = ctx
 		if (this._ctx.config.project?.id) {
-			this._localFileCacheDir = getProjectFileCacheDir(context, this._ctx.config.project.id)
+			this._localFileCacheDir = getProjectFileCacheDir(ctx, this._ctx.config.project.id)
 		}
+
 		this._projectOpenDisposable?.dispose()
+
+		//add disposables
+		this.ctx.base.subscriptions.push(this._statusBarItem, this._emitter)
 
 		const projectId = this.ctx.config.project?.id
 		if (projectId !== undefined) {
@@ -137,10 +141,10 @@ export class InoxFS implements vscode.FileSystemProvider {
 			fs.mkdirSync(dir, { recursive: true })
 		}
 
-		this._projectOpenDisposable = context.onProjectOpen(() => {
+		this._projectOpenDisposable = ctx.onProjectOpen(() => {
 			this.updateStatusBarItem()
 			this.reOpenDocs()
-			context.lspClient?.onDidChangeState?.(() => {
+			ctx.lspClient?.onDidChangeState?.(() => {
 				this.updateStatusBarItem()
 			})
 		})
