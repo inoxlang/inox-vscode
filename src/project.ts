@@ -3,10 +3,9 @@ import * as vscode from 'vscode'
 
 import { InoxExtensionContext } from "./inox-extension-context";
 import { join, basename } from 'path';
-import { stringifyCatchedValue } from './utils';
+import { stringifyCatchedValue, sleep } from './utils';
 import { saveTempTokens } from './configuration';
 import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
-import { sleep } from './utils';
 
 const PROJECT_KEY_PREFIX = 'project/'
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]+$/i

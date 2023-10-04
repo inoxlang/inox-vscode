@@ -5,7 +5,6 @@ import { Configuration } from './configuration';
 import { InoxFS } from './inox-fs';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp';
 import { stringifyCatchedValue } from './utils';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 
 const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'
 
