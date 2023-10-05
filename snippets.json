@@ -29,6 +29,16 @@
 		],
 		"description": "empty manifest"
 	},
+    "preinit": {
+        "scope": "Inox",
+		"prefix": "preinit",
+		"body": [
+			"preinit {",
+            "\t$1",
+            "}"
+		],
+		"description": "preinit statement"
+    },
     "walk": {
         "scope": "Inox",
 		"prefix": "walk",
