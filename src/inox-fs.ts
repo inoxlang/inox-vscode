@@ -22,7 +22,7 @@ const UPLOAD_CANCELLATION_TOKEN_TIMEOUT = 20_000
 let uploadTimestampsWindow: number[] = []
 
 //caching
-const PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS = 1000
+const PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS = 2000
 const MAX_CACHED_CONTENT_SIZE = 1_000_000
 const CACHED_CONTENT_EXTENSIONS = [
 	//code
@@ -34,6 +34,7 @@ const CACHED_CONTENT_EXTENSIONS = [
 	//data & config
 	'.json', '.yaml', '.yml'
 ]
+const MSG_TYPE_OF_FILE_NOT_CACHED = "[This type of file is never cached by default]"
 
 type RemoteDirEntry = {
 	name: string,
@@ -233,14 +234,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 						continue
 					}
 
-					const contentB64 = await this.fetchBase64Content(uri)
-					if (contentB64 == 'not-found') {
-						break
+					const cacheContent = CACHED_CONTENT_EXTENSIONS.includes(extname(remotePath))
+					if(cacheContent){
+						const contentB64 = await this.fetchBase64Content(uri)
+						if (contentB64 == 'not-found') {
+							break
+						}
+	
+						const content = Buffer.from((contentB64 as any).content, 'base64')
+						await this.writeFileInCache(uri, content)
+					} else {
+						await this.writeFileInCache(uri, Buffer.from(''))
 					}
-
-					const content = Buffer.from((contentB64 as any).content, 'base64')
-					await this.writeFileInCache(uri, content)
-					this.filesToCacheProgressively.delete(remotePath)
 				} finally {
 					break
 				}
@@ -272,7 +277,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 				for (const e of entries) {
 					const remoteEntryPath = join(remotePath, e.name)
 					const localPath = join(localFileCacheDir, remoteEntryPath)
-
 					const cacheEntryStats = await fs.promises.stat(localPath).catch(() => null)
 
 					if (e.type == vscode.FileType.Directory) {
@@ -284,8 +288,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 							this.writeToDebugChannel(`${remoteEntryPath} already cached`)
 							continue
 						}
-						this.writeToDebugChannel(`schedule caching of file ${remoteEntryPath} because the remote file is newer`)
+
+						//even if the content will not be cached we add the file
 						this.filesToCacheProgressively.add(remoteEntryPath)
+
+						const cacheContent = CACHED_CONTENT_EXTENSIONS.includes(extname(remoteEntryPath))
+						if(cacheContent){
+							if(cacheEntryStats){
+								this.writeToDebugChannel(`schedule caching of file ${remoteEntryPath} because the remote file is newer`)
+							} else {
+								this.writeToDebugChannel(`schedule caching of file ${remoteEntryPath}`)
+							}
+						} 
 					}
 				}
 				break
@@ -319,7 +333,11 @@ export class InoxFS implements vscode.FileSystemProvider {
 							})
 						break
 					case vscode.FileType.File:
-						this.writeToDebugChannel(`schedule caching of file ${remotePath}`)
+						const cacheContent = CACHED_CONTENT_EXTENSIONS.includes(extname(remotePath))
+						if(cacheContent){
+							this.writeToDebugChannel(`schedule caching of file ${remotePath}`)
+						}
+						//even if the content will not be cached we add the file
 						this.filesToCacheProgressively.add(remotePath)
 						break
 				}
@@ -559,7 +577,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 					await fs.promises.writeFile(localFilePath, buffer)
 				}
 			} else {
-				await fs.promises.writeFile(localFilePath, Buffer.from("[This type of file is never cached]"))
+				await fs.promises.writeFile(localFilePath, Buffer.from(MSG_TYPE_OF_FILE_NOT_CACHED))
 			}
 		} catch (reason) {
 			this.ctx.debugChannel.appendLine(`failed to write file cache entry for ${uri.path}` + stringifyCatchedValue(reason))
