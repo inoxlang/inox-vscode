@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { InoxExtensionContext } from './inox-extension-context';
 import * as fs from 'fs'
 import { extname, join } from 'path';
-import { sleep } from './utils';
+import { sleep, stringifyCatchedValue } from './utils';
 
 export const INOX_FS_SCHEME = "inox"
 const CANCELLATION_TOKEN_TIMEOUT = 5000
@@ -274,13 +274,32 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 
 			if (this._localFileCacheDir) {
-				//create the entries of type dir in the file cache
-				const dirPath = join(this._localFileCacheDir, uri.path)
-				await Promise.allSettled(entries.map(async e => {
-					if ((e.type as vscode.FileType) == vscode.FileType.Directory) {
-						await fs.promises.mkdir(join(dirPath, e.name), { recursive: true })
-					}
-				}))
+				try {
+					//asynchronously create the entries of type dir in the file cache
+					const dirPath = join(this._localFileCacheDir, uri.path)
+					entries.map(e => {
+						if ((e.type as vscode.FileType) == vscode.FileType.Directory) {
+							fs.promises.mkdir(join(dirPath, e.name), { recursive: true })
+							.catch(reason => {
+								this.ctx.debugChannel.appendLine(`failed to create cache dir ${e.name}`+ stringifyCatchedValue(reason))
+							})
+						}
+					})
+
+					//asynchronously remove the cached files & dirs that are not in the entries returned by the server
+					const entriesInCache = await fs.promises.readdir(dirPath)
+					entriesInCache.map(e => {
+						if(entries.includes(e)){
+							return
+						}
+						fs.promises.rm(join(dirPath, e), { recursive: true })
+						.catch(reason => {
+							this.ctx.debugChannel.appendLine(`failed to remove file ${e}`+ stringifyCatchedValue(reason))
+						})
+					})
+				} catch(err){
+					this.ctx.debugChannel.appendLine(stringifyCatchedValue(err))
+				}
 			}
 
 			return entries.map(e => {
