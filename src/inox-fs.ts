@@ -5,8 +5,25 @@ import { extname, join } from 'path';
 import { sleep, stringifyCatchedValue } from './utils';
 
 export const INOX_FS_SCHEME = "inox"
+
+const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
+
+//status texts
+const REMOTE_FS_STATUS_TEXT = '$(explorer-view-icon) Remote filesystem'
+const DISCONNECTED_REMOTE_FS_STATUS_TEXT = '$(explorer-view-icon) Remote filesystem (disconnected)'
+const LOCAL_FILE_CACHE_STATUS_TEXT = '$(explorer-view-icon) Using local file cache'
+
+//remote filesystem
+const MULTIPART_UPLOAD_B64_SIZE_THRESHOLD = 95_000
+const ONE_SECOND_MILLIS = 1000
+const DEFAULT_MAX_UPLOAD_PART_RATE = 10 //up to 10 parts each second
 const CANCELLATION_TOKEN_TIMEOUT = 5000
 const UPLOAD_CANCELLATION_TOKEN_TIMEOUT = 20_000
+let uploadTimestampsWindow: number[] = []
+
+//caching
+const PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS = 1000
+const MAX_CACHED_CONTENT_SIZE = 1_000_000
 const CACHED_CONTENT_EXTENSIONS = [
 	//code
 	'.ix', '.js', '.ts', '.html', '.css',
@@ -17,19 +34,12 @@ const CACHED_CONTENT_EXTENSIONS = [
 	//data & config
 	'.json', '.yaml', '.yml'
 ]
-const MAX_CACHED_CONTENT_SIZE = 1_000_000
-const MULTIPART_UPLOAD_B64_SIZE_THRESHOLD = 95_000
-const ONE_SECOND_MILLIS = 1000
-const DEFAULT_MAX_UPLOAD_PART_RATE = 10 //up to 10 parts each second
 
-const LOCAL_FILE_CACHE_STATUS_TEXT = '$(explorer-view-icon) Using local file cache'
-const REMOTE_FS_STATUS_TEXT = '$(explorer-view-icon) Remote filesystem'
-const DISCONNECTED_REMOTE_FS_STATUS_TEXT = '$(explorer-view-icon) Remote filesystem (disconnected)'
-
-const DEBUG_PREFIX = `[${INOX_FS_SCHEME} FS]`
-
-let uploadTimestampsWindow: number[] = []
-
+type RemoteDirEntry = { 
+	name: string, 
+	type: vscode.FileType, 
+	mtime: number 
+}
 
 export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
 	ctx.outputChannel.appendLine('create project filesystem')
@@ -46,18 +56,21 @@ export class InoxFS implements vscode.FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 	private _ctx: InoxExtensionContext | undefined;
 	private _projectOpenDisposable?: vscode.Disposable
-	private _localFileCacheDir: string | undefined
+	private _localFileCacheDir: string | undefined //project specific cache dir
 	private _useLocalFileCache = false
 	private _statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right)
 
 	private fileContents = new Map<string, Uint8Array>()
+
+	private filesToCacheProgressively = new Set<string>() //remote file paths
+	private dirsToCacheProgressively = new Set<string>() //remote dir paths
+	private progressiveFileCachingHandle?: NodeJS.Timer
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
 
 	constructor(readonly outputChannel: vscode.OutputChannel) {
 	}
-
 
 	async fallbackOnLocalFileCache() {
 		if (this._ctx === undefined) {
@@ -144,11 +157,196 @@ export class InoxFS implements vscode.FileSystemProvider {
 		this._projectOpenDisposable = ctx.onProjectOpen(() => {
 			this.updateStatusBarItem()
 			this.reOpenDocs()
+			this.filesToCacheProgressively.clear()
+			this.dirsToCacheProgressively.clear()
+
+			if (this.progressiveFileCachingHandle !== undefined) {
+				clearInterval(this.progressiveFileCachingHandle)
+				this.progressiveFileCachingHandle = undefined
+			}
+
 			ctx.lspClient?.onDidChangeState?.(() => {
 				this.updateStatusBarItem()
 			})
+
+			this.startProgressiveFileCaching()
 		})
 	}
+
+	// starts periodic file caching. The interval is PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS;
+	// during one tick at most one file's content is fetched.
+	private startProgressiveFileCaching() {
+		this.progressiveFileCachingHandle = setInterval(async () => {
+			if (this.progressiveFileCachingHandle === undefined) {
+				return
+			}
+
+			//stop progressive caching if the client is not running
+			if (!this.clientRunningAndProjectOpen) {
+				clearInterval(this.progressiveFileCachingHandle)
+				this.progressiveFileCachingHandle = undefined
+				return
+			}
+
+			if (this._localFileCacheDir === undefined) {
+				return
+			}
+
+			const localFileCacheDir = this._localFileCacheDir
+
+			//ignore the current tick if a upload is happening
+			//TODO: only fetch content when the websocket client is idle in order to 
+			//not slow down other operations.
+			const now = Date.now()
+			if (uploadTimestampsWindow.length > 0 && (now - uploadTimestampsWindow[uploadTimestampsWindow.length - 1]) < ONE_SECOND_MILLIS) {
+				return
+			}
+
+			//fetch a single file & write the content in the cache
+			for (const remotePath of this.filesToCacheProgressively) {
+				this.filesToCacheProgressively.delete(remotePath)
+				const localPath = join(localFileCacheDir, remotePath)
+
+				const uri = vscode.Uri.from({
+					scheme: INOX_FS_SCHEME,
+					path: remotePath
+				})
+
+				try {
+					//get stats of remote file & local file (cache)
+					const [stats, cacheEntryStats] = await Promise.all([
+						this.fetchStat(uri),
+						fs.promises.stat(localPath).catch(() => null)
+					])
+
+					if (stats instanceof vscode.FileSystemError) {
+						continue
+					}
+
+					//if the cache entry has been written after the last modification of the remote file
+					//we do not need to cache it again & we move to the next file to cache.
+					if (cacheEntryStats && cacheEntryStats.mtime.getTime() > stats.mtime) {
+						this.writeToDebugChannel(`${remotePath} already cached`)
+						continue
+					}
+
+					const contentB64 = await this.fetchBase64Content(uri)
+					if (contentB64 == 'not-found') {
+						break
+					}
+
+					const content = Buffer.from((contentB64 as any).content, 'base64')
+					await this.writeFileInCache(uri, content)
+					this.filesToCacheProgressively.delete(remotePath)
+				} finally {
+					break
+				}
+			}
+
+			//fetch the entries of a single dir to cache
+			for (const remotePath of this.dirsToCacheProgressively) {
+				this.dirsToCacheProgressively.delete(remotePath)
+
+				const uri = vscode.Uri.from({
+					scheme: INOX_FS_SCHEME,
+					path: remotePath
+				})
+
+				let entries: RemoteDirEntry[]
+				try {
+					const localPath = join(localFileCacheDir, remotePath)
+					await fs.promises.mkdir(localPath, { recursive: true })
+
+					const entriesOrError = await this.fetchDirEntries(uri)
+					if (!Array.isArray(entriesOrError)) { //error
+						break
+					}
+					entries = entriesOrError
+				} catch {
+					break
+				}
+
+				for (const e of entries) {
+					const remoteEntryPath = join(remotePath, e.name)
+					const localPath = join(localFileCacheDir, remoteEntryPath)
+
+					const cacheEntryStats = await fs.promises.stat(localPath).catch(() => null)
+
+					if (e.type == vscode.FileType.Directory) {
+						this.dirsToCacheProgressively.add(remoteEntryPath)
+					} else if (e.type == vscode.FileType.File) {
+						//if the cache entry has been written after the last modification of the remote file
+						//we do not need to cache it again.
+						if (cacheEntryStats && cacheEntryStats?.mtime.getTime() > e.mtime) {
+							this.writeToDebugChannel(`${remoteEntryPath} already cached`)
+							continue
+						}
+						this.filesToCacheProgressively.add(remoteEntryPath)
+					}
+				}
+				break
+			}
+
+		}, PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS)
+	}
+
+
+	// This method is called by readDir. Since we want readDir to return as quickly as possible
+	// the only 'awaited' IO operations performed in this function are a single fs.promises.mkdir call  
+	// and a single fs.promises.readdir call. Other non-awaited IO operations are also performed.
+	private async scheduleCachingOfDirEntries(uri: vscode.Uri, entries: RemoteDirEntry[]) {
+		try {
+			//asynchronously create the entries of type dir in the file cache
+			const dirPath = join(this._localFileCacheDir!, uri.path)
+			await fs.promises.mkdir(dirPath, { recursive: true })
+
+			entries.map(e => {
+				const localPath = join(dirPath, e.name)
+				const remotePath = join(uri.path, e.name)
+
+				switch (e.type as vscode.FileType) {
+					case vscode.FileType.Directory:
+						this.writeToDebugChannel(`schedule caching of directory ${remotePath}`)
+						this.dirsToCacheProgressively.add(remotePath)
+
+						fs.promises.mkdir(localPath, { recursive: true })
+							.catch(reason => {
+								this.writeToDebugChannel(+ `failed to create cache dir ${e.name}` + stringifyCatchedValue(reason))
+							})
+						break
+					case vscode.FileType.File:
+						this.writeToDebugChannel(`schedule caching of file ${remotePath}`)
+						this.filesToCacheProgressively.add(remotePath)
+						break
+				}
+			})
+
+			//asynchronously remove the cached files & dirs that are not in the entries returned by the server
+			const entriesInCache = await fs.promises.readdir(dirPath)
+			entriesInCache.map(cachedEntry => {
+				if (entries.find(e => e.name == cachedEntry)) {
+					return
+				}
+				fs.promises.rm(join(dirPath, cachedEntry), { recursive: true })
+					.catch(reason => {
+						this.ctx.debugChannel.appendLine(`failed to remove file cache entry for ${cachedEntry}` + stringifyCatchedValue(reason))
+					})
+			})
+		} catch (err) {
+			this.ctx.debugChannel.appendLine(stringifyCatchedValue(err))
+		}
+	}
+
+	clearFileCache() {
+		if (this._localFileCacheDir) {
+			return fs.promises.rm(this._localFileCacheDir, { recursive: true })
+		}
+	}
+
+	get fileCacheDir() {
+		return this._localFileCacheDir
+	}
+
 
 	get ctx() {
 		if (this._ctx === undefined) {
@@ -225,13 +423,23 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		return this.fetchStat(uri).then(stat => {
+			if (stat instanceof vscode.FileSystemError) {
+				throw stat
+			}
+			return stat
+		})
+	}
+
+
+	private async fetchStat(uri: vscode.Uri) {
 		const tokenSource = this.createTokenSource()
 
 		return this.lspClient.sendRequest('fs/fileStat', {
 			uri: uri.toString(),
-		}, tokenSource.token).then((stats): vscode.FileStat => {
+		}, tokenSource.token).then((stats): vscode.FileStat | vscode.FileSystemError => {
 			if (stats == 'not-found') {
-				throw vscode.FileSystemError.FileNotFound(uri)
+				return vscode.FileSystemError.FileNotFound(uri)
 			}
 
 			return stats as vscode.FileStat
@@ -258,13 +466,31 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		return this.fetchDirEntries(uri).then(async entries => {
+			if (!Array.isArray(entries)) {
+				//error
+				throw entries
+			}
+
+			if (this._localFileCacheDir) {
+				await this.scheduleCachingOfDirEntries(uri, entries)
+			}
+
+			return entries.map(e => {
+				const { name, type } = e
+				return [name, type]
+			})
+		})
+	}
+
+	private fetchDirEntries(uri: vscode.Uri) {
 		const tokenSource = this.createTokenSource()
 
 		return this.lspClient.sendRequest('fs/readDir', {
 			uri: uri.toString(),
 		}, tokenSource.token).then(async entries => {
 			if (entries == 'not-found') {
-				throw vscode.FileSystemError.FileNotFound(uri)
+				return vscode.FileSystemError.FileNotFound(uri)
 			}
 
 			if (!Array.isArray(entries) || entries.some(e => typeof e != 'object')) {
@@ -272,40 +498,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 				return []
 			}
 
-
-			if (this._localFileCacheDir) {
-				try {
-					//asynchronously create the entries of type dir in the file cache
-					const dirPath = join(this._localFileCacheDir, uri.path)
-					entries.map(e => {
-						if ((e.type as vscode.FileType) == vscode.FileType.Directory) {
-							fs.promises.mkdir(join(dirPath, e.name), { recursive: true })
-							.catch(reason => {
-								this.ctx.debugChannel.appendLine(`failed to create cache dir ${e.name}`+ stringifyCatchedValue(reason))
-							})
-						}
-					})
-
-					//asynchronously remove the cached files & dirs that are not in the entries returned by the server
-					const entriesInCache = await fs.promises.readdir(dirPath)
-					entriesInCache.map(e => {
-						if(entries.includes(e)){
-							return
-						}
-						fs.promises.rm(join(dirPath, e), { recursive: true })
-						.catch(reason => {
-							this.ctx.debugChannel.appendLine(`failed to remove file ${e}`+ stringifyCatchedValue(reason))
-						})
-					})
-				} catch(err){
-					this.ctx.debugChannel.appendLine(stringifyCatchedValue(err))
-				}
-			}
-
-			return entries.map(e => {
-				const { name, type } = e
-				return [name, type]
-			})
+			return entries as RemoteDirEntry[]
 		})
 	}
 
@@ -322,11 +515,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
-		const tokenSource = this.createTokenSource()
-
-		return this.lspClient.sendRequest('fs/readFile', {
-			uri: uri.toString(),
-		}, tokenSource.token).then(async (contentB64): Promise<Uint8Array> => {
+		return this.fetchBase64Content(uri).then(async (contentB64): Promise<Uint8Array> => {
 			if (contentB64 == 'not-found') {
 				throw vscode.FileSystemError.FileNotFound(uri)
 			}
@@ -335,23 +524,42 @@ export class InoxFS implements vscode.FileSystemProvider {
 			this.fileContents.set(uri.path, buffer)
 
 			if (this._localFileCacheDir) {
-				//put the file in the file cache
-				const filePath = join(this._localFileCacheDir, uri.path)
-
-				const cacheContent = CACHED_CONTENT_EXTENSIONS.includes(extname(uri.path))
-				if (cacheContent) {
-					if (buffer.byteLength > MAX_CACHED_CONTENT_SIZE) {
-						await fs.promises.writeFile(filePath, Buffer.from("[This file has not been cached because it is too large]"))
-					} else {
-						await fs.promises.writeFile(filePath, buffer)
-					}
-				} else {
-					await fs.promises.writeFile(filePath, Buffer.from("[This type of file is never cached]"))
-				}
+				this.writeFileInCache(uri, buffer)
 			}
 
 			return buffer
 		})
+	}
+
+	private fetchBase64Content(uri: vscode.Uri): Promise<string> {
+		const tokenSource = this.createTokenSource()
+
+		return this.lspClient.sendRequest('fs/readFile', {
+			uri: uri.toString(),
+		}, tokenSource.token)
+	}
+
+	async writeFileInCache(uri: vscode.Uri, buffer: Uint8Array) {
+		if (this._localFileCacheDir === undefined) {
+			return
+		}
+
+		const localFilePath = join(this._localFileCacheDir, uri.path)
+		const cacheContent = CACHED_CONTENT_EXTENSIONS.includes(extname(uri.path))
+
+		try {
+			if (cacheContent) {
+				if (buffer.byteLength > MAX_CACHED_CONTENT_SIZE) {
+					await fs.promises.writeFile(localFilePath, Buffer.from("[This file has not been cached because it is too large]"))
+				} else {
+					await fs.promises.writeFile(localFilePath, buffer)
+				}
+			} else {
+				await fs.promises.writeFile(localFilePath, Buffer.from("[This type of file is never cached]"))
+			}
+		} catch (reason) {
+			this.ctx.debugChannel.appendLine(`failed to write file cache entry for ${uri.path}` + stringifyCatchedValue(reason))
+		}
 	}
 
 	async writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
@@ -362,6 +570,9 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri.path)
 		}
 
+		if (this._localFileCacheDir) {
+			this.writeFileInCache(uri, content)
+		}
 
 		const base64Content = Buffer.from(content).toString('base64')
 		const lspClient = this.lspClient
@@ -401,11 +612,11 @@ export class InoxFS implements vscode.FileSystemProvider {
 			const { done, uploadId } = resp as any
 
 			if (done) {
-				this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ` unique part of ${uri.path} was uploaded (${firstPart.length / 1000}kB of Base64)`)
+				this.writeToDebugChannel(`unique part of ${uri.path} was uploaded (${firstPart.length / 1000}kB of Base64)`)
 				return
 			}
 
-			this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ` first part of ${uri.path} was uploaded (${firstPart.length / 1000}kB of Base64)`)
+			this.writeToDebugChannel(`first part of ${uri.path} was uploaded (${firstPart.length / 1000}kB of Base64)`)
 
 			//upload subsequent parts
 			let startIndex = MULTIPART_UPLOAD_B64_SIZE_THRESHOLD
@@ -431,20 +642,20 @@ export class InoxFS implements vscode.FileSystemProvider {
 				const isLast = endIndex >= base64Content.length
 
 				//update uploadTimestampsWindow & pause while necessary
-				while(true){
+				while (true) {
 					//remove timestamps older than one second
 					while (uploadTimestampsWindow.length > 0 && (Date.now() - uploadTimestampsWindow[0]) > ONE_SECOND_MILLIS) {
 						uploadTimestampsWindow.shift()
 					}
-	
+
 					if (uploadTimestampsWindow.length >= DEFAULT_MAX_UPLOAD_PART_RATE - 1) {
-						this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ` pause upload a short time to avoid being rate limited`)
+						this.writeToDebugChannel(`pause upload a short time to avoid being rate limited`)
 						await sleep(250)
 					} else {
 						break
 					}
 				}
-			
+
 				await lspClient.sendRequest('fs/writeUploadPart', {
 					uri: uri.toString(),
 					uploadId: uploadId,
@@ -452,7 +663,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 					last: isLast
 				}, tokenSource.token)
 
-				this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ` one part of ${uri.path} was uploaded (${part.length / 1000}kB of Base64)`)
+				this.writeToDebugChannel(`one part of ${uri.path} was uploaded (${part.length / 1000}kB of Base64)`)
 
 				if (isLast) {
 					break
@@ -519,6 +730,11 @@ export class InoxFS implements vscode.FileSystemProvider {
 	watch(_resource: vscode.Uri): vscode.Disposable {
 		// ignore, fires for all changes...
 		return new vscode.Disposable(() => { });
+	}
+
+
+	writeToDebugChannel(msg: string) {
+		this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ' ' + msg)
 	}
 
 }

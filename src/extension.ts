@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 
 import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languageclient';
 import { getConfiguration } from './configuration';
 import { InlineDebugAdapterFactory } from './debug';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
 import { registerLearningCodeLensAndCommands } from './learn/learn';
@@ -97,6 +97,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     {
         vscode.commands.registerCommand('inox.clear-global-state', async () => {
             ctx.clearState()
+        })
+
+        vscode.commands.registerCommand('inox.clear-project-file-cache', async () => {
+            ctx.inoxFS?.clearFileCache()
+        })
+
+        vscode.commands.registerCommand('inox.get-project-file-cache-dir', async () => {
+            const dir = ctx.inoxFS?.fileCacheDir
+
+            if(dir){
+                const entries = await fs.promises.readdir(dir).catch(() => null)
+                if(entries === null){
+                    vscode.window.showWarningMessage('failed to read file cache dir: '+dir  + '. It may not exist.')
+                } else {
+                    vscode.window.showInformationMessage(((entries.length == 0) ? '(empty) ' : '') + dir)
+                }
+            } else {
+                vscode.window.showInformationMessage('no file cache found for the current project')
+            }
         })
 
         vscode.commands.registerCommand('inox.lsp.restart', async () => {
