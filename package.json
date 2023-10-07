@@ -115,6 +115,21 @@
 				"category": "Inox",
 				"command": "inox.clear-global-state",
 				"title": "Clear Extension's Global State (Irreversible)"
+			},
+			{
+				"category": "Inox",
+				"command": "inox.clear-project-file-cache",
+				"title": "Clear Project's File Cache (Irreversible)"
+			},
+			{
+				"category": "Inox",
+				"command": "inox.clear-project-file-cache",
+				"title": "Clear Project's File Cache (Irreversible)"
+			},
+			{
+				"category": "Inox",
+				"command": "inox.get-project-file-cache-dir",
+				"title": "Get Project's File Cache Dir"
 			}
 		],
 		"menus": {

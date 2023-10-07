@@ -35,10 +35,10 @@ const CACHED_CONTENT_EXTENSIONS = [
 	'.json', '.yaml', '.yml'
 ]
 
-type RemoteDirEntry = { 
-	name: string, 
-	type: vscode.FileType, 
-	mtime: number 
+type RemoteDirEntry = {
+	name: string,
+	type: vscode.FileType,
+	mtime: number
 }
 
 export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
@@ -96,28 +96,31 @@ export class InoxFS implements vscode.FileSystemProvider {
 			for (const tab of group.tabs) {
 				const viewColumn = group.viewColumn
 
-				if (tab != undefined && (tab.input instanceof vscode.TabInputText)) {
-					const input = tab.input;
-					if (input.uri.scheme != INOX_FS_SCHEME) {
-						continue
-					}
-					//note: openTextDocument fires a didOpen event
-					vscode.workspace.openTextDocument(input.uri).then(() => {
-						vscode.window.showTextDocument(input.uri, {
-							viewColumn: viewColumn,
-							preserveFocus: false,
-						})
-
-						if (activeTab == tab) {
-							setTimeout(() => {
-								vscode.window.showTextDocument(input.uri, {
-									viewColumn: viewColumn,
-									preserveFocus: false,
-								})
-							}, 100)
-						}
-					})
+				if (tab === undefined || !(tab.input instanceof vscode.TabInputText)) {
+					continue
 				}
+
+				const input = tab.input;
+				if (input.uri.scheme != INOX_FS_SCHEME) {
+					continue
+				}
+
+				//note: openTextDocument fires a didOpen event
+				vscode.workspace.openTextDocument(input.uri).then(() => {
+					vscode.window.showTextDocument(input.uri, {
+						viewColumn: viewColumn,
+						preserveFocus: false,
+					})
+
+					if (activeTab == tab) {
+						setTimeout(() => {
+							vscode.window.showTextDocument(input.uri, {
+								viewColumn: viewColumn,
+								preserveFocus: false,
+							})
+						}, 100)
+					}
+				})
 			}
 		}
 
@@ -281,6 +284,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 							this.writeToDebugChannel(`${remoteEntryPath} already cached`)
 							continue
 						}
+						this.writeToDebugChannel(`schedule caching of file ${remoteEntryPath} because the remote file is newer`)
 						this.filesToCacheProgressively.add(remoteEntryPath)
 					}
 				}
