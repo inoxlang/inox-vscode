@@ -649,7 +649,7 @@
 					]
 				},
 				{
-					"comment": "declaration for a parenthesized call",
+					"comment": "declaration for a call",
 					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\()",
 					"beginCaptures": {
 						"1": {
@@ -678,7 +678,7 @@
 					]
 				},
 				{
-					"comment": "declaration for a call with a shorthand syntax",
+					"comment": "declaration for a pattern call with the shorthand syntax",
 					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
 					"beginCaptures": {
 						"1": {
@@ -875,10 +875,7 @@
 					"comment": "ignore binary expressions"
 				},
 				{
-					"match": "(?<=\\))\\s*(?=[a-zA-Z_][a-zA-Z0-9._-]*\\s+[^{])",
-					"comment": "ignore some unrelated cases, the space before [^{] is present for not matching pattern calls"
-				},
-				{
+					"comment": "return type is a tuple pattern",
 					"begin": "(?<=\\))\\s*(?=#\\[)",
 					"patterns": [
 						{
@@ -888,6 +885,7 @@
 					"end": "(?<=\\])(?=\\s*\\{)"
 				},
 				{
+					"comment": "return type is a record pattern",
 					"begin": "(?<=\\))\\s*(?=#\\{)",
 					"patterns": [
 						{
@@ -897,7 +895,66 @@
 					"end": "(?<=\\})(?=\\s*\\{)"
 				},
 				{
-					"begin": "(?<=\\))\\s*(?=[a-zA-Z_%\\{\\[\\(\\]])",
+					"comment": "return type is call",
+					"begin": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "return type is pattern call with the shorthand syntax",
+					"begin": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "return type is named pattern or a pattern namespace member",
+					"match": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\s+\\{)",
+					"captures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					}
+				},
+				{
+					"comment": "other return types",
+					"begin": "(?<=\\))\\s*(?=[_%\\{\\[\\(\\]])",
 					"patterns": [
 						{
 							"include": "#pattern-content"
