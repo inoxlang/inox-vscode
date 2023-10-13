@@ -892,11 +892,11 @@
 							"include": "#pattern-content"
 						}
 					],
-					"end": "(?<=\\})(?=\\s*\\{)"
+					"end": "(?<=\\})(?=\\s*(\\{|=>))"
 				},
 				{
 					"comment": "return type is call",
-					"begin": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"begin": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_-]*)(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "entity.name.type.inox"
@@ -905,7 +905,7 @@
 							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
-					"end": "\\}",
+					"end": "\\)",
 					"endCaptures": {
 						"0": {
 							"name": "punctuation.end.bracket.inox"
@@ -942,7 +942,7 @@
 				},
 				{
 					"comment": "return type is named pattern or a pattern namespace member",
-					"match": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\s+\\{)",
+					"match": "(?<=\\))\\s*([a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\s+\\{|\\s*=>)",
 					"captures": {
 						"1": {
 							"name": "entity.name.type.inox"
@@ -953,14 +953,24 @@
 					}
 				},
 				{
-					"comment": "other return types",
-					"begin": "(?<=\\))\\s*(?=[_%\\{\\[\\(\\]])",
+					"comment": "parenthesized return type, the space in the regex is present to avoid matching calls of the form (...)(arg)",
+					"begin": "(?<=\\))\\s+(?=[(])",
 					"patterns": [
 						{
 							"include": "#pattern-content"
 						}
 					],
-					"end": "(?=\\{)"
+					"end": "(?<=[)])(?=\\s*(\\{|=>))"
+				},
+				{
+					"comment": "other return types",
+					"begin": "(?<=\\))\\s*(?=[_%\\[])",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?=\\s*(\\{|=>))"
 				}
 			]
 		},
