@@ -649,6 +649,64 @@
 					]
 				},
 				{
+					"comment": "declaration for a parenthesized call",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "entity.name.type.inox"
+						},
+						"4": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "declaration for a call with a shorthand syntax",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "entity.name.type.inox"
+						},
+						"4": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
 					"match": "^\\s*(pattern)(?:[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)?",
 					"captures": {
 						"1": {
@@ -817,6 +875,10 @@
 					"comment": "ignore binary expressions"
 				},
 				{
+					"match": "(?<=\\))\\s*(?=[a-zA-Z_][a-zA-Z0-9._-]*\\s+[^{])",
+					"comment": "ignore some unrelated cases, the space before [^{] is present for not matching pattern calls"
+				},
+				{
 					"begin": "(?<=\\))\\s*(?=#\\[)",
 					"patterns": [
 						{
@@ -908,7 +970,7 @@
 					"begin": "\\b(match|not-match)\\s*(?=[a-zA-Z{\\[\\|\\(])",
 					"beginCaptures": {
 						"1": {
-					"name": "keyword.operator.expression.inox"
+							"name": "keyword.operator.expression.inox"
 						}
 					},
 					"patterns": [
