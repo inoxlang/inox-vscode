@@ -2,6 +2,7 @@ import { URL } from 'url';
 import { inspect } from 'util';
 import * as vscode from 'vscode';
 import * as fs from 'fs'
+import {basename, dirname} from 'path'
 import { OutputChannel } from "vscode"
 import { InoxExtensionContext } from './inox-extension-context';
 
@@ -23,6 +24,9 @@ export type Configuration = {
     project?: ProjectConfiguration
     tempTokens?: TempTokens //not present if project is undefined
     projectFilePresent: boolean
+
+    inVirtualWorkspace: boolean,
+
     localProjectRoot: vscode.Uri
     localProjectServerCommand: string[]
     localProjectServerEnv: Record<string, string>
@@ -49,6 +53,9 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
+
+    const inVirtualWorkspace = vscode.workspace.workspaceFolders != undefined &&
+        vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file');
 
     if (typeof websocketEndpoint != 'string') {
         let msg: string
@@ -83,7 +90,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
     let projectConfig: ProjectConfiguration | undefined;
     let tempTokens: TempTokens | undefined
-    let fileFsFolder: vscode.WorkspaceFolder | undefined
+    let localFolder: vscode.Uri | undefined
     let projectFilePresent = false
 
 
@@ -92,17 +99,25 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
             continue
         }
 
-        fileFsFolder = folder
+        localFolder = folder.uri
     }
 
-    if (!fileFsFolder) {
-        vscode.window.showErrorMessage("no file:// folder")
-        return
+    if (!localFolder) {
+        if(inVirtualWorkspace && vscode.workspace.workspaceFile != undefined){
+            const dir = dirname(vscode.workspace.workspaceFile.path)
+
+            localFolder = vscode.workspace.workspaceFile.with({
+                path: dir,
+            })
+        } else {
+            vscode.window.showErrorMessage("no file:// folder")
+            return
+        }
     }
 
     //check project config file even if not in project mode
-    const inoxProjectConfigURI = fileFsFolder.uri.with({ path: fileFsFolder.uri.path + '/' + INOX_PROJECT_FILENAME })
-    const tempTokensURI = getTempTokensURI(fileFsFolder.uri)
+    const inoxProjectConfigURI = localFolder.with({ path: localFolder.path + '/' + INOX_PROJECT_FILENAME })
+    const tempTokensURI = getTempTokensURI(localFolder)
 
     //try to read the project configuration file.
     let configDocument: vscode.TextDocument | undefined;
@@ -172,7 +187,10 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
         project: projectConfig,
         tempTokens: tempTokens,
         projectFilePresent: projectFilePresent,
-        localProjectRoot: fileFsFolder.uri,
+
+        inVirtualWorkspace: inVirtualWorkspace,
+
+        localProjectRoot: localFolder,
         localProjectServerCommand: localProjectServerCommand,
         localProjectServerEnv: localProjectServerEnv,
     }

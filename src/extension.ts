@@ -31,19 +31,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return
     }
 
-    const isVirtualWorkspace =
-        vscode.workspace.workspaceFolders != undefined &&
-        vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file');
-
-    if (isVirtualWorkspace) {
-        vscode.window.showErrorMessage('virtual workspaces not supported yet')
-        return
-    }
-
     const ctx = new InoxExtensionContext({
         base: context,
         initialConfig: config,
-        virtualWorkspace: isVirtualWorkspace,
         outputChannel: outputChannel,
         debugChannel: debugChannel,
 

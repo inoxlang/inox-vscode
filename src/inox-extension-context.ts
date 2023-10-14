@@ -10,7 +10,6 @@ const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'
 
 type InoxExtensionContextArgs = {
     base: vscode.ExtensionContext,
-    virtualWorkspace: boolean,
     initialConfig: Configuration,
     getCurrentConfig: (outputChannel: vscode.OutputChannel) => Promise<Configuration | undefined>,
     createLSPClient: (ctx: InoxExtensionContext, forceProjetMode: boolean) => LanguageClient
@@ -46,7 +45,7 @@ export class InoxExtensionContext {
 
         this.base = args.base
         this._config = args.initialConfig
-        this.virtualWorkspace = args.virtualWorkspace
+        this.virtualWorkspace = args.initialConfig.inVirtualWorkspace,
         this.outputChannel = args.outputChannel
         this.debugChannel = args.debugChannel
 

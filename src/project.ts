@@ -122,13 +122,13 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
     const workspaceFileContent = {
         "folders": [
             {
-                "name": "Project Filesystem",
+                "name": ctx.fileWorkspaceFolder.name + " Project FS",
                 "uri": "inox:/"
             },
-            {
-                "path": ".",
-                "name": ctx.fileWorkspaceFolder.name
-            }
+            // {
+            //     "path": ".",
+            //     "name": ctx.fileWorkspaceFolder.name
+            // }
         ],
         "settings": {
             "inox.enableProjectMode": true,
