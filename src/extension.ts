@@ -7,7 +7,7 @@ import { InlineDebugAdapterFactory } from './debug';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
 import { registerLearningCodeLensAndCommands } from './learn/learn';
-import { createLSPClient, startLocalProjectServerIfNecessary } from './lsp';
+import { createLSPClient, createEmbeddedContentProvider, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
@@ -88,6 +88,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
 
 
+    //------------
+
+    vscode.workspace.registerTextDocumentContentProvider('embedded-content', createEmbeddedContentProvider(ctx))
 
     const debug = new InlineDebugAdapterFactory(ctx)
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', debug));

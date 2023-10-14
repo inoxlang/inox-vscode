@@ -80,9 +80,7 @@
 				"inox.localProjectServerEnv": {
 					"order": 3,
 					"type": "object",
-					"properties": {
-
-					},
+					"properties": {},
 					"default": [],
 					"description": "environment variables passed to the command, values that are not strings are converted to JSON"
 				}
@@ -247,6 +245,7 @@
 		"await-notify": "^1.0.1",
 		"node-fetch": "^2.6.11",
 		"vscode-debugprotocol": "^1.51.0",
+		"vscode-html-languageservice": "^5.1.0",
 		"vscode-jsonrpc": "^8.1.0",
 		"vscode-languageclient": "^8.1.0",
 		"web-worker": "^1.2.0",

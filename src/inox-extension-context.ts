@@ -36,6 +36,8 @@ export class InoxExtensionContext {
     readonly virtualWorkspace: boolean
     readonly onProjectOpen = this._projectOpenEmitter.event
 
+    readonly virtualDocumentContents = new Map<string, string>();
+
     inoxFS: InoxFS | undefined
 
 

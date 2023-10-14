@@ -2,15 +2,17 @@ import child_process from 'child_process';
 import * as vscode from 'vscode';
 import { CloseAction, CloseHandlerResult, ErrorAction, LanguageClientOptions, State, ConnectionError } from "vscode-languageclient";
 import { ErrorHandlerResult, LanguageClient, Range, ServerOptions } from "vscode-languageclient/node";
-import { LOCAL_PROJECT_SERVER_COMMAND_ENTRY } from './configuration';
 import { InoxExtensionContext } from "./inox-extension-context";
 import { INOX_FS_SCHEME } from "./inox-fs";
 import { sleep } from './utils';
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
 import { openProject } from './project';
 import { fmtLspServerNotRunning } from './errors';
-
+import { getEmbeddedBlockVirtualContent, isInsideEmbeddedRegion } from './embedded-support';
+import { getLanguageService } from 'vscode-html-languageservice';
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
+
+const htmlLanguageService = getLanguageService();
 
 const LSP_SERVER_START_CHECK_INTERVAL_MILLIS = 500
 const LSP_SERVER_START_CHECK_COUNT = 10
@@ -137,6 +139,37 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
     },
     outputChannel: ctx.outputChannel,
     traceOutputChannel: ctx.debugChannel,
+    middleware: {
+      provideCompletionItem: async (document, position, context, token, next) => {
+        const docText = document.getText()
+        const offsetAtPosition = document.offsetAt(position)
+
+        const inCSS = isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'css')
+        const inJS = isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'js')
+
+        //if not in CSS or JS do no forward request forwarding
+        if (!inCSS && !inJS) {
+          return await next(document, position, context, token);
+        }
+
+        const lang = inCSS ? 'css' : 'js'
+
+        const originalUri = document.uri.toString(true);
+        ctx.virtualDocumentContents.set(originalUri, getEmbeddedBlockVirtualContent(htmlLanguageService, docText, lang));
+
+        const vdocUriString = `embedded-content://${lang}/${encodeURIComponent(
+          originalUri
+        )}.${lang}`;
+
+        const vdocUri = vscode.Uri.parse(vdocUriString);
+        return await vscode.commands.executeCommand<vscode.CompletionList>(
+          'vscode.executeCompletionItemProvider',
+          vdocUri,
+          position,
+          context.triggerCharacter
+        );
+      }
+    },
     errorHandler: {
       error(error, message, count) {
         ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + error)
@@ -225,3 +258,14 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
   return client
 }
 
+
+
+export function createEmbeddedContentProvider(ctx: InoxExtensionContext): vscode.TextDocumentContentProvider {
+  return {
+    provideTextDocumentContent: uri => {
+      const originalUri = uri.path.slice(1).slice(0, -4);
+      const decodedUri = decodeURIComponent(originalUri);
+      return ctx.virtualDocumentContents.get(decodedUri);
+    }
+  }
+}
