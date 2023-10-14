@@ -1715,6 +1715,12 @@
 			},
 			"patterns": [
 				{
+					"include": "#topscript-tag"
+				},
+				{
+					"include": "#top-style-tag"
+				},
+				{
 					"include": "#top-xml-tag-without-attributes-in-expression"
 				},
 				{
@@ -1747,6 +1753,305 @@
 			"patterns": [
 				{
 					"include": "#xml-tag-without-attributes"
+				}
+			]
+		},
+		"top-script-tag": {
+			"match": "(?<=)\\w+<script",
+			"patterns": [
+				{
+					"include": "#script-tag"
+				}
+			]
+		},
+		"script-tag": {
+			"begin": "(^[ \\t]+)?(?=<script\\b(?!-))",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.embedded.leading.inox"
+				}
+			},
+			"end": "(?!\\G)([ \\t]*$\\n?)?",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.embedded.trailing.inox"
+				}
+			},
+			"patterns": [
+				{
+					"begin": "(<)(script)\\b",
+					"beginCaptures": {
+						"0": {
+							"name": "meta.tag.metadata.script.start.inox"
+						},
+						"1": {
+							"name": "punctuation.definition.tag.begin.inox"
+						},
+						"2": {
+							"name": "entity.name.tag.inox"
+						}
+					},
+					"end": "(/)(script)(>)",
+					"endCaptures": {
+						"0": {
+							"name": "meta.tag.metadata.script.end.inox"
+						},
+						"1": {
+							"name": "punctuation.definition.tag.begin.inox"
+						},
+						"2": {
+							"name": "entity.name.tag.inox"
+						},
+						"3": {
+							"name": "punctuation.definition.tag.end.inox"
+						}
+					},
+					"name": "meta.embedded.block.inox",
+					"patterns": [
+						{
+							"begin": "\\G",
+							"end": "(?=/)",
+							"patterns": [
+								{
+									"begin": "(>)",
+									"beginCaptures": {
+										"0": {
+											"name": "meta.tag.metadata.script.start.inox"
+										},
+										"1": {
+											"name": "punctuation.definition.tag.end.inox"
+										}
+									},
+									"end": "((<))(?=/script)",
+									"endCaptures": {
+										"0": {
+											"name": "meta.tag.metadata.script.end.inox"
+										},
+										"1": {
+											"name": "punctuation.definition.tag.begin.inox"
+										},
+										"2": {
+											"name": "source.js-ignored-vscode"
+										}
+									},
+									"patterns": [
+										{
+											"begin": "\\G",
+											"end": "(?=</script)",
+											"name": "source.js",
+											"patterns": [
+												{
+													"begin": "(^[ \\t]+)?(?=//)",
+													"beginCaptures": {
+														"1": {
+															"name": "punctuation.whitespace.comment.leading.js"
+														}
+													},
+													"end": "(?!\\G)",
+													"patterns": [
+														{
+															"begin": "//",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.definition.comment.js"
+																}
+															},
+															"end": "(?=</script)|\\n",
+															"name": "comment.line.double-slash.js"
+														}
+													]
+												},
+												{
+													"begin": "/\\*",
+													"captures": {
+														"0": {
+															"name": "punctuation.definition.comment.js"
+														}
+													},
+													"end": "\\*/|(?=</script)",
+													"name": "comment.block.js"
+												},
+												{
+													"include": "source.js"
+												}
+											]
+										}
+									]
+								},
+								{
+									"begin": "\\G",
+									"end": "(?ix:\n\t\t\t\t\t\t\t\t\t\t\t\t(?=>\t\t\t\t\t\t\t\t\t\t\t# Tag without type attribute\n\t\t\t\t\t\t\t\t\t\t\t\t  | type(?=[\\s=])\n\t\t\t\t\t\t\t\t\t\t\t\t  \t(?!\\s*=\\s*\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t''\t\t\t\t\t\t\t\t# Empty\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | \"\"\t\t\t\t\t\t\t\t\t#   Values\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | ('|\"|)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\ttext/\t\t\t\t\t\t\t# Text mime-types\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tjavascript(1\\.[0-5])?\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | x-javascript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | jscript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | livescript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | (x-)?ecmascript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | babel\t\t\t\t\t\t# Javascript variant currently\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  \t\t\t\t\t\t\t\t#   recognized as such\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  \t)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | application/\t\t\t\t\t# Application mime-types\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  \t(\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(x-)?javascript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | (x-)?ecmascript\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  | module\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t  \t)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t[\\s\"'>]\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t)",
+									"name": "meta.tag.metadata.script.start.inox",
+									"patterns": [
+										{
+											"include": "#attribute"
+										}
+									]
+								},
+								{
+									"begin": "(?ix:\n\t\t\t\t\t\t\t\t\t\t\t\t(?=\n\t\t\t\t\t\t\t\t\t\t\t\t\ttype\\s*=\\s*\n\t\t\t\t\t\t\t\t\t\t\t\t\t('|\"|)\n\t\t\t\t\t\t\t\t\t\t\t\t\ttext/\n\t\t\t\t\t\t\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tx-handlebars\n\t\t\t\t\t\t\t\t\t\t\t\t\t  | (x-(handlebars-)?|ng-)?template\n\t\t\t\t\t\t\t\t\t\t\t\t\t  | html\n\t\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t\t\t[\\s\"'>]\n\t\t\t\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t\t\t\t)",
+									"end": "((<))(?=/script)",
+									"endCaptures": {
+										"0": {
+											"name": "meta.tag.metadata.script.end.inox"
+										},
+										"1": {
+											"name": "punctuation.definition.tag.begin.inox"
+										},
+										"2": {
+											"name": "text.inox.basic"
+										}
+									},
+									"patterns": [
+										{
+											"begin": "\\G",
+											"end": "(>)",
+											"endCaptures": {
+												"1": {
+													"name": "punctuation.definition.tag.end.inox"
+												}
+											},
+											"name": "meta.tag.metadata.script.start.inox",
+											"patterns": [
+												{
+													"include": "#attribute"
+												}
+											]
+										},
+										{
+											"begin": "(?!\\G)",
+											"end": "(?=</script)",
+											"name": "text.inox.basic",
+											"patterns": [
+												{
+													"include": "text.inox.basic"
+												}
+											]
+										}
+									]
+								},
+								{
+									"begin": "(?=type)",
+									"end": "(<)(?=/script)",
+									"endCaptures": {
+										"0": {
+											"name": "meta.tag.metadata.script.end.inox"
+										},
+										"1": {
+											"name": "punctuation.definition.tag.begin.inox"
+										}
+									},
+									"patterns": [
+										{
+											"begin": "\\G",
+											"end": "(>)",
+											"endCaptures": {
+												"1": {
+													"name": "punctuation.definition.tag.end.inox"
+												}
+											},
+											"name": "meta.tag.metadata.script.start.inox",
+											"patterns": [
+												{
+													"include": "#xml-tag-attributes"
+												}
+											]
+										},
+										{
+											"begin": "(?!\\G)",
+											"end": "(?=</script)",
+											"name": "source.unknown"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"top-style-tag": {
+			"match": "(?<=)\\w+<style",
+			"patterns": [
+				{
+					"include": "#style-tag"
+				}
+			]
+		},
+		"style-tag": {
+			"name": "meta.tag.style.inox",
+			"begin": "(^[ \\t]+)?(?=<style\\b(?!-))",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.embedded.leading.inox"
+				}
+			},
+			"end": "(?!\\G)([ \\t]*$\\n?)?",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.embedded.trailing.inox"
+				}
+			},
+			"patterns": [
+				{
+					"name": "meta.embedded.block.inox",
+					"begin": "(<)(style)(?=\\s|/?>)",
+					"beginCaptures": {
+						"0": {
+							"name": "meta.tag.metadata.style.start.inox"
+						},
+						"1": {
+							"name": "punctuation.definition.tag.begin.inox"
+						},
+						"2": {
+							"name": "entity.name.tag.inox"
+						}
+					},
+					"end": "((<)/)(style)\\s*(>)",
+					"endCaptures": {
+						"0": {
+							"name": "meta.tag.metadata.style.end.inox"
+						},
+						"1": {
+							"name": "punctuation.definition.tag.begin.inox"
+						},
+						"2": {
+							"name": "source.css-ignored-vscode"
+						},
+						"3": {
+							"name": "entity.name.tag.inox"
+						},
+						"4": {
+							"name": "punctuation.definition.tag.end.inox"
+						}
+					},
+					"patterns": [
+						{
+							"begin": "\\G",
+							"captures": {
+								"1": {
+									"name": "punctuation.definition.tag.end.inox"
+								}
+							},
+							"end": "(>)",
+							"name": "meta.tag.metadata.style.start.inox",
+							"patterns": [
+								{
+									"include": "#xml-tag-attributes"
+								}
+							]
+						},
+						{
+							"begin": "(?!\\G)",
+							"end": "(?=</style)",
+							"name": "source.css",
+							"patterns": [
+								{
+									"include": "source.css"
+								}
+							]
+						}
+					]
 				}
 			]
 		},
@@ -1886,6 +2191,12 @@
 		},
 		"xml-children": {
 			"patterns": [
+				{
+					"include": "#style-tag"
+				},
+				{
+					"include": "#script-tag"
+				},
 				{
 					"include": "#xml-tag-without-attributes"
 				},
