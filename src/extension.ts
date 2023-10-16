@@ -6,7 +6,7 @@ import { getConfiguration } from './configuration';
 import { InlineDebugAdapterFactory } from './debug';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
-import { registerLearningCodeLensAndCommands } from './learn/learn';
+import { registerLearningCodeLensAndCommands } from './learn/mod';
 import { createLSPClient, createEmbeddedContentProvider, startLocalProjectServerIfNecessary } from './lsp';
 import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
