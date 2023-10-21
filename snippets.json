@@ -167,6 +167,27 @@
             "}"
         ]
     },
+    "pattern": {
+        "scope": "Inox",
+        "prefix": "pattern",
+        "body": ["pattern "]
+    },
+    "patterndefinition": {
+        "scope": "Inox",
+        "prefix": "patterndefinition",
+        "body": [
+            "pattern ${1:name} = $2"
+        ]
+    },
+    "pnamespacedefinition": {
+        "scope": "Inox",
+        "prefix": "pnamespacedefinition",
+        "body": [
+            "pnamespace ${1:mynamespace}. = {",
+            "\t${2:mypattern}: %int",
+            "}"
+        ]
+    },
     "if": {
         "scope": "Inox",
         "prefix": "if",
