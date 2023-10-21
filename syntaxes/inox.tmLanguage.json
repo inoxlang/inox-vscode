@@ -36,7 +36,7 @@
 			"include": "#pattern-conversions"
 		},
 		{
-			"include": "#local-var-declarations"
+			"include": "#var-declarations"
 		},
 		{
 			"include": "#multiline-concatenation"
@@ -763,10 +763,10 @@
 				}
 			]
 		},
-		"local-var-declarations": {
+		"var-declarations": {
 			"patterns": [
 				{
-					"match": "(?:^[ \t]+)(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(?:^[ \t]+)(\\b(?:global)var)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -784,7 +784,7 @@
 					}
 				},
 				{
-					"match": "(\\bvar)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(\\b(?:global)var)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -802,7 +802,7 @@
 					}
 				},
 				{
-					"begin": "(\\bvar)[ \t]+(\\()",
+					"begin": "(\\b(?:global)var)[ \t]+(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -828,7 +828,7 @@
 				}
 			]
 		},
-		"single-local-var-declaration": {
+		"var-declaration": {
 			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
 			"captures": {
 				"1": {
@@ -1053,7 +1053,7 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|assign|Mapping|udata|concat|self|pnamespace)\\b(?![-_])"
+					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|globalvar|assign|Mapping|udata|concat|self|pnamespace)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",
