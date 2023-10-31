@@ -1034,7 +1034,7 @@
 		"binary-match-rhs": {
 			"patterns": [
 				{
-					"begin": "\\b(match|not-match)\\s*(?=[a-zA-Z{\\[\\|\\(])",
+					"begin": "(?<!^\\s*)\\b(match|not-match)\\s*(?=[a-zA-Z{\\[\\|\\(])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
