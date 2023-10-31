@@ -169,7 +169,7 @@
 					"name": "constant.numeric"
 				},
 				{
-					"match": "-?(?x) # turn on extended mode\n (?:\n    0       # a zero\n    |       # ...or...\n    [1-9_]   # a 1-9 character\n    \\d*     # followed by zero or more digits\n  )\n  (?:\n    (?:\n      \\.    # a period\n      \\d+   # followed by one or more digits\n    )?\n    (?:\n      [eE]  # an e character\n      [+-]? # followed by an option +/-\n      \\d+   # followed by one or more digits\n    )?      # make exponent optional\n  )?        # make decimal portion optional",
+					"match": "-?(?x) # turn on extended mode\n (?:\n    0       # a zero\n    |       # ...or...\n    [1-9]   # a 1-9 character\n    [0-9_]*     # followed by zero or more digits\n  )\n  (?:\n    (?:\n      \\.    # a period\n      [0-9_]+   # followed by one or more digits\n    )?\n    (?:\n      [eE]  # an e character\n      [+-]? # followed by an option +/-\n      \\d+   # followed by one or more digits\n    )?      # make exponent optional\n  )?        # make decimal portion optional",
 					"name": "constant.numeric"
 				}
 			]
