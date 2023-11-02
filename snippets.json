@@ -167,6 +167,16 @@
             "}"
         ]
     },
+    "var": {
+        "scope": "Inox",
+        "prefix": "var",
+        "body": ["var "]
+    },
+    "globalvar": {
+        "scope": "Inox",
+        "prefix": "globalvar",
+        "body": ["globalvar "]
+    },
     "pattern": {
         "scope": "Inox",
         "prefix": "pattern",
