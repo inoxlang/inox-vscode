@@ -320,5 +320,36 @@
             "</body>",
             "</html>"
         ]
+    },
+    "testsuite": {
+        "scope": "Inox",
+        "prefix": "testsuite",
+        "body": [
+            "testsuite({",
+            "\tname: \"$1\"",
+            "}) {",
+            "\t$2",
+            "}"
+        ]
+    },
+    "testcasesimple": {
+        "scope": "Inox",
+        "prefix": "testcase_simple",
+        "body": [
+            "testcase \"${1:name}\" {",
+            "\t$2",
+            "}"
+        ]
+    },
+    "testcase": {
+        "scope": "Inox",
+        "prefix": "testcase",
+        "body": [
+            "testcase({",
+            "\tname: \"$1\"",
+            "}) {",
+            "\t$2",
+            "}"
+        ]
     }
 }
