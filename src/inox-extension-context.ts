@@ -16,6 +16,7 @@ type InoxExtensionContextArgs = {
     startLocalProjectServerIfNecessary: (ctx: InoxExtensionContext) => Promise<boolean>
     outputChannel: vscode.OutputChannel
     debugChannel: vscode.OutputChannel
+    testChannel: vscode.OutputChannel
 }
 
 export class InoxExtensionContext {
@@ -30,6 +31,8 @@ export class InoxExtensionContext {
 
     readonly outputChannel: vscode.OutputChannel
     readonly debugChannel: vscode.OutputChannel
+    readonly testChannel: vscode.OutputChannel
+
 
     readonly base: vscode.ExtensionContext
     readonly virtualWorkspace: boolean
@@ -46,8 +49,9 @@ export class InoxExtensionContext {
         this.base = args.base
         this._config = args.initialConfig
         this.virtualWorkspace = args.initialConfig.inVirtualWorkspace,
-        this.outputChannel = args.outputChannel
+            this.outputChannel = args.outputChannel
         this.debugChannel = args.debugChannel
+        this.testChannel = args.testChannel
 
         vscode.workspace.onDidChangeConfiguration(() => this.updateConfiguration())
 
@@ -102,7 +106,7 @@ export class InoxExtensionContext {
             }
         }
 
-        if (! this.config.project) {
+        if (!this.config.project) {
             //TODO: remove filesystem.
         }
 

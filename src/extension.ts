@@ -11,6 +11,7 @@ import { createLSPClient, createEmbeddedContentProvider, startLocalProjectServer
 import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
+import { registerSpecCodeLensAndCommands } from './testing/mod';
 
 
 // after this duration the local file cache is used as a fallack
@@ -18,6 +19,8 @@ const LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = 3000;
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
+let testChannel: vscode.OutputChannel;
+
 
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -25,6 +28,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     outputChannel.appendLine('Inox extension activate()')
 
     debugChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
+    testChannel = vscode.window.createOutputChannel('Inox Tests');
+
 
     const config = await getConfiguration(outputChannel)
     if (!config) {
@@ -36,6 +41,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         initialConfig: config,
         outputChannel: outputChannel,
         debugChannel: debugChannel,
+        testChannel: testChannel,
 
         getCurrentConfig: getConfiguration,
         createLSPClient: createLSPClient,
@@ -46,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         ctx.inoxFS = createAndRegisterInoxFs(ctx)
         ctx.inoxFS.ctx = ctx
         setTimeout(() => {
-            if(!ctx.lspClient?.isRunning()){
+            if (!ctx.lspClient?.isRunning()) {
                 ctx.inoxFS?.fallbackOnLocalFileCache()
             }
         }, LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS)
@@ -84,7 +90,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     const debug = new InlineDebugAdapterFactory(ctx)
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('inox', debug));
+
     registerLearningCodeLensAndCommands(ctx)
+    registerSpecCodeLensAndCommands(ctx)
 
     //register commands
     {
@@ -99,10 +107,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.commands.registerCommand('inox.get-project-file-cache-dir', async () => {
             const dir = ctx.inoxFS?.fileCacheDir
 
-            if(dir){
+            if (dir) {
                 const entries = await fs.promises.readdir(dir).catch(() => null)
-                if(entries === null){
-                    vscode.window.showWarningMessage('failed to read file cache dir: '+dir  + '. It may not exist.')
+                if (entries === null) {
+                    vscode.window.showWarningMessage('failed to read file cache dir: ' + dir + '. It may not exist.')
                 } else {
                     vscode.window.showInformationMessage(((entries.length == 0) ? '(empty) ' : '') + dir)
                 }

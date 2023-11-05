@@ -164,7 +164,8 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         try {
             const projectId = await lspClient.sendRequest('project/create', {
                 name: projectName,
-                addTutFile: isFirstProject
+                addTutFile: isFirstProject,
+                addMainFile: true,
             })
             if (typeof projectId != 'string') {
                 throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
