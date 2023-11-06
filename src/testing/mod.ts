@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { findTestSuiteAndCaseStatements, getNodeBase, getSpanLineColumn, parseInoxChunk } from '../parse/mod';
 import { InoxExtensionContext } from '../inox-extension-context';
 import { INOX_FS_SCHEME } from '../inox-fs';
-import { RUN_ALL_TESTS_IN_FILE_CMD_NAME, registerCommands } from './commands';
+import { RUN_ALL_TESTS_IN_FILE_CMD_NAME, RUN_TESTCASE_IN_FILE_CMD_NAME, RUN_TESTSUITE_IN_FILE_CMD_NAME, registerCommands } from './commands';
 
 export function registerSpecCodeLensAndCommands(ctx: InoxExtensionContext) {
     const provider = new SpecFileLensProvider(ctx)
@@ -56,15 +56,15 @@ export class SpecFileLensProvider implements vscode.CodeLensProvider {
             let cmd: vscode.Command
             if ('base:test-suite-expr' in stmt) {
                 cmd = {
-                    command: '',
-                    title: 'Run Test Suite',
-                    arguments: [document]
+                    command: RUN_TESTSUITE_IN_FILE_CMD_NAME,
+                    title: 'Run Suite',
+                    arguments: [{ document, span }]
                 }
             } else {
                 cmd = {
-                    command: '',
-                    title: 'Run Test Case',
-                    arguments: [document]
+                    command: RUN_TESTCASE_IN_FILE_CMD_NAME,
+                    title: 'Run Test',
+                    arguments: [{ document, span }]
                 }
             }
 

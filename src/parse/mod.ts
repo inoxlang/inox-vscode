@@ -73,6 +73,8 @@ async function getExports(ctx: InoxExtensionContext) {
         await sleep(200)
     } else if (moduleExports === 'loading') {
         await sleep(200)
+    } else {
+        return moduleExports
     }
 
     moduleExports = modExports.get(ctx)
