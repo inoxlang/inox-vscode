@@ -72,6 +72,7 @@ export function registerCommands(ctx: InoxExtensionContext) {
         })
 
         ctx.testChannel.clear()
+        ctx.testChannel.show(true)
 
         setTimeout(() => {
             listenerDisposable.dispose()
