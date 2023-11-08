@@ -707,7 +707,7 @@
 					]
 				},
 				{
-					"match": "^\\s*(pattern)(?:[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)?",
+					"match": "^\\s*(pattern\\b)(?:\\s*$|[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)",
 					"captures": {
 						"1": {
 							"name": "keyword.other.inox"
