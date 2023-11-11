@@ -1,144 +1,145 @@
 {
-
-	"manifest": {
-		"scope": "Inox",
-		"prefix": "manifest",
-		"body": [
-			"manifest {",
-			"\t$1",
-			"}"
-		],
-		"description": "empty manifest"
-	},
-	"manifest-rw": {
-		"scope": "Inox",
-		"prefix": "manifest-rw",
-		"body": [
-			"manifest {",
-			"\tread: $1",
-			"\twrite: $1",
-			"}"
-		],
-		"description": "empty manifest"
-	},
-    "includable-chunk": {
-		"scope": "Inox",
-		"prefix": "includable-chunk",
-		"body": [
-			"includable-chunk"
-		],
-		"description": "empty manifest"
-	},
-    "preinit": {
+    "manifest": {
         "scope": "Inox",
-		"prefix": "preinit",
-		"body": [
-			"preinit {",
+        "prefix": "manifest",
+        "body": [
+            "manifest {",
             "\t$1",
             "}"
-		],
-		"description": "preinit statement"
+        ],
+        "description": "empty manifest"
+    },
+    "manifest-rw": {
+        "scope": "Inox",
+        "prefix": "manifest-rw",
+        "body": [
+            "manifest {",
+            "\tread: $1",
+            "\twrite: $1",
+            "}"
+        ],
+        "description": "empty manifest"
+    },
+    "includable-chunk": {
+        "scope": "Inox",
+        "prefix": "includable-chunk",
+        "body": [
+            "includable-chunk"
+        ],
+        "description": "empty manifest"
+    },
+    "preinit": {
+        "scope": "Inox",
+        "prefix": "preinit",
+        "body": [
+            "preinit {",
+            "\t$1",
+            "}"
+        ],
+        "description": "preinit statement"
     },
     "walk": {
         "scope": "Inox",
-		"prefix": "walk",
-		"body": [
-			"walk $1 entry {",
-			"\t$0$2",
-			"}"
-		],
-		"description": "for .. in loop"
+        "prefix": "walk",
+        "body": [
+            "walk $1 entry {",
+            "\t$0$2",
+            "}"
+        ],
+        "description": "for .. in loop"
     },
-	"forin": {
-		"scope": "Inox",
-		"prefix": "forin",
-		"body": [
-			"for $1 in $2 {",
-			"\t$0$3",
-			"}"
-		],
-		"description": "for .. in loop"
-	},
-    "for10": {
-		"scope": "Inox",
-		"prefix": "for10",
-		"body": [
-			"for (1 .. 10) {",
-			"\t$1",
-			"}"
-		],
-		"description": "for (1.. 10) loop"
-	},
-    "for0n": {
-		"scope": "Inox",
-		"prefix": "for0n",
-		"body": [
-			"for (0 .. $1) {",
-			"\t$2",
-			"}"
-		]
-	},
-    "for1n": {
-		"scope": "Inox",
-		"prefix": "for1n",
-		"body": [
-			"for (1 .. $1) {",
-			"\t$2",
-			"}"
-		]
-	},
+    "for elem in": {
+        "scope": "Inox",
+        "prefix": "for_elem_in",
+        "body": [
+            "for ${1:elem} in $2 {",
+            "\t$0$3",
+            "}"
+        ],
+        "description": "for .. in loop"
+    },
+    "for index, elem in": {
+        "scope": "Inox",
+        "prefix": "for_index_elem_in",
+        "body": [
+            "for ${1:index}, ${2:elem} in $3 {",
+            "\t$0$4",
+            "}"
+        ],
+        "description": "for .. in loop"
+    },
+    "for i in range": {
+        "scope": "Inox",
+        "prefix": "for_i_in_range",
+        "body": [
+            "for ${1:i} in (0 ..< 10) {",
+            "\t$0$2",
+            "}"
+        ],
+        "description": "for .. in loop"
+    },
+    "for (0 ..< 10)": {
+        "scope": "Inox",
+        "prefix": "for_zero_to_ten_exclusive",
+        "body": [
+            "for (0 ..< 10) {",
+            "\t$0$1",
+            "}"
+        ],
+        "description": "for .. in loop"
+    },
     "1_10": {
-		"scope": "Inox",
-		"prefix": "1_10",
-		"body": [
-			"(1 .. 10)"
-		]
-	},
+        "scope": "Inox",
+        "prefix": "1_10",
+        "body": [
+            "(1 .. 10)"
+        ]
+    },
     "1_n": {
-		"scope": "Inox",
-		"prefix": "1_n",
-		"body": [
-			"(1 .. $1)"
-		]
-	},
+        "scope": "Inox",
+        "prefix": "1_n",
+        "body": [
+            "(1 .. $1)"
+        ]
+    },
     "0_n": {
-		"scope": "Inox",
-		"prefix": "0_n",
-		"body": [
-			"(0 .. $1)"
-		]
-	},
+        "scope": "Inox",
+        "prefix": "0_n",
+        "body": [
+            "(0 .. $1)"
+        ]
+    },
     "switch": {
-		"scope": "Inox",
-		"prefix": "switch",
-		"body": [
-			"switch $1 {",
-                "\t$2 {",
-                "\t\t$3",
-                "\t}",
+        "scope": "Inox",
+        "prefix": "switch",
+        "body": [
+            "switch $1 {",
+            "\t$2 {",
+            "\t\t$3",
+            "\t}",
             "}"
-		],
-		"description": "minimal switch statement"
-	},
+        ],
+        "description": "minimal switch statement"
+    },
     "match": {
-		"scope": "Inox",
-		"prefix": "match",
-		"body": [
-			"match $1 {",
-                "\t$2 {",
-                "\t\t$3",
-                "\t}",
+        "scope": "Inox",
+        "prefix": "match",
+        "body": [
+            "match $1 {",
+            "\t$2 {",
+            "\t\t$3",
+            "\t}",
             "}"
-		],
-		"description": "minimal match statement"
-	},
-	"assertmatch": {
-		"scope": "Inox",
-		"prefix": "assertmatch",
-		"body": [
-			"assert ($1 match $2)"
-		]
-	},
+        ],
+        "description": "minimal match statement"
+    },
+    "assertmatch": {
+        "scope": "Inox",
+        "prefix": "assertmatch",
+        "body": [
+            "assert ($1 match $2)"
+        ]
+    },
     "importincl": {
         "scope": "Inox",
         "prefix": "importincl",
@@ -170,17 +171,23 @@
     "var": {
         "scope": "Inox",
         "prefix": "var",
-        "body": ["var "]
+        "body": [
+            "var "
+        ]
     },
     "globalvar": {
         "scope": "Inox",
         "prefix": "globalvar",
-        "body": ["globalvar "]
+        "body": [
+            "globalvar "
+        ]
     },
     "pattern": {
         "scope": "Inox",
         "prefix": "pattern",
-        "body": ["pattern "]
+        "body": [
+            "pattern "
+        ]
     },
     "patterndefinition": {
         "scope": "Inox",
@@ -218,7 +225,7 @@
             "}"
         ]
     },
-	 "ifex": {
+    "ifex": {
         "scope": "Inox",
         "prefix": "ifex",
         "body": [
@@ -248,28 +255,28 @@
             "}"
         ]
     },
-	"gogroup": {
+    "gogroup": {
         "scope": "Inox",
         "prefix": "gogroup",
         "body": [
-			"group = RoutineGroup()",
-			"coroutine1 = go {globals: .{$1}} do {",
+            "group = RoutineGroup()",
+            "coroutine1 = go {globals: .{$1}} do {",
             "\t",
             "}",
             "coroutine2 = go {globals: .{}} do {",
             "\t",
             "}",
-			"results = group.wait_results!()"
+            "results = group.wait_results!()"
         ]
     },
-	"union2": {
+    "union2": {
         "scope": "Inox",
         "prefix": "union2",
         "body": [
             "%| $1 | $2"
         ]
     },
-	"union3": {
+    "union3": {
         "scope": "Inox",
         "prefix": "union3",
         "body": [
@@ -307,7 +314,7 @@
     },
     "html-xml-element": {
         "scope": "Inox",
-        "prefix":"<html",
+        "prefix": "<html",
         "body": [
             "<html>",
             "<head>",
