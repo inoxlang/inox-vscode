@@ -3,6 +3,7 @@ import { InoxExtensionContext } from "../inox-extension-context"
 import { INOX_FS_SCHEME } from '../inox-fs';
 import { NodeSpan } from '../parse/ast';
 import { LanguageClient } from 'vscode-languageclient/node';
+import { stringifyCatchedValue } from '../utils';
 
 export const RUN_ALL_TESTS_IN_FILE_CMD_NAME = "inox.testing.run-all-tests-in-file"
 export const RUN_TESTSUITE_IN_FILE_CMD_NAME = "inox.testing.run-suite-in-file"
@@ -10,8 +11,11 @@ export const RUN_TESTCASE_IN_FILE_CMD_NAME = "inox.testing.run-case-in-file"
 
 
 const TEST_FILE_METHOD = "testing/testFileAsync"
-const TEST_OUTPUT_EVENT_METHOD = "testing/outputEvent"
 const STOP_TEST_RUN_METHOD = "testing/stopRun"
+
+const TEST_OUTPUT_EVENT_METHOD = "testing/outputEvent"
+const TEST_RUN_FINISHED_METHOD = "testing/runFinished"
+
 
 const textDecoder = new TextDecoder()
 
@@ -39,6 +43,8 @@ export function registerCommands(ctx: InoxExtensionContext) {
     function stopRun(lspClient: LanguageClient, runId: string) {
         const timeout = 1000
         const token = createTokenSource(timeout).token
+        ctx.testChannel.appendLine('\n<send test stop to server>')
+
         return lspClient.sendRequest(STOP_TEST_RUN_METHOD, {
             testRunId: runId,
         }, token)
@@ -63,40 +69,54 @@ export function registerCommands(ctx: InoxExtensionContext) {
         }
 
         let runId = ""
-        const testFileAsyncTokenSource = createTokenSource(TEST_FILE_REQUEST_CANCELLATION_TOKEN_TIMEOUT)
+        let runFinished = false
 
-        const listenerDisposable = lspClient.onNotification(TEST_OUTPUT_EVENT_METHOD, ({ data }) => {
-            const buffer = Buffer.from(data as string, 'base64')
-            const decoded = textDecoder.decode(buffer)
-            ctx.testChannel.append(decoded)
-        })
+        const listenerDisposables = [
+            lspClient.onNotification(TEST_OUTPUT_EVENT_METHOD, ({ data }) => {
+                const buffer = Buffer.from(data as string, 'base64')
+                const decoded = textDecoder.decode(buffer)
+                ctx.testChannel.append(decoded)
+            }),
+            lspClient.onNotification(TEST_RUN_FINISHED_METHOD, () => {
+                runFinished = true
+                listenerDisposables.forEach(disposable => disposable.dispose())
+            })
+        ]
 
         ctx.testChannel.clear()
         ctx.testChannel.show(true)
 
         setTimeout(() => {
-            listenerDisposable.dispose()
+            listenerDisposables.forEach(disposable => disposable.dispose())
 
-            if (runId != "" && lspClient.isRunning()) {
+            if (runId != "" && lspClient.isRunning() && !runFinished) {
+                ctx.testChannel.appendLine('\n<timeout on editor side>')
                 stopRun(lspClient, runId)
             }
         }, FILE_TEST_DEFAULT_TIMEOUT)
 
         try {
+            const testFileAsyncTokenSource = createTokenSource(TEST_FILE_REQUEST_CANCELLATION_TOKEN_TIMEOUT)
+
             const resp = await lspClient.sendRequest(TEST_FILE_METHOD, {
                 path: document.uri.path,
                 positiveFilters: positiveFilters,
             }, testFileAsyncTokenSource.token)
 
             if ((typeof resp != 'object') || resp === null) {
-                listenerDisposable.dispose()
+                listenerDisposables.forEach(disposable => disposable.dispose())
+                runFinished = true
                 return
             }
 
+            ctx.testChannel.appendLine('\n<file is prepared>')
+
             runId = (resp as Record<string, unknown>).testRunid as string
             currentSingleFileTestRunId = runId
-        } catch {
-            listenerDisposable.dispose()
+        } catch (err) {
+            runFinished = true
+            ctx.testChannel.appendLine('\n' + stringifyCatchedValue(err))
+            listenerDisposables.forEach(disposable => disposable.dispose())
         }
     }
 
