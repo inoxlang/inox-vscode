@@ -50,6 +50,26 @@
 					"comments": "on",
 					"strings": "on"
 				}
+			},
+			"editor.tokenColorCustomizations": {
+				"textMateRules": [
+					{
+						"scope": [
+							"comment.line.highlighted-start"
+						],
+						"settings": {
+							"foreground": "#20b953"
+						}
+					},
+					{
+						"scope": [
+							"comment.line.muted"
+						],
+						"settings": {
+							"foreground": "#3d3d3d8c"
+						}
+					}
+				]
 			}
 		},
 		"configuration": {

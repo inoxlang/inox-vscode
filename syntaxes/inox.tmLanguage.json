@@ -214,6 +214,19 @@
 		"comments": {
 			"patterns": [
 				{
+					"comment": "tutorial metadata comments",
+					"begin": "(#[ \t](?:Series|Tutorial):\\s*(?:.*))(\\[.*)",
+					"end": "\\n",
+					"captures": {
+						"1": {
+							"name": "comment.line.highlighted-start"
+						},
+						"2": {
+							"name": "comment.line.muted"
+						}
+					}
+				},
+				{
 					"begin": "#[ \t!]",
 					"beginCaptures": {
 						"0": {
