@@ -27,6 +27,10 @@ export class SpecFileLensProvider implements vscode.CodeLensProvider {
     constructor(readonly ctx: InoxExtensionContext) { }
 
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
+        if (!this.ctx.lspClient?.isRunning()) {
+            return []
+        }
+
         let topOfDocument = new vscode.Range(0, 0, 0, 0)
         const selectSeriesCommand: vscode.Command = {
             command: RUN_ALL_TESTS_IN_FILE_CMD_NAME,

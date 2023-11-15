@@ -38,8 +38,11 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
 
     isTutorialLoading = false
 
+
+    constructor(readonly ctx: InoxExtensionContext) { }
+
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
-        if (this.isTutorialLoading) {
+        if (this.isTutorialLoading || !this.ctx.lspClient?.isRunning()) {
             return []
         }
 
@@ -93,7 +96,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
                 }
                 break
             default:
-                if(current.error == MetadataCommentError.UnknownTutorial){
+                if (current.error == MetadataCommentError.UnknownTutorial) {
                     lenses.push(chooseSeriesLens, selectTutorialLens)
                     break
                 }
@@ -115,7 +118,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
 
 
 export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
-    const provider = new TutorialCodeLensProvider()
+    const provider = new TutorialCodeLensProvider(ctx)
 
     setTimeout(() => {
         tryUpdatingData(ctx)
@@ -223,11 +226,11 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
         }
 
         const current = getCurrentTutorialAndSeries(tutDoc)
-        
-        if(current == MetadataCommentError.NotFound || current == MetadataCommentError.UnknownSeries){
+
+        if (current == MetadataCommentError.NotFound || current == MetadataCommentError.UnknownSeries) {
             return
         }
-       
+
         type QuickPickItem = vscode.QuickPickItem & {
             tutorial: Tutorial
         }
