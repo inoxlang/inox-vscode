@@ -35,7 +35,7 @@ This extension provides support for the Inox programming language:
   - Hover information
   - Completions
 - Debugging
-- [Builtin-Tutorials](#builtin-tutorials)
+- [Built-in Tutorials](#builtin-tutorials)
 
 ## Project Server
 
