@@ -132,7 +132,7 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
 
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: documentScheme, language: 'inox' }],
+    documentSelector: [{ scheme: documentScheme, language: 'inox', pattern: '**/*.ix' }],
     synchronize: {
       configurationSection: 'Inox',
       fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
