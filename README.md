@@ -50,5 +50,5 @@ the `inox` binary is only available on Linux for now.
 ## Built-in Tutorials
 
 <video width="320" height="240" controls>
-  <source src="assets/docs/tutorial-demo.webm">
+  <source src="assets/docs/tutorial-demo.mp4" type="video/mp4">
 </video>
