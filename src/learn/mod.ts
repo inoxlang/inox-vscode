@@ -5,6 +5,7 @@ import { LSP_CLIENT_NOT_RUNNING_MSG } from '../errors';
 import { LEARNING_PREFIX } from './const';
 import { Tutorial, TutorialSeries, learningInfo, tryUpdatingData, tutorialSeries } from './data';
 import { assertNotNil } from '../utils';
+import { parseInoxChunk } from '../parse/mod';
 
 
 export const SELECT_TUTORIAL_SERIES_CMD_NAME = 'inox.learn.select-tutorial-series'
@@ -43,6 +44,15 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
 
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
         if (this.isTutorialLoading || !this.ctx.lspClient?.isRunning()) {
+            return []
+        }
+
+        try {
+            const parseResult = await parseInoxChunk(this.ctx, document.uri.path, document.getText())
+            if (!parseResult.chunk || !parseResult.chunkId) {
+                return []
+            }
+        } catch {
             return []
         }
 
