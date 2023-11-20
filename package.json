@@ -49,7 +49,9 @@
 					"other": "on",
 					"comments": "on",
 					"strings": "on"
-				}
+				},
+				"editor.defaultFormatter": "graphr00t.inox",
+				"editor.formatOnSave": true
 			},
 			"editor.tokenColorCustomizations": {
 				"textMateRules": [
