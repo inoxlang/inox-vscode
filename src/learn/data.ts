@@ -21,8 +21,9 @@ export interface Tutorial {
     id: string
     name: string
     program: string
+    otherFiles?: Record<string, string>
     output?: string
-    logOutput?: string 
+    logOutput?: string
 }
 
 export interface LearningInfo {

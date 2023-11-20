@@ -190,7 +190,7 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
 
             //load first tutorial of the series
             provider.isTutorialLoading = true
-            loadTutorialInDocument(editor, selectedItem.series, series.tutorials[0]).then(() => {
+            loadTutorialInDocument(ctx, editor, selectedItem.series, series.tutorials[0]).then(() => {
 
                 setTimeout(() => {
                     provider.isTutorialLoading = false
@@ -227,7 +227,7 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
         }
 
         const nextTutorial = series.tutorials[indexOfCurrentTutorial + 1]
-        return loadTutorialInDocument(editor, series, nextTutorial)
+        return loadTutorialInDocument(ctx, editor, series, nextTutorial)
     })
 
     vscode.commands.registerCommand(SELECT_TUTORIAL_CMD_NAME, async (tutDoc: vscode.TextDocument) => {
@@ -275,7 +275,7 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
 
             //load selected tutorial in document
             provider.isTutorialLoading = true
-            loadTutorialInDocument(editor, series, selectedItem.tutorial).then(() => {
+            loadTutorialInDocument(ctx, editor, series, selectedItem.tutorial).then(() => {
                 setTimeout(() => {
                     provider.isTutorialLoading = false
                 }, 100)
@@ -307,9 +307,20 @@ async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
     return true
 }
 
-function loadTutorialInDocument(editor: vscode.TextEditor, series: TutorialSeries, tutorial: Tutorial) {
+// loadTutorialInDocument removes all the content of the document and creates the files in tutorial.otherFiles.
+function loadTutorialInDocument(ctx: InoxExtensionContext, editor: vscode.TextEditor, series: TutorialSeries, tutorial: Tutorial) {
     const comment = formatMetadataComment(series, tutorial)
     const range = getDocRange(editor.document)
+
+
+    if (ctx.inoxFS) {
+        for (const [path, content] of Object.entries(tutorial.otherFiles ?? {})) {
+            const uri = vscode.Uri.from({ scheme: INOX_FS_SCHEME, path: path })
+            const buf = new TextEncoder().encode(content)
+            ctx.inoxFS.writeFile(uri, buf, { overwrite: true, create: true }).catch()
+        }
+    }
+
     let newFileContent = comment + '\n\n' + tutorial.program
 
     if (!newFileContent.endsWith('\n')) {
