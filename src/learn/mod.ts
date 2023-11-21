@@ -310,7 +310,6 @@ async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
 // loadTutorialInDocument removes all the content of the document and creates the files in tutorial.otherFiles.
 function loadTutorialInDocument(ctx: InoxExtensionContext, editor: vscode.TextEditor, series: TutorialSeries, tutorial: Tutorial) {
     const comment = formatMetadataComment(series, tutorial)
-    const range = getDocRange(editor.document)
 
 
     if (ctx.inoxFS) {
@@ -328,6 +327,8 @@ function loadTutorialInDocument(ctx: InoxExtensionContext, editor: vscode.TextEd
     }
 
     return editor.edit(builder => {
+        const range = getDocRange(editor.document)
+
         builder.delete(range)
         builder.insert(new vscode.Position(0, 0), newFileContent)
     }).then(() => editor.document.save())
