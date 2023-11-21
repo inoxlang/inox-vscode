@@ -596,7 +596,24 @@ export class InoxFS implements vscode.FileSystemProvider {
 			this.writeFileInCache(uri, content)
 		}
 
-		const base64Content = Buffer.from(content).toString('base64')
+		var utf8Content: Buffer
+
+		if(content.at(0) == 254 && content.at(1) == 255){ //UTF16(BE) BOM
+			const utf16 = Buffer.from(content) //big endian
+			utf16.swap16() //little endian
+
+			const s = Buffer.from(utf16).toString('utf16le')
+			utf8Content = Buffer.from(new TextEncoder().encode(s))
+		} else {
+			utf8Content = Buffer.from(content)
+		}
+
+		//remove UTF8 BOM
+		if(utf8Content.at(0) == 239 && utf8Content.at(1) == 187 && utf8Content.at(2) == 191){ 
+			utf8Content = utf8Content.slice(3)
+		}
+
+		const base64Content = utf8Content.toString('base64')
 		const lspClient = this.lspClient
 
 		if (base64Content.length < MULTIPART_UPLOAD_B64_SIZE_THRESHOLD) {
