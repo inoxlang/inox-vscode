@@ -423,9 +423,9 @@
 									"include": "$self"
 								}
 							],
-							"end": "(\\}|(?=`|\\s*$))",
+							"end": "(?:(\\})|(?=`|\\s*$))",
 							"endCaptures": {
-								"0": {
+								"1": {
 									"name": "punctuation.definition.template-expression.end"
 								}
 							}
@@ -435,7 +435,7 @@
 							"name": "string.unquoted.string-slice"
 						}
 					],
-					"end": "`"
+					"end": "(`|\n)"
 				},
 				{
 					"comment": "unquoted path literal",
