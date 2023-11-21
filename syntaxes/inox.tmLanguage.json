@@ -402,6 +402,48 @@
 		"paths": {
 			"patterns": [
 				{
+					"comment": "quoted path literal",
+					"name": "string.unquoted",
+					"match": "\\.{0,2}/`[^{}\n]*`"
+				},
+				{
+					"comment": "quoted path expression",
+					"name": "string.interpolated.path-expression",
+					"begin": "\\.{0,2}/`[^{}\n`]*(?=\\{)",
+					"patterns": [
+						{
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "(\\}|(?=`|\\s*$))",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"match": "[^{}\n`]+",
+							"name": "string.unquoted.string-slice"
+						}
+					],
+					"end": "`"
+				},
+				{
+					"comment": "unquoted path literal",
+					"name": "string.unquoted",
+					"match": "\\.{0,2}/[^\\s\\[\\]{}(),;:|]*"
+				},
+				{
+					"comment": "unquoted path expression",
 					"name": "string.interpolated.path-expression",
 					"begin": "\\.{0,2}/[^\\s\\[\\]{}(),;:|]*(?=\\{)",
 					"patterns": [
@@ -430,10 +472,6 @@
 						}
 					],
 					"end": "(?=[\\s})\\],:;])"
-				},
-				{
-					"name": "string.unquoted",
-					"match": "\\.{0,2}/[^\\s\\[\\]{}(),;:|]*"
 				}
 			]
 		},
