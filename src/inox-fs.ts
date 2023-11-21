@@ -36,6 +36,18 @@ const CACHED_CONTENT_EXTENSIONS = [
 ]
 const MSG_TYPE_OF_FILE_NOT_CACHED = "[This type of file is never cached by default]"
 
+//extensions of files to convert into UTF8.
+const UTF8_ENCODED_EXTENSIONS  = [
+	//code
+	'.ix', '.js', '.ts', '.html', '.css',
+
+	//doc
+	'.md', '.txt',
+
+	//data & config
+	'.json', '.yaml', '.yml'
+]
+
 type RemoteDirEntry = {
 	name: string,
 	type: vscode.FileType,
@@ -596,24 +608,35 @@ export class InoxFS implements vscode.FileSystemProvider {
 			this.writeFileInCache(uri, content)
 		}
 
-		var utf8Content: Buffer
+		var sentContent: Buffer
+		const convertToUTF8 = UTF8_ENCODED_EXTENSIONS.includes(extname(uri.path))
 
-		if(content.at(0) == 254 && content.at(1) == 255){ //UTF16(BE) BOM
-			const utf16 = Buffer.from(content) //big endian
-			utf16.swap16() //little endian
+		if(convertToUTF8){
+			//UTF16(BE) BOM
+			if(content.at(0) == 254 && content.at(1) == 255){
+				const utf16 = Buffer.from(content) //big endian
+				utf16.swap16() //convert to little endian
+	
+				const s = Buffer.from(utf16).toString('utf16le')
+				sentContent = Buffer.from(new TextEncoder().encode(s))
+			//UTF16(LE) BOM
+			} else if(content.at(0) == 255 && content.at(1) == 254) {
+				const s = Buffer.from(content).toString('utf16le')
+				sentContent = Buffer.from(new TextEncoder().encode(s))
+			} else {
+				sentContent = Buffer.from(content)
+			}
 
-			const s = Buffer.from(utf16).toString('utf16le')
-			utf8Content = Buffer.from(new TextEncoder().encode(s))
+			//remove UTF8 BOM
+			if(sentContent.at(0) == 239 && sentContent.at(1) == 187 && sentContent.at(2) == 191){ 
+				sentContent = sentContent.slice(3)
+			}
 		} else {
-			utf8Content = Buffer.from(content)
+			sentContent = Buffer.from(content)
 		}
 
-		//remove UTF8 BOM
-		if(utf8Content.at(0) == 239 && utf8Content.at(1) == 187 && utf8Content.at(2) == 191){ 
-			utf8Content = utf8Content.slice(3)
-		}
 
-		const base64Content = utf8Content.toString('base64')
+		const base64Content = sentContent.toString('base64')
 		const lspClient = this.lspClient
 
 		if (base64Content.length < MULTIPART_UPLOAD_B64_SIZE_THRESHOLD) {
