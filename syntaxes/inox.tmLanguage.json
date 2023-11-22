@@ -66,6 +66,9 @@
 			"include": "#variables"
 		},
 		{
+			"include": "#ports"
+		},
+		{
 			"include": "#numbers"
 		},
 		{
@@ -152,6 +155,10 @@
 					"match": "[$][$][_a-zA-Z-]*\\b"
 				}
 			]
+		},
+		"ports": {
+			"match": ":\\d+(/[a-zA-Z]*)?",
+			"name":"constant.numeric"
 		},
 		"numbers": {
 			"patterns": [
@@ -2435,6 +2442,9 @@
 				},
 				{
 					"include": "#variables"
+				},
+				{
+					"include": "#ports"
 				},
 				{
 					"include": "#numbers"
