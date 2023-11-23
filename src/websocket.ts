@@ -45,6 +45,8 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promi
             throw new Error(`no websocket endpoint set`)
         }
 
+        ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`)
+
         const webSocket = new _Websocket(endpoint, getWebsocketOptions(endpoint))
 
         webSocket.onerror = ev => {
