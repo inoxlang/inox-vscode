@@ -158,6 +158,11 @@
 					"command": "inox.secretKeeper.addEntry",
 					"when": "view == secretKeeper",
 					"group": "navigation"
+				},
+				{
+					"command": "inox.accountManager.createAnonymousAccount",
+					"when": "view == accountManager",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -229,6 +234,12 @@
 					"id": "secretKeeper",
 					"name": "Secrets",
 					"contextualTitle": "Secrets"
+				},
+				{
+					"id": "accountManager",
+					"name": "Account",
+					"type": "webview",
+					"contextualTitle": "Account"
 				}
 			]
 		},

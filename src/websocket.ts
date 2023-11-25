@@ -4,6 +4,7 @@ import { WebSocket as _Websocket } from 'ws';
 import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from './vscode-ws-jsonrpc/src/index';
 import { InoxExtensionContext } from './inox-extension-context';
 import { URL } from 'url';
+import { join } from 'path';
 
 const PING_INTERVAL_MILLIS = 5000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
@@ -33,16 +34,20 @@ export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: UR
     })
 }
 
-export function connectToWebsocketServer(ctx: InoxExtensionContext): () => Promise<MessageTransports> {
+export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appendPath: string}): () => Promise<MessageTransports> {
     return async () => {
         const websocketId = nextId++
 
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `create websocket (id ${websocketId})`)
 
-        const endpoint = ctx.config.websocketEndpoint
+        let endpoint = ctx.config.websocketEndpoint
         if(!endpoint){
             ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `no websocket endpoint set`)
             throw new Error(`no websocket endpoint set`)
+        }
+
+        if(opts?.appendPath) {
+            endpoint.pathname = join(endpoint.pathname, opts.appendPath)
         }
 
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`)

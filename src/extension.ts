@@ -12,6 +12,7 @@ import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
 import { registerSpecCodeLensAndCommands } from './testing/mod';
+import { AccountManager } from './cloud/mod';
 
 
 // after this duration the local file cache is used as a fallack
@@ -62,6 +63,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.commands.registerCommand('inox.secretKeeper.addEntry', secretKeeper.addSecret.bind(secretKeeper))
         vscode.commands.registerCommand('inox.secretKeeper.deleteEntry', (entry: SecretEntry) => secretKeeper.deleteSecret(entry.label))
         vscode.commands.registerCommand('inox.secretKeeper.updateEntry', (entry: SecretEntry) => secretKeeper.updateSecret(entry.label))
+
+        const accountManager = new AccountManager(ctx);
+        vscode.window.registerWebviewViewProvider('accountManager', accountManager);
+        vscode.commands.registerCommand(
+            'inox.accountManager.createAnonymousAccount', 
+            accountManager.startAnonymousAccountCreation.bind(accountManager))
     }
 
     ctx.restartLSPClient(false)
