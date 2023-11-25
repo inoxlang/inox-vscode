@@ -81,13 +81,13 @@
 					"order": 0,
 					"type": "boolean",
 					"default": false,
-					"description": "enable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
+					"description": "Enable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
 				},
 				"inox.websocketEndpoint": {
 					"order": 1,
 					"type": "string",
 					"default": "wss://localhost:8305",
-					"description": "the endpoint of the Websocket LSP server to use for project mode.",
+					"description": "The endpoint of the Websocket LSP server to use for project mode.",
 					"pattern": "^(|wss://.*)$"
 				},
 				"inox.localProjectServerCommand": {
@@ -97,14 +97,14 @@
 						"type": "string"
 					},
 					"default": [],
-					"description": "the command to start a local Inox project server."
+					"description": "The command to start a local Inox project server. The first item is the command name and each of the other items is a single CLI argument."
 				},
 				"inox.localProjectServerEnv": {
 					"order": 3,
 					"type": "object",
 					"properties": {},
 					"default": [],
-					"description": "environment variables passed to the command, values that are not strings are converted to JSON"
+					"description": "Environment variables passed to the command, values that are not strings are converted to JSON"
 				}
 			}
 		},
