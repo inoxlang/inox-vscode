@@ -7,6 +7,12 @@ export function getBaseStyleeshet(){
 
      const BASE_STYLESHEET = /*css*/`
 
+        html, body {
+            height: 100%;
+            padding-top: 5px;
+            overflow: hidden;
+        }
+
         body {
             color: var(--vscode-foreground);
             font-family: var(--vscode-font-family);
@@ -32,6 +38,10 @@ export function getBaseStyleeshet(){
         button:hover {
             cursor: pointer;
             background: var(--vscode-button-hoverBackground);
+        }
+
+        .muted-text {
+            color: var(--vscode-descriptionForeground);
         }
     `
 

@@ -42,6 +42,10 @@ export class AccountManager implements vscode.WebviewViewProvider {
         const scriptNonce = getNonce()
         const cssNonce = getNonce()
 
+
+        //data
+        const websocketEndpoint = this.ctx.config.websocketEndpoint!
+
         return `<!DOCTYPE html>
 
         <html lang="en">
@@ -54,10 +58,33 @@ export class AccountManager implements vscode.WebviewViewProvider {
             <title>Account</title>
         </head>
         <body>
-            <style nonce='${cssNonce}'>${makeBaseStyleeshet()}</style>
-            
+            <style nonce='${cssNonce}'>
+                ${makeBaseStyleeshet()}
+                .no-account-box {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    align-items: center;
+                    gap: 5px;
+                }
 
-            <button>ALLOW</button>
+                .no-account-box > span {
+                    text-align: center;
+                }
+            </style>
+
+            <div class="no-account-box">
+                <span class="muted-text">You are currently using a Websocket connection to <b>${websocketEndpoint}</b>.</span>
+
+                <span> 
+                    <a href="https://inox.run">inox.run</a> provides free hosting for small Inox projects and a free project server.
+                    You can create an <b>anonymous</b> account to persist and host your projects.
+                </span>
+
+                <button class="align-self-center">Create Anonymous Account</button>
+
+                <span class="muted-text"> No email or credit card required. No personal data is stored. </span>
+            </div>
         </body>
         </html>`;
     }
