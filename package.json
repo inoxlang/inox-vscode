@@ -152,32 +152,6 @@
 				"title": "Get Project's File Cache Dir"
 			}
 		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "inox.secretKeeper.addEntry",
-					"when": "view == secretKeeper",
-					"group": "navigation"
-				},
-				{
-					"command": "inox.accountManager.createAnonymousAccount",
-					"when": "view == accountManager",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "inox.secretKeeper.deleteEntry",
-					"when": "view == secretKeeper && viewItem == secret",
-					"group": "inline"
-				},
-				{
-					"command": "inox.secretKeeper.updateEntry",
-					"when": "view == secretKeeper && viewItem == secret",
-					"group": "inline"
-				}
-			]
-		},
 		"breakpoints": [
 			{
 				"language": "inox"
@@ -249,7 +223,28 @@
 				"contents": "No secrets found.\n[Add Secret](command:secretKeeper.addEntry)",
 				"when": "view.loaded"
 			}
-		]
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "inox.secretKeeper.addEntry",
+					"when": "view == secretKeeper",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "inox.secretKeeper.deleteEntry",
+					"when": "view == secretKeeper && viewItem == secret",
+					"group": "inline"
+				},
+				{
+					"command": "inox.secretKeeper.updateEntry",
+					"when": "view == secretKeeper && viewItem == secret",
+					"group": "inline"
+				}
+			]
+		}
 	},
 	"capabilities": {
 		"virtualWorkspaces": {
