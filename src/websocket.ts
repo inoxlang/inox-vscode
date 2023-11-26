@@ -124,7 +124,7 @@ function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, 
     })
 }
 
-function getWebsocketOptions(endpoint: URL){
+export function getWebsocketOptions(endpoint: URL){
     return {
         //ignore certificate errors for localhost / 127.0.0.1
         rejectUnauthorized: !(['localhost', '127.0.0.1'].includes(endpoint.hostname)),

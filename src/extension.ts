@@ -66,9 +66,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         const accountManager = new AccountManager(ctx);
         vscode.window.registerWebviewViewProvider('accountManager', accountManager);
-        vscode.commands.registerCommand(
-            'inox.accountManager.createAnonymousAccount', 
-            accountManager.startAnonymousAccountCreation.bind(accountManager))
     }
 
     ctx.restartLSPClient(false)
