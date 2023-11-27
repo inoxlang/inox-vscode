@@ -34,8 +34,9 @@ This extension provides support for the Inox programming language:
   - Error diagnostics
   - Hover information
   - Completions
+  - Formatting
 - Debugging
-- [Built-in Tutorials](#builtin-tutorials)
+- [Tutorials](#tutorials)
 
 ## Project Server
 
@@ -47,6 +48,6 @@ the `inox` binary is only available on Linux for now.
 
 ⚠️ If you install the binary make sure to add `inox` to your **$PATH**.
 
-## Built-in Tutorials
+## Tutorials
 
 ![tutorial demo](assets/docs/tutorial-demo.gif)
