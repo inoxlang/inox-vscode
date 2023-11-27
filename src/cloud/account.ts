@@ -9,7 +9,7 @@ import { join } from 'path';
 import { getWebsocketOptions } from '../websocket';
 
 
-const PROOF_HOSTERS = ['Github']
+const PROOF_HOSTERS = ['Github','Gitlab']
 const LOG_PREFIX = "[Account] "
 
 export class AccountManager implements vscode.WebviewViewProvider {
@@ -29,7 +29,7 @@ export class AccountManager implements vscode.WebviewViewProvider {
         };
 
 
-        this.view.webview.html = this.getHTML()
+        this.view.webview.html = '<b>This section is under construction 🔨</b>';
 
         webviewView.webview.onDidReceiveMessage(data => {
 			switch (data.type) {
@@ -113,8 +113,8 @@ export class AccountManager implements vscode.WebviewViewProvider {
 
     async startAnonymousAccountCreation() {
         const result = await vscode.window.showQuickPick(PROOF_HOSTERS, {
-            placeHolder: 'Choose a platform where you have an account (no personal data or email address stored)',
-            title: 'Account Creation (< 2 minutes)'
+            placeHolder: 'Choose a platform where you have an account (no personal data or email address will be stored)',
+            title: 'Proove you are a human'
         })
 
         if(result === undefined || !PROOF_HOSTERS.includes(result)){
