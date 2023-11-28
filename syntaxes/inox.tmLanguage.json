@@ -1392,7 +1392,7 @@
 					"name": "string.unquoted.string-slice"
 				},
 				{
-					"begin": "\\{\\{",
+					"begin": "\\$\\{",
 					"beginCaptures": {
 						"0": {
 							"name": "punctuation.definition.template-expression.begin"
@@ -1403,7 +1403,7 @@
 							"include": "$self"
 						}
 					],
-					"end": "\\}\\}",
+					"end": "\\}",
 					"endCaptures": {
 						"0": {
 							"name": "punctuation.definition.template-expression.end"
