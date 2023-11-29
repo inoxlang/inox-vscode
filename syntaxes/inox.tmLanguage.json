@@ -158,7 +158,7 @@
 		},
 		"ports": {
 			"match": ":\\d+(/[a-zA-Z]*)?",
-			"name":"constant.numeric"
+			"name": "constant.numeric"
 		},
 		"numbers": {
 			"patterns": [
@@ -1197,12 +1197,19 @@
 			"patterns": [
 				{
 					"comment": "Function declarations",
-					"begin": "(\\bfn)\\b\\s+(\\w+)\\s*\\(",
+					"begin": "(\\bfn)(?:\\b|\\[([^\\]]*)\\]?)\\s+(\\w+)\\s*\\(",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.function.inox"
 						},
 						"2": {
+							"patterns": [
+								{
+									"include": "#identifiers"
+								}
+							]
+						},
+						"3": {
 							"name": "entity.name.function.inox"
 						}
 					},
@@ -1225,10 +1232,17 @@
 				},
 				{
 					"comment": "Function expressions",
-					"begin": "(\\bfn)\\s*\\(",
+					"begin": "(\\bfn)(?:\\b|\\[([^\\]]*)\\]?)\\s*\\(",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.function.inox"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#identifiers"
+								}
+							]
 						}
 					},
 					"patterns": [
