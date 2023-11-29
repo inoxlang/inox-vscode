@@ -550,6 +550,102 @@
 		"list-patterns": {
 			"patterns": [
 				{
+					"comment": "general element pattern is an object pattern",
+					"begin": "%\\[\\s*\\](\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "general element pattern is a record pattern",
+					"begin": "%\\[\\s*\\](#\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "general element pattern is a call",
+					"begin": "%\\[\\s*\\]([a-zA-Z_][a-zA-Z0-9_.-]*)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "declaration for a pattern call with the shorthand syntax",
+					"begin": "%\\[\\s*\\]([a-zA-Z_][a-zA-Z0-9_.-]*)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "general element pattern is a named pattern or a pattern namespace member",
+					"match": "%\\[\\s*\\]([a-zA-Z_][a-zA-Z0-9_.-]*)\\b(?!\\{|\\()",
+					"captures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						}
+					}
+				},
+				{
+					"comment": "known length",
 					"begin": "%\\[",
 					"beginCaptures": {
 						"0": {
@@ -758,7 +854,7 @@
 				},
 				{
 					"comment": "declaration for a call",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\()",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -787,7 +883,7 @@
 				},
 				{
 					"comment": "declaration for a pattern call with the shorthand syntax",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -799,13 +895,13 @@
 							"name": "entity.name.type.inox"
 						},
 						"4": {
-							"name": "punctuation.begin.bracket.curly.inox"
+							"name": "punctuation.begin.bracket.inox"
 						}
 					},
 					"end": "\\}",
 					"endCaptures": {
 						"0": {
-							"name": "punctuation.end.bracket.inox"
+							"name": "punctuation.end.bracket.curly.inox"
 						}
 					},
 					"patterns": [
