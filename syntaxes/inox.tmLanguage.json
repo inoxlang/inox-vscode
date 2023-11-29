@@ -621,7 +621,7 @@
 				},
 				{
 					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![-a-zA-Z0-9_]*[?]?:)",
-					"comment": "unprefixed pattern name, the regexe does not support last pattern names in union patterns",
+					"comment": "unprefixed pattern name, the regex does not support last pattern names in union patterns",
 					"name": "entity.name.type.inox"
 				},
 				{
@@ -676,7 +676,36 @@
 					]
 				},
 				{
-					"comment": "declaration for a list pattern",
+					"comment": "declaration for a list pattern with an element pattern",
+					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\[)\\s*(\\])(?=[a-zA-Z_%#{\\[])",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "punctuation.begin.bracket.inox"
+						},
+						"4": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"end": "(;|\\}|\\]|$)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "declaration for a list pattern with a known length",
 					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=[ \t]*(\\[)",
 					"beginCaptures": {
 						"1": {
@@ -686,7 +715,7 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
-							"name": "punctuation.begin.bracket.curly.inox"
+							"name": "punctuation.begin.bracket.inox"
 						}
 					},
 					"end": "\\]",
