@@ -181,7 +181,7 @@
 								"additionalProperties": false,
 								"patternProperties": {
 									"^default$": {
-										"title": "Default log level of modules. The level for a specific module can be configured, example: \"/file.ix\" : \"info\".",
+										"title": "Default log level of modules.",
 										"enum": [
 											"debug",
 											"info",
@@ -189,7 +189,7 @@
 											"error"
 										]
 									},
-									"^/.*$": {
+									"^/.*\\.ix$": {
 										"title": "Log level for a specific module (file).",
 										"enum": [
 											"debug",
@@ -202,7 +202,7 @@
 								"default": {
 									"default": "debug"
 								},
-								"description": "Log level of modules."
+								"description": "Log level of modules. The level for a specific module can be configured by adding a <key: value>, example: `/file.ix : info`"
 							}
 						}
 					}
