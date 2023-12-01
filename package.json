@@ -218,13 +218,22 @@
 						"type": "inox",
 						"request": "launch",
 						"name": "Launch Main Program",
-						"program": "/main.ix"
+						"program": "/main.ix",
+						"logLevels": {
+							"default": "debug",
+							"enableInternalDebug": false,
+							"/main.ix": "debug"
+						}
 					},
 					{
 						"type": "inox",
 						"request": "launch",
 						"name": "Launch Current Program",
-						"program": "${file}"
+						"program": "${file}",
+						"logLevels": {
+							"default": "debug",
+							"enableInternalDebug": false
+						}
 					}
 				]
 			}
