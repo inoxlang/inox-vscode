@@ -174,7 +174,7 @@
 								"type": "string",
 								"description": "The program to debug."
 							},
-							"logLevel": {
+							"logLevels": {
 								"required": [
 									"default"
 								],
@@ -189,6 +189,10 @@
 											"error"
 										]
 									},
+									"enableInternalDebug": {
+										"title": " ⚠️ Enable debug logs of internal sources (e.g. http server). THIS CAN PRODUCE A LOT OF LOG EVENTS. This setting has no effect if the default level is not debug.",
+										"type": "boolean"
+									},
 									"^/.*\\.ix$": {
 										"title": "Log level for a specific module (file).",
 										"enum": [
@@ -200,7 +204,9 @@
 									}
 								},
 								"default": {
-									"default": "debug"
+									"default": "debug",
+									"enableInternalDebug": false,
+									"/main.ix": "debug"
 								},
 								"description": "Log level of modules. The level for a specific module can be configured by adding a <key: value>, example: `/file.ix : info`"
 							}
