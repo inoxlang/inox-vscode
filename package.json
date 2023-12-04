@@ -255,6 +255,12 @@
 					"contextualTitle": "Secrets"
 				},
 				{
+					"id": "prodOverview",
+					"name": "Production",
+					"type": "webview",
+					"contextualTitle": "Production"
+				},
+				{
 					"id": "accountManager",
 					"name": "Account",
 					"type": "webview",
