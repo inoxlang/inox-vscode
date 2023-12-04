@@ -13,8 +13,7 @@ import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
 import { registerSpecCodeLensAndCommands } from './testing/mod';
 import { AccountManager } from './cloud/mod';
-import { ProdOverview, registerProdManagerCommands } from './prod/mod';
-
+import { ProdOverview } from './prod/mod';
 
 // after this duration the local file cache is used as a fallack
 const LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = 3000;
@@ -70,8 +69,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         const prodOverview = new ProdOverview(ctx);
         vscode.window.registerWebviewViewProvider('prodOverview', prodOverview);
-
-        context.subscriptions.push(...registerProdManagerCommands(ctx));
     }
 
     ctx.restartLSPClient(false)

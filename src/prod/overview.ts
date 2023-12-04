@@ -4,7 +4,6 @@ import { InoxExtensionContext } from "../inox-extension-context";
 import { getNonce } from '../utils';
 import { getBaseStylesheet as makeBaseStyleeshet } from '../style/stylesheet';
 import { WebSocket as _Websocket } from 'ws';
-import { OPEN_PROD_MANAGER_COMMAND } from './view';
 
 
 export class ProdOverview implements vscode.WebviewViewProvider {
@@ -25,15 +24,6 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
 
         this.view.webview.html = this.getHTML()
-
-        webviewView.webview.onDidReceiveMessage(data => {
-			switch (data.type) {
-				case 'show-prod-manager': {
-                    vscode.commands.executeCommand(OPEN_PROD_MANAGER_COMMAND)
-                    break
-                }
-			}
-		});
     }
 
     private getHTML() {
