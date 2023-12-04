@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { InoxExtensionContext } from "../inox-extension-context";
 import { getNonce } from '../utils';
-import { getBaseStyleeshet as makeBaseStyleeshet } from '../style/stylesheet';
+import { getBaseStylesheet as makeBaseStyleeshet } from '../style/stylesheet';
 import { WebSocket as _Websocket } from 'ws';
 import { inspect } from 'util';
 import { join } from 'path';

@@ -150,6 +150,11 @@
 				"category": "Inox",
 				"command": "inox.get-project-file-cache-dir",
 				"title": "Get Project's File Cache Dir"
+			},
+			{
+				"command": "prodManager.openView",
+				"title": "Open the production manager view",
+				"category": "Inox Production"
 			}
 		],
 		"breakpoints": [

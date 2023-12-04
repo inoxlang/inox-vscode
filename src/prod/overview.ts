@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 
 import { InoxExtensionContext } from "../inox-extension-context";
 import { getNonce } from '../utils';
-import { getBaseStyleeshet as makeBaseStyleeshet } from '../style/stylesheet';
+import { getBaseStylesheet as makeBaseStyleeshet } from '../style/stylesheet';
 import { WebSocket as _Websocket } from 'ws';
+import { OPEN_PROD_MANAGER_COMMAND } from './view';
 
 
 export class ProdOverview implements vscode.WebviewViewProvider {
@@ -11,7 +12,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     constructor(readonly ctx: InoxExtensionContext) {
     }
 
-    public static readonly viewType = 'prodManager';
+    public static readonly viewType = 'prodOverview';
     private view?: vscode.WebviewView;
 
     resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
@@ -27,7 +28,8 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(data => {
 			switch (data.type) {
-				case 'show-prod-view': {
+				case 'show-prod-manager': {
+                    vscode.commands.executeCommand(OPEN_PROD_MANAGER_COMMAND)
                     break
                 }
 			}
@@ -70,7 +72,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             </style>
 
             <section class="actions">
-                <button id="show-deployment-btn">Manage Production</button>
+                <button id="show-prod-btn">Open Manager</button>
             </div>
 
 
@@ -80,9 +82,9 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 const vscode = acquireVsCodeApi();
                 const oldState = vscode.getState() || { };
 
-                const anonCreationButton = document.querySelector("#show-deployment-btn")
-                anonCreationButton.addEventListener('click', () => {
-                    vscode.postMessage({ type: 'show-deployment-view' });
+                const showProdButton = document.querySelector("#show-prod-btn")
+                showProdButton.addEventListener('click', () => {
+                    vscode.postMessage({ type: 'show-prod-manager' });
                 })
             </script>
         </body>

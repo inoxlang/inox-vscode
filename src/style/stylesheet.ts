@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 
-export function getBaseStyleeshet(){
+export function getBaseStylesheet(){
     const activeColorThemeKind = vscode.window.activeColorTheme.kind
     const darkTheme =  activeColorThemeKind == vscode.ColorThemeKind.Dark || activeColorThemeKind == vscode.ColorThemeKind.HighContrast
 
