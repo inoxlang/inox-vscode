@@ -85,11 +85,12 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
                     switch (action) {
                         case 'Deploy': case 'Update': {
-
                             const error = await this.deployApplication({
                                 name: appName,
                                 updateRunningApp: (action == 'Update')
                             })
+                            this.fetchApplicationStatuses().then(() => this.updateViewIfNeeded()).catch()
+
                             if (error != null) {
                                 this.ctx.debugChannel.appendLine(error.message)
                                 vscode.window.showErrorMessage(error.message)
@@ -99,6 +100,8 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                         }
                         case 'Stop': {
                             const error = await this.stopApplication({ name: appName, force: false })
+                            this.fetchApplicationStatuses().then(() => this.updateViewIfNeeded()).catch()
+                            
                             if (error != null) {
                                 this.ctx.debugChannel.appendLine(error.message)
                                 vscode.window.showErrorMessage(error.message)
