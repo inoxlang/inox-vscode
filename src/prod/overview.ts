@@ -101,7 +101,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                         case 'Stop': {
                             const error = await this.stopApplication({ name: appName, force: false })
                             this.fetchApplicationStatuses().then(() => this.updateViewIfNeeded()).catch()
-                            
+
                             if (error != null) {
                                 this.ctx.debugChannel.appendLine(error.message)
                                 vscode.window.showErrorMessage(error.message)
@@ -303,6 +303,10 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 case 'gracefully-stopped':
                     deployAction = 'Deploy'
                     appStatusName = 'stopped'
+                    break
+                case 'gracefully-stopping':
+                    deployAction = 'None'
+                    appStatusName = 'stopping'
                     break
                 case 'deployed':
                     deployAction = 'Update'

@@ -28,9 +28,9 @@ export function getBaseStylesheet(){
             --success-background: rgb(22, 161, 22);
             --success-foreground: rgb(223, 223, 223);
 
-            --transitional-state-background: rgb(22, 161, 22);
-            --transitional-state-foreground: rgb(209, 209, 36);;
-
+            --transitional-state-background: rgb(173, 143, 44);
+            --transitional-state-foreground: rgb(223, 223, 223);
+            
             --error-background: rgb(22, 161, 22);
             --error-foreground: rgb(214, 23, 23);
         }
@@ -71,6 +71,10 @@ export function getBaseStylesheet(){
             line-height: 20px;
             max-width: 200px;
             padding: 0 5px;
+        }
+
+        input::placeholder {
+            color: var(--vscode-input-placeholderForeground);
         }
 
         input:focus {
