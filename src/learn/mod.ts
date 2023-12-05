@@ -402,7 +402,13 @@ function getDocRange(document: vscode.TextDocument): vscode.Range {
 }
 
 function formatHelpMessage(commandTitle: string) {
-    return `# This file is a tutorial file. Click just above on [${commandTitle}] to load a tutorial. \nmanifest {\n\n}\n`
+    return ([
+        `# This file is a tutorial file. Click just above on [${commandTitle}] to load a tutorial.`,
+        '# You can execute an Inox program in VSCode by doing the following:',
+        "# - Click on 'Run and Debug' in the activity bar (left)",
+        "# - Select the 'Launch Current Program' task",
+        "# - Click on the green arrow"
+    ]).join('\n')
 }
 
 
