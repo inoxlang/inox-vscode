@@ -43,6 +43,17 @@ export function getBaseStylesheet(){
         .muted-text {
             color: var(--vscode-descriptionForeground);
         }
+
+        input {
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: none;
+        }
+
+        input:focus {
+            border: var(--vscode-focusBorder);
+            border-radius: 1px;
+        }
     `
 
     return BASE_STYLESHEET
