@@ -32,6 +32,7 @@ export function getBaseStylesheet(){
 
             padding: 0 15px;
             text-align: center;
+
             height: 32px;
             line-height: 30px;
             max-width: 200px;
@@ -68,6 +69,10 @@ export function getBaseStylesheet(){
             list-style: none;
             padding: 0;
             margin: 0;
+        }
+
+        header {
+            font-weight: 700;
         }
     `
 

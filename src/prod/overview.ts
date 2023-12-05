@@ -6,8 +6,26 @@ import { getBaseStylesheet as makeBaseStyleeshet } from '../style/stylesheet';
 import { WebSocket as _Websocket } from 'ws';
 
 
-const APP_STATUSES_REFRESH_INTERVAL = 5_000;
+const APP_STATUSES_REFRESH_INTERVAL = 3_000;
+
+
+// LSP methods
+
+const LIST_APPS_METHOD = 'project/listApplicationStatuses'
+const REGISTER_APP_METHOD = 'project/registerApplication'
+const DEPLOY_APP_METHOD ='prod/deployApplication'
+
+//messages between ProdOverview and the webview
+
 const REGISTER_APP_MSG_TYPE = "register-app"
+const DO_APP_ACTION_MSG_TYPE = "do-app-action"
+const APPLICATION_ACTION_NAMES: ApplicationAction[] = ['None', 'Deploy']
+
+
+type ApplicationStatus = 
+    'undeployed' | 'deploying' | 'deployed' | 'gracefully-stopping' | 'gracefully-stopped' | 'erroneously-stopped' | 'failed-to-prepare'
+
+type ApplicationAction = 'None' | 'Deploy'
 
 export class ProdOverview implements vscode.WebviewViewProvider {
 
@@ -18,7 +36,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     private view?: vscode.WebviewView;
 
     private data: {
-        applicationStatuses?: Record<string, string>
+        applicationStatuses?: Record<string, ApplicationStatus>
     } = {}
 
     private viewUpdateNeeded = false
@@ -50,7 +68,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         view.webview.onDidReceiveMessage(async data => {
             switch (data.type) {
                 case REGISTER_APP_MSG_TYPE: {
-                    const error = await this.registerApplication(data.name)
+                    const error = await this.registerApplication(data.name, data.modulePath)
                     if (error != null) {
                         this.ctx.debugChannel.appendLine(error.message)
                         vscode.window.showErrorMessage(error.message)
@@ -58,6 +76,22 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                     }
                     await this.fetchApplicationStatuses()
                     await this.updateViewIfNeeded()
+                    break
+                }
+                case DO_APP_ACTION_MSG_TYPE: {
+                    const action = data.action as ApplicationAction;
+                    const appName = data.appName
+
+                    switch(action){
+                    case 'Deploy':
+                        const error = await this.deployApplication(appName)
+                        if (error != null) {
+                            this.ctx.debugChannel.appendLine(error.message)
+                            vscode.window.showErrorMessage(error.message)
+                            return
+                        }
+                        break
+                    }
                     break
                 }
             }
@@ -113,8 +147,20 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                     event.returnValue = false;
                     const data = new FormData(registerAppForm);
                     const name = String(data.get("name"));
-                    vscode.postMessage({ type: '${REGISTER_APP_MSG_TYPE}', name: name });
+                    const modulePath = String(data.get("modulePath"));
+                    vscode.postMessage({ type: '${REGISTER_APP_MSG_TYPE}', name: name, modulePath: modulePath });
                 })
+
+                const actionButtons = document.querySelectorAll('[data-action]')
+                for(const button of actionButtons){
+                    button.addEventListener('click', event => {
+                        vscode.postMessage({ 
+                            type: '${DO_APP_ACTION_MSG_TYPE}', 
+                            action: button.dataset.action,
+                            appName: button.dataset.appName,
+                         });
+                    })
+                }
             </script>
         </body>
         </html>`;
@@ -132,7 +178,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         }
 
         try {
-            const { statuses } = <any>await lspClient.sendRequest('project/listApplicationStatuses', {})
+            const { statuses } = <any>await lspClient.sendRequest(LIST_APPS_METHOD, {})
             newStatuses = statuses
         } catch {
             newStatuses = undefined
@@ -148,14 +194,34 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         this.data.applicationStatuses = newStatuses
     }
 
-    private async registerApplication(name: string): Promise<Error | null> {
+    private async registerApplication(name: string, modulePath: string): Promise<Error | null> {
         const lspClient = this.ctx.lspClient
         if (lspClient === undefined || !lspClient.isRunning()) {
             return new Error('LSP client not running')
         }
 
         try {
-            const resp = <any>await lspClient.sendRequest('project/registerApplication', {
+            const resp = <any>await lspClient.sendRequest(REGISTER_APP_METHOD, {
+                name: name,
+                modulePath: modulePath
+            })
+            if ('error' in resp) {
+                return new Error(resp.error)
+            }
+            return null
+        } catch (err) {
+            return new Error(stringifyCatchedValue(err))
+        }
+    }
+
+    private async deployApplication(name: string): Promise<Error | null> {
+        const lspClient = this.ctx.lspClient
+        if (lspClient === undefined || !lspClient.isRunning()) {
+            return new Error('LSP client not running')
+        }
+
+        try {
+            const resp = <any>await lspClient.sendRequest(DEPLOY_APP_METHOD, {
                 name: name
             })
             if ('error' in resp) {
@@ -179,10 +245,25 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     }
 
     private renderApplicationsSection(){
-        const applicationsLiElements = Object.entries(this.data.applicationStatuses ?? {}).map(([appName, appStatus]) => {
+        const liElements = Object.entries(this.data.applicationStatuses ?? {}).map(([appName, appStatus]) => {
+            let action: ApplicationAction = 'None'
+
+            switch(appStatus){
+                case 'undeployed': case 'erroneously-stopped': case 'failed-to-prepare': case 'gracefully-stopped':
+                action = 'Deploy'
+                break
+            }
+
+
             return /*html*/`<li>
                 <span>${appName}</span>
-                <span>${appStatus}</span>
+                <span data-status="${appStatus}">${appStatus}</span>
+                <div>
+                    ${(action == 'None') ? '' :
+                        /*html*/`<button data-action=${action} data-app-name=${appName}>${action}</button>
+                        `
+                    }
+                </div>
             </li>`
         }).join('\n')
 
@@ -193,7 +274,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 'failed to get application statuses' :
                 (Object.keys(this.data.applicationStatuses).length == 0) ? 
                 /*html*/`<span class="muted-text"> No applications registered.</span>` : 
-                /*html*/`<ul class="apps">${applicationsLiElements} </ul>`
+                /*html*/`<ul class="apps">${liElements} </ul>`
             }
         </section>`
     }
@@ -202,7 +283,8 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         return /*html*/`<section class="actions">
             <header>Register Application</header>
             <form id="register-app-form">
-                <input name="name" type="text" pattern="^[a-z]([a-z0-9]|-)*$" placeholder="name, example: main-app">            
+                <input required name="name" type="text" pattern="^[a-z]([a-z0-9]|-)*$" placeholder="name (example: main-app)">
+                <input required name="modulePath" type="text" pattern="^/.*\.ix*$" placeholder="module (example: /main.ix)">            
                 <button id="show-prod-btn">Register</button>
             </form>
         </section>`
@@ -210,6 +292,10 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
     private makeStylesheet(){
         return /*css*/`
+            html, body {
+                overflow-y: scroll;
+            }
+
             main {
                 display: flex;
                 flex-direction: column;
@@ -228,14 +314,13 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
             form {
                 display: flex;
-                flex-direction: row;
+                flex-direction: column;
                 width: 100%;
                 align-items: start;
                 gap: 10px;
             }
 
             header {
-                font-weight: 700;
                 font-size: 18px;
             }
 
@@ -251,20 +336,51 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             }
 
             ul.apps {
+                width: 100%;
+
                 border-bottom: var(--thin-border);
                 display: flex;
                 flex-direction: column;
-                width: 100%;
-                gap: 10px;
             }
 
             ul.apps > li {
                 border-top: var(--thin-border);
-                height: 25px;
+                height: 32px;
+                padding: 5px;
 
                 display: grid;
-                grid-template-columns: 1fr 2fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 text-align: center;
+            }
+
+            ul.apps button {
+                height: 23px;
+                display: inline-flex;
+                align-items: center; 
+            }
+
+            [data-status=undeployed] {
+                color: var(--vscode-descriptionForeground);
+            }
+
+            [data-status=deploying] {
+                color: yellow;
+            }
+
+            [data-status=deployed] {
+                color: green;
+            }
+
+            [data-status=gracefully-stopping] {
+                color: yellow;
+            }
+
+            [data-status=gracefully-stopped] {
+                color: var(--vscode-descriptionForeground);
+            }
+
+            [data-status=erroneously-stopped], [data-status=failed-to-prepare] {
+                color: red;
             }
         `
     }
