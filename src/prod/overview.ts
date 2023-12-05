@@ -32,7 +32,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         };
 
         const view = this.view
-       
+
         this.ctx.onProjectOpen(() => {
             this.fetchApplicationStatuses().then(() => {
                 this.updateViewIfNeeded()
@@ -88,39 +88,17 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         <body>
             <style nonce='${cssNonce}'>
                 ${makeBaseStyleeshet()}
-                .applications, .actions {
-                    display: flex;
-                    flex-direction: column;
-                    width: 100%;
-                    align-items: start;
-                    gap: 5px;
-                }
-
-                header {
-                    font-weight: 700;
-                }
+                ${this.makeStylesheet()}
             </style>
 
-            <section class="applications">
-                <header>Applications</header>
-                ${(this.data.applicationStatuses === undefined) ?
-                'failed to get application statuses' :
-                Object.entries(this.data.applicationStatuses ?? {}).map(([appName, appStatus]) => {
-                    return /*html*/`<div>
-                            <span>${appName}</span>
-                            <span>${appStatus}</span>
-                        </div>`
-                }).join('\n')
-            }
-            </section>
+            <main>
+                ${this.renderApplicationsSection()}
+                ${this.renderActionsSection()}
+            </main>
 
-            <section class="actions">
-                <form id="register-app-form">
-                    <input name="name" type="text" pattern="^[a-z]([a-z0-9]|-)*$" placeholder="name, example: main-app">            
-                    <button id="show-prod-btn">Register Application</button>
-                </form>
-            </div>
-
+            <footer>
+                <span class="muted-text">In the near future the project server will provide a dashboard to perform more complex operations.</span>
+            </footer>
 
             <script nonce='${scriptNonce}'>
                 //https://code.visualstudio.com/api/extension-guides/webview
@@ -162,7 +140,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
 
 
         //no changes
-        if(JSON.stringify(prevStatuses) == JSON.stringify(newStatuses)){
+        if (JSON.stringify(prevStatuses) == JSON.stringify(newStatuses)) {
             return
         }
 
@@ -190,7 +168,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     }
 
     private async updateViewIfNeeded() {
-        if(! this.viewUpdateNeeded){
+        if (!this.viewUpdateNeeded) {
             return
         }
         if (this.view === undefined) {
@@ -199,5 +177,97 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         this.viewUpdateNeeded = false
         this.view.webview.html = await this.getHTML()
     }
+
+    private renderApplicationsSection(){
+        const applicationsLiElements = Object.entries(this.data.applicationStatuses ?? {}).map(([appName, appStatus]) => {
+            return /*html*/`<li>
+                <span>${appName}</span>
+                <span>${appStatus}</span>
+            </li>`
+        }).join('\n')
+
+        return /*html*/`<section class="applications">
+            <header>Applications</header>
+
+            ${(this.data.applicationStatuses === undefined) ?
+                'failed to get application statuses' :
+                (Object.keys(this.data.applicationStatuses).length == 0) ? 
+                /*html*/`<span class="muted-text"> No applications registered.</span>` : 
+                /*html*/`<ul class="apps">${applicationsLiElements} </ul>`
+            }
+        </section>`
+    }
+
+    private renderActionsSection(){
+        return /*html*/`<section class="actions">
+            <header>Register Application</header>
+            <form id="register-app-form">
+                <input name="name" type="text" pattern="^[a-z]([a-z0-9]|-)*$" placeholder="name, example: main-app">            
+                <button id="show-prod-btn">Register</button>
+            </form>
+        </section>`
+    }
+
+    private makeStylesheet(){
+        return /*css*/`
+            main {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                align-items: start;
+                gap: 20px;
+            }
+
+            .applications, .actions {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                align-items: start;
+                gap: 5px;
+            }
+
+            form {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                align-items: start;
+                gap: 10px;
+            }
+
+            header {
+                font-weight: 700;
+                font-size: 18px;
+            }
+
+            footer {
+                margin-top: 5px;
+                font-size: 12px;
+
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                align-items: center;
+                gap: 5px;
+            }
+
+            ul.apps {
+                border-bottom: var(--thin-border);
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            ul.apps > li {
+                border-top: var(--thin-border);
+                height: 25px;
+
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                text-align: center;
+            }
+        `
+    }
 }
+
 
