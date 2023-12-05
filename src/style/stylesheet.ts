@@ -24,6 +24,15 @@ export function getBaseStylesheet(){
             font-weight: var(--vscode-font-weight);
 
             --thin-border: 1px solid rgba(136, 136, 136, 0.568);
+
+            --success-background: rgb(22, 161, 22);
+            --success-foreground: rgb(223, 223, 223);
+
+            --transitional-state-background: rgb(22, 161, 22);
+            --transitional-state-foreground: rgb(209, 209, 36);;
+
+            --error-background: rgb(22, 161, 22);
+            --error-foreground: rgb(214, 23, 23);
         }
 
         button {
@@ -40,9 +49,13 @@ export function getBaseStylesheet(){
             border-radius: 2px;
         }
 
-        button:hover {
+        button:not(:disabled):hover {
             cursor: pointer;
             background: var(--vscode-button-hoverBackground);
+        }
+
+        button:disabled {
+            opacity: 50%;
         }
 
         .muted-text {
