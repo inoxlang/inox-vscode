@@ -3,6 +3,12 @@ import { CancellationTokenSource } from 'vscode-languageclient'
 import { InoxExtensionContext } from '../inox-extension-context';
 import { stringifyCatchedValue } from '../utils';
 
+
+const UPSERT_SECRET_METHOD = 'secrets/upsert'
+const DELETE_SECRET_METHOD = 'secrets/delete'
+const LIST_SECRETS_METHOD = 'secrets/list'
+
+
 export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SecretEntry | undefined | void> = new vscode.EventEmitter<SecretEntry | undefined | void>();
@@ -45,7 +51,7 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 					tokenSource.cancel()
 				}
 			}, 6000)
-			resp = await lspClient.sendRequest('secrets/listSecrets', {}, tokenSource.token)
+			resp = await lspClient.sendRequest(LIST_SECRETS_METHOD, {}, tokenSource.token)
 		} catch (err) {
 			this.ctx.debugChannel.appendLine(stringifyCatchedValue(err))
 			return
@@ -107,7 +113,7 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 		}
 
 		const lspClient = this.ctx.lspClient
-		await lspClient.sendRequest('secrets/upsertSecret', {
+		await lspClient.sendRequest(UPSERT_SECRET_METHOD, {
 			name: secretName,
 			value: secretValue
 		})
@@ -122,7 +128,7 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 		}
 
 		const secretValue = await vscode.window.showInputBox({
-			placeHolder: 'Value - not accessible after the secret is update',
+			placeHolder: 'Value - not accessible after the secret is updated',
 		})
 
 		if (secretValue === undefined) {
@@ -135,7 +141,7 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 		}
 
 		const lspClient = this.ctx.lspClient
-		await lspClient.sendRequest('secrets/upsertSecret', {
+		await lspClient.sendRequest(UPSERT_SECRET_METHOD, {
 			name: secretName,
 			value: secretValue
 		})
@@ -158,7 +164,7 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 			return
 		}
 
-		await this.ctx.lspClient.sendRequest('secrets/deleteSecret', {
+		await this.ctx.lspClient.sendRequest(DELETE_SECRET_METHOD, {
 			name: secretName,
 		})
 		return this.listSecrets()
