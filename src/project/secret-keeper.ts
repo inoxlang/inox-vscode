@@ -57,8 +57,11 @@ export class SecretKeeper implements vscode.TreeDataProvider<SecretEntry> {
 			return
 		}
 
-		if (resp && typeof (resp == 'object') && resp !== null && ('secrets' in resp) && Array.isArray(resp.secrets)) {
-			this.entries = resp.secrets.map((e: { name: string, lastModificationDate: string }) => {
+		if (resp && 
+			typeof (resp == 'object') && 
+			resp !== null && ('secrets' in resp) && 
+			(resp.secrets == null || Array.isArray(resp.secrets))) {
+			this.entries = (resp.secrets ?? []).map((e: { name: string, lastModificationDate: string }) => {
 				const lastModificationDate = new Date(Date.parse(e.lastModificationDate))
 				const description = lastModificationDate.toLocaleDateString([], {
 					hour: '2-digit',
