@@ -43,6 +43,10 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     private viewUpdateNeeded = false
 
     async resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): Promise<void> {
+        if(this.view == webviewView){
+            return
+        }
+
         this.view = webviewView
 
         webviewView.webview.options = {
@@ -51,12 +55,18 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         };
 
         const view = this.view
-
-        this.ctx.onProjectOpen(() => {
+  
+        if(this.ctx.projectOpen){
             this.fetchApplicationStatuses().then(() => {
                 this.updateViewIfNeeded()
+            }).catch()
+        } else {
+            this.ctx.onProjectOpen(() => {
+                this.fetchApplicationStatuses().then(() => {
+                    this.updateViewIfNeeded()
+                }).catch()
             })
-        })
+        }
 
         setInterval(async () => {
             this.fetchApplicationStatuses()
