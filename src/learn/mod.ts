@@ -407,11 +407,10 @@ function formatHelpMessage(commandTitle: string) {
         '# You can execute an Inox program in VSCode by doing the following:',
         "# - Click on 'Run and Debug' in the activity bar (left)",
         "# - Select the 'Launch Current Program' task",
-        "# - Click on the green arrow"
+        "# - Click on the green arrow",
+        "manifest {}",
     ]).join('\n')
 }
-
-
 
 //test
 
