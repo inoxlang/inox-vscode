@@ -2,7 +2,7 @@
 	"name": "inox",
 	"displayName": "inox",
 	"description": "",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"icon": "assets/inox-128.png",
 	"repository": {
 		"type": "git",
@@ -304,9 +304,9 @@
 	"main": "./out/extension",
 	"scripts": {
 		"compile": "tsc -p ./",
-
 		"watch": "tsc -watch -p ./",
-		"package": "npm i; tsc -p ./tsconfig-release.json; npm prune --prod; vsce package; npm i"
+		"package": "npm i; tsc -p ./tsconfig-release.json; npm prune --prod; vsce package; npm i",
+		"package:pre-release": "npm i; tsc -p ./tsconfig-release.json; npm prune --prod; vsce package --pre-release; npm i"
 	},
 	"devDependencies": {
 		"@types/node": "16.11.12",
