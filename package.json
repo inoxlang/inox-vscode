@@ -77,12 +77,6 @@
 		"configuration": {
 			"title": "Inox",
 			"properties": {
-				"inox.enableProjectMode": {
-					"order": 0,
-					"type": "boolean",
-					"default": false,
-					"description": "Enable project mode, PLEASE RELAUNCH THE WINDOW AFTER THE CHANGE."
-				},
 				"inox.websocketEndpoint": {
 					"order": 1,
 					"type": "string",
@@ -104,7 +98,13 @@
 					"type": "object",
 					"properties": {},
 					"default": [],
-					"description": "Environment variables passed to the command, values that are not strings are converted to JSON"
+					"description": "Environment variables passed to the command, values that are not strings are converted to JSON."
+				},
+				"inox.enableProjectMode": {
+					"order": 1000,
+					"type": "boolean",
+					"default": false,
+					"description": "(DO NOT EDIT) This setting is set to true in generated workspace files."
 				}
 			}
 		},
