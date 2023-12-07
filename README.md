@@ -2,9 +2,6 @@
 
 # Inox extension
 
-This extension provides support for the Inox programming language.\
-[Features](#features)
-
 <details>
 
 **<summary>Click Here if you use VSCodium</summary>**
@@ -18,17 +15,37 @@ tab and clicking here:\
 
 </details>
 
+This extension provides support for the Inox programming language.
+
+- [Tutorials](#tutorials)
+- Syntax highlighting
+- Convenient snippets
+- LSP support
+  - Error diagnostics
+  - Hover information
+  - Completions
+  - Formatting
+- [Debugging](#debugging)
+
+
 ## Requirements
 
-By default this extension requires a project server to be listening on `wss://localhost:8305`.
+By default this extension requires a project server to be listening on `wss://localhost:8305`.\
 You can install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to 
-start a project server automatically.
+start a project server automatically, or manually start it if you are developping on a local Linux machine (see further below).
 
-If the project server runs on a **remote server** (e.g. a VPS) you have to update the [Websocket Endpoint](command:workbench.action.openSettings?%22%40ext%3Agraphr00t.inox%22) setting to the following value:
+If the project server runs on a **remote matchine** (e.g. a VPS) you have to update the [Websocket Endpoint](command:workbench.action.openSettings?%22%40ext%3Agraphr00t.inox%22) setting to the following value:
 ```
 wss://<server-ip>:8305
 ```
 
+**Manually starting the project server on your local Linux machine**
+
+If you have installed the `inox` binary on your local Linux machine you can execute this command:
+
+```
+inox project-server &
+```
 
 ## Usage
 
@@ -46,22 +63,12 @@ wss://<server-ip>:8305
   ![recent workspace](./assets/docs/recent-workspace.png)
 
 
-## Features
+## Tutorials
 
-- [Tutorials](#tutorials)
-- Syntax highlighting
-- Convenient snippets
-- LSP support
-  - Error diagnostics
-  - Hover information
-  - Completions
-  - Formatting
-- Debugging
-
-### Tutorials
+Create a file named `learn.tut.ix` inside an Inox project and follow the instructions. Happy learning :).
 
 ![tutorial demo](assets/docs/tutorial-demo.gif)
 
-### Debugging
+## Debugging
 
 ![img](assets/docs/debug-demo.png)
