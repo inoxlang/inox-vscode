@@ -259,12 +259,6 @@
 					"name": "Production",
 					"type": "webview",
 					"contextualTitle": "Production"
-				},
-				{
-					"id": "accountManager",
-					"name": "Account",
-					"type": "webview",
-					"contextualTitle": "Account"
 				}
 			]
 		},
