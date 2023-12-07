@@ -214,9 +214,11 @@ export async function openProject(ctx: InoxExtensionContext) {
             vscode.window.showErrorMessage('invalid response from project server (method: project/open)')
             return
         }
-        await saveTempTokens(ctx, (resp as Record<string, unknown>).tempTokens)
 
-        ctx.projectOpen = true
+        const {canBeDeployedInProd, tempTokens} = (resp as Record<string, unknown>)
+        await saveTempTokens(ctx, tempTokens)
+
+        ctx.markProjectAsOpen({canProjectBeDeployedInProd: Boolean(canBeDeployedInProd)})
     } catch (err) {
         vscode.window.showErrorMessage(stringifyCatchedValue(err))
     }

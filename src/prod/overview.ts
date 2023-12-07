@@ -7,7 +7,10 @@ import { WebSocket as _Websocket } from 'ws';
 
 
 const APP_STATUSES_REFRESH_INTERVAL = 3_000;
-
+const PROD_NOT_AVAILABLE_MSG = [
+    `The project cannot be deployed in production.`,
+    `This is likely due to the project server not being started by the inoxd daemon on a remote machine.`
+].join('\n')
 
 // LSP methods
 
@@ -48,13 +51,13 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         }
 
         this.view = webviewView
+        const view = this.view
 
         webviewView.webview.options = {
             enableScripts: true,
             localResourceRoots: [this.ctx.base.extensionUri]
         };
-
-        const view = this.view
+        webviewView.webview.html = '[loading]'
   
         if(this.ctx.projectOpen){
             this.fetchApplicationStatuses().then(() => {
@@ -68,7 +71,14 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             })
         }
 
-        setInterval(async () => {
+        const timer = setInterval(async () => {
+            if(this.ctx.projectOpen && !this.ctx.canProjectBeDeployedInProd) {
+                clearInterval(timer)
+                this.viewUpdateNeeded = true
+                this.updateViewIfNeeded()
+                return
+            }
+
             this.fetchApplicationStatuses()
             this.updateViewIfNeeded()
         }, APP_STATUSES_REFRESH_INTERVAL)
@@ -136,16 +146,32 @@ export class ProdOverview implements vscode.WebviewViewProvider {
         const scriptNonce = getNonce()
         const cssNonce = getNonce()
 
-        return /*html*/`<!DOCTYPE html>
-        <html lang="en">
-        <head>
+        const head = /*html*/`<head>
             <meta charset="UTF-8">
             <meta 
                 http-equiv="Content-Security-Policy" 
                 content="default-src 'none'; style-src ${webview.cspSource} 'nonce-${cssNonce}'; script-src 'nonce-${scriptNonce}';">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Account</title>
-        </head>
+        </head>`
+
+        if(! this.ctx.canProjectBeDeployedInProd){
+            return /*html*/`<!DOCTYPE html><html>
+                ${head}
+                    <body>
+                    <style nonce='${cssNonce}'>
+                        ${makeBaseStyleeshet()}
+                    </style>
+
+                    <span class="muted-text">${PROD_NOT_AVAILABLE_MSG}</span>
+                </body>
+            </html>`
+        }
+
+
+        return /*html*/`<!DOCTYPE html>
+        <html lang="en">
+            ${head}
         <body>
             <style nonce='${cssNonce}'>
                 ${makeBaseStyleeshet()}

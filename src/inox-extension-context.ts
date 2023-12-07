@@ -26,6 +26,7 @@ export class InoxExtensionContext {
     private _lspClient: LanguageClient | undefined
     private _lspClientFailedStart = false
     private _projectOpen: boolean = false
+    private _canProjectBeDeployedInProd: boolean = false
     private _projectOpenEmitter = new vscode.EventEmitter<void>();
     private _restartingClient = false
 
@@ -74,7 +75,7 @@ export class InoxExtensionContext {
         if (this._restartingClient) {
             return
         }
-        this.projectOpen = false
+        this._projectOpen = false
         this._restartingClient = true
 
         if (! await this._args.startLocalProjectServerIfNecessary(this)) {
@@ -155,12 +156,15 @@ export class InoxExtensionContext {
         return this._projectOpen
     }
 
-    set projectOpen(val: boolean) {
-        if (val) {
-            this._projectOpenEmitter.fire()
-        }
-        this._projectOpen = val
+    markProjectAsOpen(args: {canProjectBeDeployedInProd: boolean}) {
+        this._projectOpen = true
+        this._canProjectBeDeployedInProd = args.canProjectBeDeployedInProd
     }
+
+    get canProjectBeDeployedInProd(): boolean {
+        return this._canProjectBeDeployedInProd
+    }
+
 
     getStateValue(key: string) {
         return this.base.globalState.get(GLOBAL_STATE_ENTRY_PREFIX + key)
