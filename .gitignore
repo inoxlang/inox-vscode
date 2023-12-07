@@ -3,3 +3,4 @@ node_modules/
 extension-nolsp.ts
 
 .vscode/
+*.vsix
