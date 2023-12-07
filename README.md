@@ -1,18 +1,15 @@
 **👉 Once the extension is installed make sure to read [Requirements](#requirements) and [Usage](#usage).**
 
-
 # Inox extension
-
-https://marketplace.visualstudio.com/items?itemName=graphr00t.inox
 
 This extension provides support for the Inox programming language.\
 [Features](#features)
 
 <details>
 
-**<summary>👉 Click Here if you use VSCodium</summary>**
+**<summary>Click Here if you use VSCodium</summary>**
 
-Click on the marketplace link above and then on `Download Extension` to download the VSIX file for the extension:\
+Go on https://marketplace.visualstudio.com/items?itemName=graphr00t.inox and click on `Download Extension` to download the VSIX file for the extension:\
 ![image](https://user-images.githubusercontent.com/113632189/235324122-3f75a2bd-1238-4c53-9192-bcc530ab68c1.png)
 
 You can install the extension in VSCodium by going on the **Extensions**
