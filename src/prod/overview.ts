@@ -333,10 +333,14 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             }
 
 
-            return /*html*/`<li>
-                <span>${appName}</span>
-                <div data-status="${appStatus}"><span>${appStatusName}</span></div>
+            return /*html*/`<li><section class="app">
+                <header>${appName}</header>
                 <div>
+                    <span class="label">Status: </span>
+                    <span data-status="${appStatus}">${appStatusName}</span>
+                </div>
+              
+                <div class="app-actions">
                     ${(deployAction == 'None') ? '' :
                         /*html*/`<button data-action=${deployAction} data-app-name=${appName}>${deployAction}</button>
                         `
@@ -344,7 +348,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 }
                     <button ${!allowStop ? 'disabled' : ''} data-action=${stopAction} data-app-name=${appName}>${stopAction}</button>
                 </div>
-            </li>`
+            </section></li>`
         }).join('\n')
 
         return /*html*/`<section class="applications">
@@ -415,7 +419,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 gap: 5px;
             }
 
-            ul.apps {
+            .apps {
                 width: 100%;
 
                 border-bottom: var(--thin-border);
@@ -423,29 +427,35 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 flex-direction: column;
             }
 
-            ul.apps > li {
+            .app {
                 border-top: var(--thin-border);
-                height: 32px;
                 padding: 5px;
 
-                display: grid;
-                grid-template-columns: 25% 25% 50%;
-                text-align: center;
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
             }
 
-            ul.apps button {
+            .app button {
                 height: 23px;
                 display: inline-flex;
                 align-items: center; 
             }
 
+            .app-actions {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .label {
+                font-weight: 600;
+                font-size: 13px;
+            }
 
             [data-status] {
                 font-weight: 700;
-                border-radius: 10px;
-                display:flex;
-                align-items: center;
-                justify-content: center;
+                border-radius: 2px;
                 padding: 3px;
             }
 
