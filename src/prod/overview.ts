@@ -304,7 +304,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                     break
                 case 'erroneously-stopped':
                     deployAction = 'Deploy'
-                    appStatusName = 'stopped'
+                    appStatusName = 'stopped with errors'
                     break
                 case 'failed-to-prepare':
                     deployAction = 'Deploy'
@@ -446,6 +446,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 display: flex;
                 flex-direction: row;
                 gap: 10px;
+                padding-top: 5px;
             }
 
             .label {
