@@ -304,8 +304,9 @@
 	"main": "./out/extension",
 	"scripts": {
 		"compile": "tsc -p ./",
-		"package": "vsce package",
-		"watch": "tsc -watch -p ./"
+
+		"watch": "tsc -watch -p ./",
+		"package": "npm i; tsc -p ./tsconfig-release.json; npm prune --prod; vsce package; npm i"
 	},
 	"devDependencies": {
 		"@types/node": "16.11.12",
