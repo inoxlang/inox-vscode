@@ -304,6 +304,7 @@
 	"main": "./out/extension",
 	"scripts": {
 		"compile": "tsc -p ./",
+		"package": "vsce package",
 		"watch": "tsc -watch -p ./"
 	},
 	"devDependencies": {
@@ -315,6 +316,7 @@
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.3",
 		"@vscode/debugadapter": "^1.61.0",
+		"@vscode/vsce": "^2.22.0",
 		"await-notify": "^1.0.1",
 		"node-fetch": "^2.6.11",
 		"vscode-debugprotocol": "^1.51.0",
