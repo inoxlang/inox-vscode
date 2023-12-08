@@ -1,10 +1,11 @@
 import { inspect } from 'util';
 import { MessageTransports } from 'vscode-languageclient/node';
-import { WebSocket as _Websocket } from 'ws';
+import { WebSocket as _Websocket, ClientOptions } from 'ws';
 import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from './vscode-ws-jsonrpc/src/index';
 import { InoxExtensionContext } from './inox-extension-context';
 import { URL } from 'url';
 import { join } from 'path';
+import { isIP } from 'net';
 
 const PING_INTERVAL_MILLIS = 5000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
@@ -124,9 +125,11 @@ function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, 
     })
 }
 
-export function getWebsocketOptions(endpoint: URL){
+export function getWebsocketOptions(endpoint: URL): ClientOptions {
+    //ignore certificate errors for localhost and IP addresses
+    const reject = (endpoint.hostname != "localhost") && !isIP(endpoint.hostname)
+
     return {
-        //ignore certificate errors for localhost / 127.0.0.1
-        rejectUnauthorized: !(['localhost', '127.0.0.1'].includes(endpoint.hostname)),
+        rejectUnauthorized: reject
     }
 }
