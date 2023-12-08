@@ -118,7 +118,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
     }
 
 
-    const localProjectRoot = ctx.fileWorkspaceFolder.uri.path
+    const localProjectRoot = ctx.fileWorkspaceFolder.uri.fsPath
     const workspaceFile = join(localProjectRoot, `${ctx.fileWorkspaceFolder.name}.code-workspace`)
     const inoxProjectFile = join(localProjectRoot, 'inox-project.json')
     const readmeFile = join(localProjectRoot, 'README.txt')

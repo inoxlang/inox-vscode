@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { InoxExtensionContext } from './inox-extension-context';
 import * as fs from 'fs'
 import { extname, join } from 'path';
+import {join as joinPosix} from 'path/posix';
+
 import { sleep, stringifyCatchedValue } from './utils';
 
 export const INOX_FS_SCHEME = "inox"
@@ -294,7 +296,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 				}
 
 				for (const e of entries) {
-					const remoteEntryPath = join(remotePath, e.name)
+					const remoteEntryPath = joinPosix(remotePath, e.name)
 					const localPath = join(localFileCacheDir, remoteEntryPath)
 					const cacheEntryStats = await fs.promises.stat(localPath).catch(() => null)
 
@@ -339,7 +341,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 			entries.map(e => {
 				const localPath = join(dirPath, e.name)
-				const remotePath = join(uri.path, e.name)
+				const remotePath = joinPosix(uri.path, e.name)
 
 				switch (e.type as vscode.FileType) {
 					case vscode.FileType.Directory:
@@ -809,7 +811,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 }
 
 function getProjectFileCacheDir(ctx: InoxExtensionContext, id: string) {
-	return join(ctx.base.globalStorageUri.path, id)
+	return join(ctx.base.globalStorageUri.fsPath, id)
 }
 
 

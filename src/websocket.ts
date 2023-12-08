@@ -4,8 +4,8 @@ import { WebSocket as _Websocket, ClientOptions } from 'ws';
 import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from './vscode-ws-jsonrpc/src/index';
 import { InoxExtensionContext } from './inox-extension-context';
 import { URL } from 'url';
-import { join } from 'path';
 import { isIP } from 'net';
+import {join as joinPosix} from 'path/posix';
 
 const PING_INTERVAL_MILLIS = 5000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
@@ -48,7 +48,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appe
         }
 
         if(opts?.appendPath) {
-            endpoint.pathname = join(endpoint.pathname, opts.appendPath)
+            endpoint.pathname = joinPosix(endpoint.pathname, opts.appendPath)
         }
 
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`)

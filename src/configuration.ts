@@ -2,7 +2,7 @@ import { URL } from 'url';
 import { inspect } from 'util';
 import * as vscode from 'vscode';
 import * as fs from 'fs'
-import {basename, dirname} from 'path'
+import {join, dirname} from 'path'
 import { OutputChannel } from "vscode"
 import { InoxExtensionContext } from './inox-extension-context';
 
@@ -104,11 +104,9 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
     if (!localFolder) {
         if(inVirtualWorkspace && vscode.workspace.workspaceFile != undefined){
-            const dir = dirname(vscode.workspace.workspaceFile.path)
+            const dir = dirname(vscode.workspace.workspaceFile.fsPath)
 
-            localFolder = vscode.workspace.workspaceFile.with({
-                path: dir,
-            })
+            localFolder = vscode.workspace.workspaceFile.with({ path: dir })
         } else {
             vscode.window.showErrorMessage("no file:// folder")
             return
@@ -116,7 +114,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     }
 
     //check project config file even if not in project mode
-    const inoxProjectConfigURI = localFolder.with({ path: localFolder.path + '/' + INOX_PROJECT_FILENAME })
+    const inoxProjectConfigURI = localFolder.with({ path: localFolder.fsPath + '/' + INOX_PROJECT_FILENAME })
     const tempTokensURI = getTempTokensURI(localFolder)
 
     //try to read the project configuration file.
@@ -126,7 +124,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     try {
         configDocument = await vscode.workspace.openTextDocument(inoxProjectConfigURI)
         projectFilePresent = true
-        tempTokensFileContent = new TextDecoder().decode(await fs.promises.readFile(tempTokensURI.path))
+        tempTokensFileContent = new TextDecoder().decode(await fs.promises.readFile(tempTokensURI.fsPath))
     } catch {
 
     }
@@ -233,12 +231,12 @@ function checkProjectConfig(config: ProjectConfiguration): boolean {
 
 
 function getTempTokensURI(fileFsFolder: vscode.Uri) {
-    return fileFsFolder.with({ path: fileFsFolder.path + '/' + TEMP_TOKENS_FILENAME })
+    return fileFsFolder.with({ path: join(fileFsFolder.fsPath, TEMP_TOKENS_FILENAME) })
 }
 
 export async function saveTempTokens(ctx: InoxExtensionContext, arg: unknown) {
     const uri = getTempTokensURI(ctx.config.localProjectRoot)
     const json = JSON.stringify(arg)
     const data = new TextEncoder().encode(json)
-    return fs.promises.writeFile(uri.path, data)
+    return fs.promises.writeFile(uri.fsPath, data)
 }
