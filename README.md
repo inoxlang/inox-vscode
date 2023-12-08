@@ -30,29 +30,29 @@ This extension provides support for the Inox programming language.
 
 ## Requirements
 
-By default this extension requires a project server to be listening on `wss://localhost:8305`.\
-You can install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to 
-start a project server automatically, or manually start it if you are developping on a local Linux machine (see further below).
+By default this extension requires a project server to be listening on `wss://localhost:8305`.
 
-If the project server runs on a **remote matchine** (e.g. a VPS) you have to update the [Websocket Endpoint](command:workbench.action.openSettings?%22%40ext%3Agraphr00t.inox%22) setting to the following value:
-```
-wss://<server-ip>:8305
-```
+__A) You have a local machine or VM running Linux__
 
-**Manually starting the project server on your local Linux machine**
-
-If you have installed the `inox` binary on your local Linux machine you can execute this command:
-
+You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: 
 ```
 inox project-server &
 ```
+
+__B) You have a remote machine running Linux (e.g VPS)__
+
+- Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically.
+- update the `Websocket Endpoint` setting to the following value:
+  ```
+  wss://<server-ip>:8305
+  ```
 
 ## Usage
 
 **Creating a project**
 
 - Create a folder (example: `inox-web-app`)
-- Open it with VSCode
+- Open the folder in a **new VSCode window**
 - Execute the VSCode command `Inox: Initialize new Project in Current Folder`
 
 **Opening a project**
@@ -62,6 +62,8 @@ inox project-server &
 
   ![recent workspace](./assets/docs/recent-workspace.png)
 
+
+**😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
 
 ## Tutorials
 
