@@ -181,11 +181,18 @@ export class InoxFS implements vscode.FileSystemProvider {
 				this.progressiveFileCachingHandle = undefined
 			}
 
-			ctx.lspClient?.onDidChangeState?.(() => {
-				this.updateStatusBarItem()
-			})
+			let lspClient = ctx.lspClient;
+			if(lspClient){
+				const event = lspClient.onDidChangeState(() => {
+					this.updateStatusBarItem()
+					//dispose the event if the LSP client has changed.
+					if(this.ctx.lspClient != lspClient){
+						event.dispose()
+					}
+				})
+			}
 
-			this.startProgressiveFileCaching()
+			vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer')
 		})
 	}
 

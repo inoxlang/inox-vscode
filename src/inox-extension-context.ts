@@ -158,7 +158,10 @@ export class InoxExtensionContext {
 
     markProjectAsOpen(args: {canProjectBeDeployedInProd: boolean}) {
         this._projectOpen = true
+        this._projectOpenEmitter.fire()
         this._canProjectBeDeployedInProd = args.canProjectBeDeployedInProd
+        this.outputChannel.appendLine('project is now open')
+        this.debugChannel.appendLine('project is now open ' + JSON.stringify(args))
     }
 
     get canProjectBeDeployedInProd(): boolean {
