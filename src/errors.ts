@@ -5,8 +5,8 @@ export const LSP_CLIENT_NOT_RUNNING_MSG = "LSP client is not running, are you co
 
 
 
-export function fmtLspServerNotRunning(ctx: InoxExtensionContext){
-    let msg = `No Inox LSP server is running on ${ctx.config.websocketEndpoint}.` +
+export function fmtFailedToConnectToLSPServer(ctx: InoxExtensionContext){
+    let msg = `Failed to connect to LSP server at ${ctx.config.websocketEndpoint}. The server may not be running or there may be certificate issues.` +
     ` If there are too many connections from your IP the server may prevent you to create a new one.`;
 
   if(process.platform == 'linux') {

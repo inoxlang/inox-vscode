@@ -7,7 +7,7 @@ import { InlineDebugAdapterFactory } from './debug';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
 import { registerLearningCodeLensAndCommands } from './learn/mod';
-import { createLSPClient, createEmbeddedContentProvider, startLocalProjectServerIfNecessary } from './lsp';
+import { createLSPClient, createEmbeddedContentProvider, checkConnAndStartLocalProjectServerIfPossible } from './lsp';
 import { initializeNewProject } from './project';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
@@ -46,7 +46,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         getCurrentConfig: getConfiguration,
         createLSPClient: createLSPClient,
-        startLocalProjectServerIfNecessary: startLocalProjectServerIfNecessary,
+        checkConnAndStartLocalProjectServerIfPossible: checkConnAndStartLocalProjectServerIfPossible,
     })
 
     if (config.project) {
