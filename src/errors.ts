@@ -3,7 +3,7 @@ import { InoxExtensionContext } from "./inox-extension-context";
 
 export const EXTENSION_DOC_RECOMMENDENTATION_MSG = "Make sure to read the 'Requirements' and 'Usage' sections in the extension's details."
 export const LSP_CLIENT_NOT_RUNNING_MSG = 
-  "LSP client is not running. The project server may not be running or there may be certificate issues." + EXTENSION_DOC_RECOMMENDENTATION_MSG
+  "LSP client is not running. The project server may not be running or there may be certificate issues. " + EXTENSION_DOC_RECOMMENDENTATION_MSG
 
 export function fmtFailedToConnectToLSPServer(ctx: InoxExtensionContext){
     let msg = `Failed to connect to LSP server at ${ctx.config.websocketEndpoint}. The server may not be running or there may be certificate issues.` +
