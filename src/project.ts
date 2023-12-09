@@ -30,9 +30,12 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
     }
 
     if (!ctx.lspClient?.isRunning()) {
+        //only show error if an error message was not displayed just before.
+        if(ctx.lastFailedToConnectTime == null || (Date.now() - ctx.lastFailedToConnectTime) > 3000){
+            vscode.window.showErrorMessage(fmtLspClientNotRunning(ctx))
+        }
         return
     }
-
 
     let projectName: string
     //show an input box

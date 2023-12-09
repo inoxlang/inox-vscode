@@ -10,7 +10,7 @@ export function fmtLspClientNotRunning(ctx: InoxExtensionContext){
 }
 
 export function fmtFailedToConnectToLSPServer(ctx: InoxExtensionContext){
-    let msg = `Failed to connect to LSP server at ${ctx.config.websocketEndpoint}. The server may not be running or there may be certificate issues.` +
+    let msg = `Failed to connect to LSP server at ${ctx.config.websocketEndpoint}. The server may not be running or there may be certificate issues. ` +
     EXTENSION_DOC_RECOMMENDENTATION_MSG + " Also if there are too many connections from your IP the server may prevent you to create a new one. ";
 
   return msg

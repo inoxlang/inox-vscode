@@ -29,6 +29,7 @@ export class InoxExtensionContext {
     private _canProjectBeDeployedInProd: boolean = false
     private _projectOpenEmitter = new vscode.EventEmitter<void>();
     private _restartingClient = false
+    private _lastFailedToConnectTime: number|null = null
 
     readonly outputChannel: vscode.OutputChannel
     readonly debugChannel: vscode.OutputChannel
@@ -79,10 +80,13 @@ export class InoxExtensionContext {
         this._restartingClient = true
 
         if (! await this._args.checkConnAndStartLocalProjectServerIfPossible(this)) {
+            this._lastFailedToConnectTime = Date.now()
+
             this.debugChannel.appendLine('LSP server is not running, abort client restart')
             this._restartingClient = false
             return
         }
+        this._lastFailedToConnectTime = null
 
         if (this._lspClient === undefined) {
             this._lspClient = this._args.createLSPClient(this, forceProjetMode)
@@ -168,6 +172,9 @@ export class InoxExtensionContext {
         return this._canProjectBeDeployedInProd
     }
 
+    get lastFailedToConnectTime() {
+        return this._lastFailedToConnectTime
+    }
 
     getStateValue(key: string) {
         return this.base.globalState.get(GLOBAL_STATE_ENTRY_PREFIX + key)
