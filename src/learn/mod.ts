@@ -5,7 +5,7 @@ import { fmtLspClientNotRunning } from '../errors';
 import { LEARNING_PREFIX } from './const';
 import { Tutorial, TutorialSeries, learningInfo, tryUpdatingData, tutorialSeries } from './data';
 import { assertNotNil } from '../utils';
-import { parseInoxChunk } from '../parse/mod';
+import { loadWASMParsingModule, parseInoxChunk } from '../parse/mod';
 
 
 export const SELECT_TUTORIAL_SERIES_CMD_NAME = 'inox.learn.select-tutorial-series'
@@ -40,7 +40,9 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
     isTutorialLoading = false
 
 
-    constructor(readonly ctx: InoxExtensionContext) { }
+    constructor(readonly ctx: InoxExtensionContext) { 
+        loadWASMParsingModule(ctx)
+    }
 
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
         if (this.isTutorialLoading || !this.ctx.lspClient?.isRunning()) {
@@ -90,8 +92,11 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
         switch (current) {
             case MetadataCommentError.NotFound: case MetadataCommentError.UnknownSeries:
                 // if there is no metadata (or the series is unknown) we cannot know the current tutorial so we delete 
-                // all the file's content and add the help message
-                if (!text.includes(helpMessage)) {
+                // all the file's content and add the help message. 
+
+                if (!text.replace(/\r/g,'').includes(helpMessage)) {
+                    //note: we remove carriage returns because VSCode could haved added them after linefeeds on windows.
+
                     const editor = vscode.window.activeTextEditor
                     if (editor?.document == document) {
                         await editor.edit(edit => {
@@ -102,6 +107,8 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
                         await document.save()
                     }
                 } else {
+                    // if the help message is already present we show the lenses.
+
                     lenses.push(chooseSeriesLens)
                 }
                 break

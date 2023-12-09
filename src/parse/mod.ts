@@ -31,6 +31,10 @@ export async function getSpanLineColumn(ctx: InoxExtensionContext, chunkId: stri
     return result as [number, number]
 }
 
+export async function loadWASMParsingModule(ctx: InoxExtensionContext) {
+    getExports(ctx)
+}
+
 const MOD_PATH = path.join(__dirname, '..', '..', 'assets', 'parse.wasm')
 const MOD_BYTES = fs.readFileSync(MOD_PATH)
 const modExports = new Map<InoxExtensionContext, Exports | 'loading'>();
