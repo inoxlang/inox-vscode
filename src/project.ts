@@ -30,11 +30,16 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
     }
 
     if (!ctx.lspClient?.isRunning()) {
-        //only show error if an error message was not displayed just before.
-        if(ctx.lastFailedToConnectTime == null || (Date.now() - ctx.lastFailedToConnectTime) > 3000){
-            vscode.window.showErrorMessage(fmtLspClientNotRunning(ctx))
+        //wait for the LSP client to connect
+        await sleep(1000)
+
+        if (!ctx.lspClient?.isRunning()) {
+            //only show error if an error message was not displayed just before.
+            if(ctx.lastFailedToConnectTime == null || (Date.now() - ctx.lastFailedToConnectTime) > 3000){
+                vscode.window.showErrorMessage(fmtLspClientNotRunning(ctx))
+            }
+            return
         }
-        return
     }
 
     let projectName: string
@@ -199,11 +204,16 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
 }
 
 export async function openProject(ctx: InoxExtensionContext) {
-    const lspClient = ctx.lspClient
-    if (!lspClient || !lspClient.isRunning()) {
-        throw new Error(fmtLspClientNotRunning(ctx))
+    if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
+        //wait for the LSP client to connect
+        await sleep(1000)
+
+        if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
+            throw new Error(fmtLspClientNotRunning(ctx))
+        }
     }
 
+    const lspClient = ctx.lspClient
     const projectId = ctx.config.project?.id
 
     if (!projectId) {
