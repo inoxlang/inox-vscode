@@ -70,9 +70,9 @@ async function getExports(ctx: InoxExtensionContext) {
     let moduleExports = modExports.get(ctx)
     if (moduleExports == undefined) {
         createInstance(ctx)
-        await sleep(200)
+        await sleep(500)
     } else if (moduleExports === 'loading') {
-        await sleep(200)
+        await sleep(500)
     } else {
         return moduleExports
     }
