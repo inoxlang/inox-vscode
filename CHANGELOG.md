@@ -17,3 +17,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.1.5] - Release
 
 - Better handle LSP connection issues
+
+## [0.1.6] - Release
+
+- Fix tutorial files on Windows
+- Focus the debug console before program launch 
