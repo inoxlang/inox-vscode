@@ -8,7 +8,7 @@ import { saveTempTokens } from './configuration';
 import { fmtLspClientNotRunning } from './errors';
 
 const PROJECT_KEY_PREFIX = 'project/'
-const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]+$/i
+const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]*$/i
 
 function getStateValue(ctx: InoxExtensionContext, key: string) {
     return ctx.getStateValue(PROJECT_KEY_PREFIX + key)
