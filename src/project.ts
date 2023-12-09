@@ -29,8 +29,14 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
         return
     }
 
+    if (!ctx.lspClient?.isRunning()) {
+        vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
+        return
+    }
+
 
     let projectName: string
+    //show an input box
     {
 
         let input: string | undefined
@@ -81,6 +87,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
         if (!ctx.lspClient?.isRunning()) {
             progress.report({ increment: 100 });
             vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
+            return
         }
 
         await _initializeNewProject(ctx, projectName)
