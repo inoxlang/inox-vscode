@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
+import { EXTENSION_DOC_RECOMMENDENTATION_MSG, LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
 import { InoxExtensionContext } from "./inox-extension-context";
 
 const SUGGESTION_COMPUTATON_INTERVAL_MILLIS = 3_000
@@ -114,7 +114,7 @@ function computeOnboardingSuggestions(ctx: InoxExtensionContext): Suggestion[] {
             suggestions.push(new Suggestion({
                 importance: SuggestionImportance.CRUCIAL,
                 message:
-                    `The Inox Extension is installed. Make sure to read the 'Requirements' and 'Usage' sections in the extension's details.`,
+                    `The Inox Extension is installed. ` + EXTENSION_DOC_RECOMMENDENTATION_MSG,
                 items: ['Got it'],
                 async onAction() {
                     await setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)

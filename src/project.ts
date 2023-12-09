@@ -30,7 +30,6 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
     }
 
     if (!ctx.lspClient?.isRunning()) {
-        vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
         return
     }
 
