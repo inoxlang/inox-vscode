@@ -5,7 +5,7 @@ import { InoxExtensionContext } from "./inox-extension-context";
 import { join, basename } from 'path';
 import { stringifyCatchedValue, sleep } from './utils';
 import { saveTempTokens } from './configuration';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
+import { fmtLspClientNotRunning } from './errors';
 
 const PROJECT_KEY_PREFIX = 'project/'
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]+$/i
@@ -85,7 +85,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
 
         if (!ctx.lspClient?.isRunning()) {
             progress.report({ increment: 100 });
-            vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
+            vscode.window.showErrorMessage(fmtLspClientNotRunning(ctx))
             return
         }
 
@@ -106,7 +106,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
 async function _initializeNewProject(ctx: InoxExtensionContext, projectName: string) {
     const lspClient = ctx.lspClient
     if (!lspClient || !lspClient.isRunning()) {
-        throw new Error(LSP_CLIENT_NOT_RUNNING_MSG)
+        throw new Error(fmtLspClientNotRunning(ctx))
     }
 
     if (ctx.config.project?.id) {
@@ -198,7 +198,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
 export async function openProject(ctx: InoxExtensionContext) {
     const lspClient = ctx.lspClient
     if (!lspClient || !lspClient.isRunning()) {
-        throw new Error(LSP_CLIENT_NOT_RUNNING_MSG)
+        throw new Error(fmtLspClientNotRunning(ctx))
     }
 
     const projectId = ctx.config.project?.id

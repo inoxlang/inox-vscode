@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { EXTENSION_DOC_RECOMMENDENTATION_MSG, LSP_CLIENT_NOT_RUNNING_MSG } from './errors';
+import { EXTENSION_DOC_RECOMMENDENTATION_MSG } from './errors';
 import { InoxExtensionContext } from "./inox-extension-context";
 
 const SUGGESTION_COMPUTATON_INTERVAL_MILLIS = 3_000

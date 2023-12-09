@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { INOX_FS_SCHEME } from '../inox-fs';
 import { InoxExtensionContext } from '../inox-extension-context';
-import { LSP_CLIENT_NOT_RUNNING_MSG } from '../errors';
+import { fmtLspClientNotRunning } from '../errors';
 import { LEARNING_PREFIX } from './const';
 import { Tutorial, TutorialSeries, learningInfo, tryUpdatingData, tutorialSeries } from './data';
 import { assertNotNil } from '../utils';
@@ -291,7 +291,7 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
 
 async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
     if (!ctx.lspClient?.isRunning()) {
-        vscode.window.showWarningMessage(LEARNING_PREFIX + LSP_CLIENT_NOT_RUNNING_MSG)
+        vscode.window.showWarningMessage(LEARNING_PREFIX + fmtLspClientNotRunning(ctx))
         return false
     }
 
