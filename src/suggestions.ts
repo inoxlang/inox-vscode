@@ -110,23 +110,13 @@ function computeOnboardingSuggestions(ctx: InoxExtensionContext): Suggestion[] {
             break suggest_first_folder
         }
 
-        if(ctx.lspClient == undefined || !ctx.lspClient.isRunning()){
-            break suggest_first_folder
-        }
-
         if (status === undefined || status == DISMISSED_ONCE_STATUS) {
             suggestions.push(new Suggestion({
                 importance: SuggestionImportance.CRUCIAL,
                 message:
-                    "The Inox Extension is installed. You can now create a new folder (example: my-web-app), open it in a empty VSCode window " +
-                    "and execute the command `Inox: Initialize new Project in Current Folder`.",
+                    `The Inox Extension is installed. Make sure to read the 'Requirements' and 'Usage' sections in the extension's details.`,
                 items: ['Got it'],
                 async onAction() {
-                    if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
-                        vscode.window.showErrorMessage(LSP_CLIENT_NOT_RUNNING_MSG)
-                        return
-                    }
-
                     await setStateValue(FIRST_FOLDER_SUGGESTION_STATUS, NEVER_SHOW_AGAIN_STATUS)
                 },
                 async onDismissed() {
