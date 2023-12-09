@@ -30,22 +30,18 @@ This extension provides support for the Inox programming language.
 
 ## Requirements
 
-By default this extension requires a project server to be listening on `wss://localhost:8305`.
+This extension should work on **all platforms**. It requires a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
 
 __A) You have a local machine or VM running Linux__
 
-You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: 
-```
-inox project-server &
-```
+You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
+
+_If you have installed inoxd inside a VM don't forget to forward the port 8305._
 
 __B) You have a remote machine running Linux (e.g VPS)__
 
 - Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically.
-- update the `Websocket Endpoint` setting to the following value:
-  ```
-  wss://<server-ip>:8305
-  ```
+- update the **Websocket Endpoint** setting to the following value: `wss://<server-ip>:8305`
 
 ## Usage
 
@@ -61,7 +57,6 @@ __B) You have a remote machine running Linux (e.g VPS)__
 - Subsequent times you can directly go in **File** > **Open Recent**:
 
   ![recent workspace](./assets/docs/recent-workspace.png)
-
 
 **😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
 
