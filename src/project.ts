@@ -30,8 +30,11 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
     }
 
     if (!ctx.lspClient?.isRunning()) {
-        //wait for the LSP client to connect
-        await sleep(1000)
+        //try to restart the LSP client if it's not already connecting.
+        await ctx.restartLSPClient(false)
+
+        //wait for the LSP client if it's already connecting.
+        await sleep(500)
 
         if (!ctx.lspClient?.isRunning()) {
             //only show error if an error message was not displayed just before.
@@ -205,8 +208,11 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
 
 export async function openProject(ctx: InoxExtensionContext) {
     if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
-        //wait for the LSP client to connect
-        await sleep(1000)
+        //try to restart the LSP client if it's not already connecting.
+        await ctx.restartLSPClient(false)
+
+        //wait for the LSP client if it's already connecting.
+        await sleep(500)
 
         if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
             throw new Error(fmtLspClientNotRunning(ctx))
