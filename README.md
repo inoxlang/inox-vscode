@@ -51,6 +51,8 @@ __B) You have a remote machine running Linux (e.g VPS)__
 - Open the folder in a **new VSCode window**
 - Execute the VSCode command `Inox: Initialize new Project in Current Folder`
 
+👉 If you installed the project server **after** having opened the folder you can use the command `Developer: Reload Window` to restart the LSP client.
+
 **Opening a project**
 
 - The first time open the `xxx.code-workspace` file and click on the floating button '**Open Workspace**'
