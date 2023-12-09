@@ -281,6 +281,9 @@ class InoxDebugSession extends DebugSession {
     protected async launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments) {
         const lsp = this.lspClient;
 
+        //show the debug console 
+        vscode.commands.executeCommand('workbench.debug.action.focusRepl');
+
         const launchRequest: DebugProtocol.LaunchRequest = {
             type: 'request',
             command: "launch",
