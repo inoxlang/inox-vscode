@@ -51,7 +51,8 @@
 					"strings": "on"
 				},
 				"editor.defaultFormatter": "graphr00t.inox",
-				"editor.formatOnSave": true
+				"editor.formatOnSave": true,
+				"editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
 			},
 			"editor.tokenColorCustomizations": {
 				"textMateRules": [
