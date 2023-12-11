@@ -22,3 +22,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Fix tutorial files on Windows
 - Focus the debug console before program launch 
+
+## [0.1.7] - Release
+
+- Minor syntax colorization fix
+- Remove '-' from word separators
