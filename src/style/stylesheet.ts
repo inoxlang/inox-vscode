@@ -69,7 +69,6 @@ export function getBaseStylesheet(){
 
             height: 32px;
             line-height: 20px;
-            max-width: 200px;
             padding: 0 5px;
         }
 

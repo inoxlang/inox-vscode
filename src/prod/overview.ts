@@ -392,9 +392,12 @@ export class ProdOverview implements vscode.WebviewViewProvider {
     private renderActionsSection() {
         return /*html*/`<section class="actions">
             <header>Register Application</header>
+
+            <span class="muted-text">Registering an application module makes it deployable.</span>
+
             <form id="register-app-form">
                 <input required name="name" type="text" pattern="^[a-z]([a-z0-9]|-)*$" placeholder="name (example: main-app)">
-                <input required name="modulePath" type="text" pattern="^/.*\.ix*$" placeholder="module (example: /main.ix)">            
+                <input required name="modulePath" type="text" pattern="^/.*\.ix*$" placeholder="absolute module path (example: /main.ix)">            
                 <button id="show-prod-btn">Register</button>
             </form>
         </section>`
@@ -443,6 +446,10 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 width: 100%;
                 align-items: center;
                 gap: 5px;
+            }
+
+            input {
+                width: 100%;
             }
 
             .apps {
