@@ -27,3 +27,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Minor syntax colorization fix
 - Remove '-' from word separators
+
+## [0.1.8] - Release
+
+- Prod section: improve some explanations
+- Improve name of the README file created during project initialization
