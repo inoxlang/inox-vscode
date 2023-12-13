@@ -1,1 +1,1 @@
-export const LEARNING_PREFIX = '[learning] '
+export const LEARNING_LOG_PREFIX = '[learning] '

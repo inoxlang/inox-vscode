@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import { INOX_FS_SCHEME } from '../inox-fs';
 import { InoxExtensionContext } from '../inox-extension-context';
 import { fmtLspClientNotRunning } from '../errors';
-import { LEARNING_PREFIX } from './const';
+import { LEARNING_LOG_PREFIX } from './const';
 import { Tutorial, TutorialSeries, learningInfo, tryUpdatingData, tutorialSeries } from './data';
-import { assertNotNil } from '../utils';
+import { assertNotNil, sleep } from '../utils';
 import { loadWASMParsingModule, parseInoxChunk } from '../parse/mod';
 
 
@@ -94,8 +94,8 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
                 // if there is no metadata (or the series is unknown) we cannot know the current tutorial so we delete 
                 // all the file's content and add the help message. 
 
-                if (!text.replace(/\r/g,'').includes(helpMessage)) {
-                    //note: we remove carriage returns because VSCode could haved added them after linefeeds on windows.
+                if (!removeCRs(text).includes(removeCRs(helpMessage))) {
+                    //note: we remove carriage returns because VSCode could haved added them before linefeeds on Windows.
 
                     const editor = vscode.window.activeTextEditor
                     if (editor?.document == document) {
@@ -107,7 +107,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
                         await document.save()
                     }
                 } else {
-                    // if the help message is already present we show the lenses.
+                    // if the help message is already present we show the lens to choose a series.
 
                     lenses.push(chooseSeriesLens)
                 }
@@ -155,6 +155,8 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
     )
 
     ctx.base.subscriptions.push(codeLensProviderDisposable)
+
+    //add commands providing tutorial selection and navigation.
 
     vscode.commands.registerCommand(SELECT_TUTORIAL_SERIES_CMD_NAME, async (tutDoc: vscode.TextDocument) => {
         if (! await tryLoadingData(ctx)) {
@@ -298,7 +300,7 @@ export function registerLearningCodeLensAndCommands(ctx: InoxExtensionContext) {
 
 async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
     if (!ctx.lspClient?.isRunning()) {
-        vscode.window.showWarningMessage(LEARNING_PREFIX + fmtLspClientNotRunning(ctx))
+        vscode.window.showWarningMessage(LEARNING_LOG_PREFIX + fmtLspClientNotRunning(ctx))
         return false
     }
 
@@ -307,17 +309,18 @@ async function tryLoadingData(ctx: InoxExtensionContext): Promise<boolean> {
     }
 
     if (learningInfo === undefined || tutorialSeries.length === 0) {
-        vscode.window.showWarningMessage(LEARNING_PREFIX + 'failed to get learning data')
+        vscode.window.showWarningMessage(LEARNING_LOG_PREFIX + 'failed to get learning data')
         return false
     }
 
     return true
 }
 
-// loadTutorialInDocument removes all the content of the document and creates the files in tutorial.otherFiles.
+// loadTutorialInDocument updates the content of the document and creates tutorial.otherFiles.
 function loadTutorialInDocument(ctx: InoxExtensionContext, editor: vscode.TextEditor, series: TutorialSeries, tutorial: Tutorial) {
     const comment = formatMetadataComment(series, tutorial)
 
+    ctx.debugChannel.appendLine(LEARNING_LOG_PREFIX + 'load tutorial ' + tutorial.name)
 
     if (ctx.inoxFS) {
         for (const [path, content] of Object.entries(tutorial.otherFiles ?? {})) {
@@ -338,7 +341,8 @@ function loadTutorialInDocument(ctx: InoxExtensionContext, editor: vscode.TextEd
 
         builder.delete(range)
         builder.insert(new vscode.Position(0, 0), newFileContent)
-    }).then(() => editor.document.save())
+    }).then(() => sleep(100)) //wait a bit to make sure the document has been updated.
+    .then(() => editor.document.save())
 }
 
 
@@ -439,3 +443,9 @@ function formatHelpMessage(commandTitle: string) {
 // if (formatted != formatPersistedMetadata(parsed)) {
 //     throw new Error('test fail')
 // }
+
+
+// removeCRs removes all carriage return characters.
+function removeCRs(s: string){
+    return s.replace(/\r/g, "")
+}
