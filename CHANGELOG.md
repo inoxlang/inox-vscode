@@ -32,3 +32,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Prod section: improve some explanations
 - Improve name of the README file created during project initialization
+
+## [0.1.9] - Release
+
+- Create projects with a default web app template
