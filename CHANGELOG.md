@@ -36,3 +36,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.1.9] - Release
 
 - Create projects with a default web app template
+
+## [0.1.10] - Release
+
+- Fix loading of tutorials in a document
+- Improve README

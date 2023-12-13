@@ -2,7 +2,7 @@
 	"name": "inox",
 	"displayName": "inox",
 	"description": "",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"icon": "assets/inox-128.png",
 	"repository": {
 		"type": "git",
