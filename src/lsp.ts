@@ -6,7 +6,7 @@ import { InoxExtensionContext } from "./inox-extension-context";
 import { INOX_FS_SCHEME } from "./inox-fs";
 import { sleep } from './utils';
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
-import { openProject } from './project';
+import { openProject } from './project/mod';
 import { fmtFailedToConnectToLSPServer } from './errors';
 import { getEmbeddedBlockVirtualContent, isInsideEmbeddedRegion } from './embedded-support';
 import { getLanguageService } from 'vscode-html-languageservice';

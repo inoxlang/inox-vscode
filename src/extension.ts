@@ -8,7 +8,7 @@ import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
 import { registerLearningCodeLensAndCommands } from './learn/mod';
 import { createLSPClient, createEmbeddedContentProvider, checkConnAndStartLocalProjectServerIfPossible } from './lsp';
-import { initializeNewProject } from './project';
+import { initializeNewProject } from './project/mod';
 import { SecretEntry, SecretKeeper } from './project/secret-keeper';
 import { computeSuggestions } from './suggestions';
 import { registerSpecCodeLensAndCommands } from './testing/mod';

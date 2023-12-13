@@ -1,23 +1,15 @@
 import * as fs from 'fs'
 import * as vscode from 'vscode'
 
-import { InoxExtensionContext } from "./inox-extension-context";
+import { InoxExtensionContext } from "../inox-extension-context";
 import { join, basename } from 'path';
-import { stringifyCatchedValue, sleep } from './utils';
-import { saveTempTokens } from './configuration';
-import { fmtLspClientNotRunning } from './errors';
+import { stringifyCatchedValue, sleep } from '../utils';
+import { saveTempTokens } from '../configuration';
+import { fmtLspClientNotRunning } from '../errors';
+import { getStateValue, setStateValue } from './extension-state';
 
-const PROJECT_KEY_PREFIX = 'project/'
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]*$/i
-
-function getStateValue(ctx: InoxExtensionContext, key: string) {
-    return ctx.getStateValue(PROJECT_KEY_PREFIX + key)
-}
-
-function setStateValue(ctx: InoxExtensionContext, key: string, value: unknown) {
-    return ctx.setStateValue(PROJECT_KEY_PREFIX + key, value)
-}
-
+const DEFAULT_TEMPLATE_NAME = "web-app-min"
 
 export async function initializeNewProject(ctx: InoxExtensionContext) {
     await ctx.updateConfiguration()
@@ -186,8 +178,9 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
             const projectId = await lspClient.sendRequest('project/create', {
                 name: projectName,
                 addTutFile: isFirstProject,
-                addMainFile: true,
+                template: DEFAULT_TEMPLATE_NAME,
             })
+            
             if (typeof projectId != 'string') {
                 throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
             }
@@ -204,47 +197,4 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         vscode.window.showWarningMessage('an inox-project.json file is already present')
     }
 
-}
-
-export async function openProject(ctx: InoxExtensionContext) {
-    if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
-        //try to restart the LSP client if it's not already connecting.
-        await ctx.restartLSPClient(false)
-
-        //wait for the LSP client if it's already connecting.
-        await sleep(500)
-
-        if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
-            throw new Error(fmtLspClientNotRunning(ctx))
-        }
-    }
-
-    const lspClient = ctx.lspClient
-    const projectId = ctx.config.project?.id
-
-    if (!projectId) {
-        vscode.window.showWarningMessage('failed to open project: missing .id in project configuration')
-        return
-    }
-
-    try {
-        ctx.debugChannel.appendLine("Send 'project/open' request")
-        const resp = await lspClient.sendRequest('project/open', {
-            projectId: projectId,
-            config: ctx.config.project ?? {},
-            tempTokens: ctx.config.tempTokens
-        })
-
-        if ((typeof resp != 'object') || resp === null) {
-            vscode.window.showErrorMessage('invalid response from project server (method: project/open)')
-            return
-        }
-
-        const {canBeDeployedInProd, tempTokens} = (resp as Record<string, unknown>)
-        await saveTempTokens(ctx, tempTokens)
-
-        ctx.markProjectAsOpen({canProjectBeDeployedInProd: Boolean(canBeDeployedInProd)})
-    } catch (err) {
-        vscode.window.showErrorMessage(stringifyCatchedValue(err))
-    }
 }
