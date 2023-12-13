@@ -51,7 +51,7 @@ __B) You have a remote machine running Linux (e.g VPS)__
 - Open the folder in a **new VSCode window**
 - Execute the VSCode command `Inox: Initialize new Project in Current Folder`
 
-👉 If you installed the project server **after** having opened the folder you can use the command `Developer: Reload Window` to restart the LSP client.
+👉 If you created the project server **after** having opened the folder you can use the command `Developer: Reload Window` to restart the LSP client.
 
 **Opening a project**
 
@@ -61,6 +61,14 @@ __B) You have a remote machine running Linux (e.g VPS)__
   ![recent workspace](./assets/docs/recent-workspace.png)
 
 **😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
+
+**Running a Program**
+
+- Click on the icon with a bug in the left bar (screenshot).
+- Select the `Launch Current Program` task, the other task always executes `/main.ix`.
+- Click on the green arrow.
+
+![run & debug](assets/docs/run-debug.png)
 
 ## Tutorials
 
