@@ -51,3 +51,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.1.12] - Release
 
 - Fix colorization of `<script>` and `<style>` tags
+
+## [0.1.13] - Release
+
+- Rename the project creation command
+- Minor internal improvements
