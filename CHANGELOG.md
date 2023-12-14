@@ -41,3 +41,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Fix loading of tutorials in a document
 - Improve README
+
+## [0.1.11] - Release
+
+- Refresh file explorer on remote structure change
+- Minor changes in README
+- Cleanup refactor of filesystem logic
