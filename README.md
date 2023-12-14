@@ -49,7 +49,7 @@ __B) You have a remote machine running Linux (e.g VPS)__
 
 - Create a folder (example: `inox-web-app`)
 - Open the folder in a **new VSCode window**
-- Execute the VSCode command `Inox: Initialize new Project in Current Folder`
+- Execute the VSCode command `Inox: Create New Project in Current Folder`
 
 👉 If you created the project server **after** having opened the folder you can use the command `Developer: Reload Window` to restart the LSP client.
 

@@ -130,7 +130,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             return ctx.restartLSPClient(false)
         })
 
-        vscode.commands.registerCommand('inox.project.initialize', async () => {
+        vscode.commands.registerCommand('inox.project.create', async () => {
             return initializeNewProject(ctx)
         })
     }

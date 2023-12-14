@@ -112,8 +112,8 @@
 		"commands": [
 			{
 				"category": "Inox",
-				"command": "inox.project.initialize",
-				"title": "Initialize new Project in Current Folder"
+				"command": "inox.project.create",
+				"title": "Create New Project in Current Folder"
 			},
 			{
 				"category": "Inox",
