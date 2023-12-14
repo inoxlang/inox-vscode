@@ -47,3 +47,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Refresh file explorer on remote structure change
 - Minor changes in README
 - Cleanup refactor of filesystem logic
+
+## [0.1.12] - Release
+
+- Fix colorization of `<script>` and `<style>`` tags
