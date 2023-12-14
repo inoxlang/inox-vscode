@@ -58,7 +58,7 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             localResourceRoots: [this.ctx.base.extensionUri]
         };
         webviewView.webview.html = '[loading]'
-  
+
         if(this.ctx.projectOpen){
             this.fetchApplicationStatuses().then(() => {
                 this.updateViewIfNeeded()
@@ -71,7 +71,11 @@ export class ProdOverview implements vscode.WebviewViewProvider {
             })
         }
 
+        //periodically refresh application statuses.
+
         const timer = setInterval(async () => {
+            //disable periodic refresh if the project cannot be deployed in production.
+
             if(this.ctx.projectOpen && !this.ctx.canProjectBeDeployedInProd) {
                 clearInterval(timer)
                 this.viewUpdateNeeded = true
@@ -79,10 +83,30 @@ export class ProdOverview implements vscode.WebviewViewProvider {
                 return
             }
 
-            this.fetchApplicationStatuses()
+            //ignore refresh if the view is not visible.
+
+            if(!view.visible){
+                return
+            }
+
+            await this.fetchApplicationStatuses()
             this.updateViewIfNeeded()
         }, APP_STATUSES_REFRESH_INTERVAL)
 
+        //refresh application statuses each time the view becomes visible.
+
+        const disposable = view.onDidChangeVisibility(async () => {
+            if(this.ctx.projectOpen && !this.ctx.canProjectBeDeployedInProd) {
+                return
+            }
+
+            if(view.visible){
+                await this.fetchApplicationStatuses()
+                this.updateViewIfNeeded()
+            }
+        })
+
+        this.ctx.base.subscriptions.push(disposable)
 
         // handle messages from the webview
 
