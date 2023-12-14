@@ -5,6 +5,7 @@ import { extname as extnamePosix } from 'path/posix';
 import { DEBUG_PREFIX, INOX_FS_SCHEME } from './consts'
 import { PersistedFileCache as OnDiskFileCache } from './cache';
 import { MULTIPART_UPLOAD_B64_SIZE_THRESHOLD, Remote } from './remote';
+import { truncateSync } from 'fs';
 export { INOX_FS_SCHEME } from './consts'
 
 //status texts
@@ -43,6 +44,9 @@ export class InoxFS implements vscode.FileSystemProvider {
 	private _statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right)
 	private _cache?: OnDiskFileCache
 	private _remote = new Remote()
+	private _recentStructureChangesCausedByUser: {uri: vscode.Uri, date: Date}[] = []
+	private _lastExploreRefresh: Date | undefined
+
 
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
@@ -143,7 +147,28 @@ export class InoxFS implements vscode.FileSystemProvider {
 					//dispose the event if the LSP client has changed.
 					if (this.ctx.lspClient != lspClient) {
 						event.dispose()
+						notifDisposable.dispose()
 					}
+				})
+
+				//refresh the file explorer each time there is a structure change that is not caused by the user.
+				const notifDisposable = lspClient.onNotification("fs/structureEvent", event => {
+					this.removeOldStructureChanges()
+
+					//ignore event if caused by user.
+					for(const change of this._recentStructureChangesCausedByUser){
+						if(change.uri.path == event.path){
+							return
+						}
+					}
+
+					//don't refresh the explorer if it has been refreshed less than 500 milliseconds ago.
+					if(this._lastExploreRefresh && (Date.now() - this._lastExploreRefresh.getTime()) < 500){
+						return
+					}
+
+					this.outputChannel.appendLine(`${DEBUG_PREFIX} refresh file explorer because ${event.path} changed remotely (not caused by user)`)
+					vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer')
 				})
 			}
 
@@ -341,6 +366,10 @@ export class InoxFS implements vscode.FileSystemProvider {
 				overwrite: options.overwrite,
 			})
 		}
+
+		//TODO: only record the change if the file is created by the write operation,
+		//otherwise if the file is deleted by some logic on the server the change will no be visible instantly.
+		this.enqueueStructureChangeCausedByUser(uri)
 	}
 
 	async rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
@@ -350,6 +379,9 @@ export class InoxFS implements vscode.FileSystemProvider {
 		if (this._useLocalFileCache) {
 			throw vscode.FileSystemError.Unavailable(oldUri.path)
 		}
+
+		this.enqueueStructureChangeCausedByUser(oldUri)
+		this.enqueueStructureChangeCausedByUser(newUri)
 
 		return this._remote.renameFile({
 			oldUri: oldUri,
@@ -366,6 +398,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		this.enqueueStructureChangeCausedByUser(uri)
 		return this._remote.delete(uri)
 	}
 
@@ -377,12 +410,35 @@ export class InoxFS implements vscode.FileSystemProvider {
 			throw vscode.FileSystemError.Unavailable(uri)
 		}
 
+		this.enqueueStructureChangeCausedByUser(uri)
 		return this._remote.createDir(uri)
 	}
 
 	watch(_resource: vscode.Uri): vscode.Disposable {
 		// ignore, fires for all changes...
 		return new vscode.Disposable(() => { });
+	}
+
+
+	private removeOldStructureChanges(){
+		//remove old structured changes
+		const now = new Date()
+		while(this._recentStructureChangesCausedByUser.length > 0 && 
+			(now.getTime() - this._recentStructureChangesCausedByUser[0].date.getTime() > 1000)){			
+			
+			this._recentStructureChangesCausedByUser.shift()
+		}
+	}
+
+	private enqueueStructureChangeCausedByUser(uri: vscode.Uri){
+		this.removeOldStructureChanges()
+		//add new change
+		const now = new Date()
+
+		this._recentStructureChangesCausedByUser.push({
+			date: now,
+			uri: uri,
+		})
 	}
 
 }
