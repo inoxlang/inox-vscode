@@ -50,4 +50,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.1.12] - Release
 
-- Fix colorization of `<script>` and `<style>`` tags
+- Fix colorization of `<script>` and `<style>` tags
