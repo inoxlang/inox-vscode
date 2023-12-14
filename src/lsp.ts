@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { CloseAction, CloseHandlerResult, ErrorAction, LanguageClientOptions, State, ConnectionError } from "vscode-languageclient";
 import { ErrorHandlerResult, LanguageClient, Range, ServerOptions } from "vscode-languageclient/node";
 import { InoxExtensionContext } from "./inox-extension-context";
-import { INOX_FS_SCHEME } from "./inox-fs";
+import { INOX_FS_SCHEME } from "./inoxfs/mod";
 import { sleep } from './utils';
 import { connectToWebsocketServer as createConnectToWebsocketServer, isWebsocketServerRunning } from "./websocket";
 import { openProject } from './project/mod';

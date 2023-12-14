@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { Configuration } from './configuration';
-import { InoxFS } from './inox-fs';
+import { InoxFS } from './inoxfs/mod';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp';
 import { stringifyCatchedValue } from './utils';
 

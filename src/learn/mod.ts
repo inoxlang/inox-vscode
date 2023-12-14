@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { INOX_FS_SCHEME } from '../inox-fs';
+import { INOX_FS_SCHEME } from '../inoxfs/mod';
 import { InoxExtensionContext } from '../inox-extension-context';
 import { fmtLspClientNotRunning } from '../errors';
 import { LEARNING_LOG_PREFIX } from './const';

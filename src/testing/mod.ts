@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import { findTestSuiteAndCaseStatements, getNodeBase, getSpanLineColumn, parseInoxChunk } from '../parse/mod';
 import { InoxExtensionContext } from '../inox-extension-context';
-import { INOX_FS_SCHEME } from '../inox-fs';
+import { INOX_FS_SCHEME } from '../inoxfs/mod';
 import { RUN_ALL_TESTS_IN_FILE_CMD_NAME, RUN_TESTCASE_IN_FILE_CMD_NAME, RUN_TESTSUITE_IN_FILE_CMD_NAME, registerCommands } from './commands';
 
 export function registerSpecCodeLensAndCommands(ctx: InoxExtensionContext) {

@@ -5,7 +5,7 @@ import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languag
 import { getConfiguration } from './configuration';
 import { InlineDebugAdapterFactory } from './debug';
 import { InoxExtensionContext } from './inox-extension-context';
-import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inox-fs';
+import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inoxfs/mod';
 import { registerLearningCodeLensAndCommands } from './learn/mod';
 import { createLSPClient, createEmbeddedContentProvider, checkConnAndStartLocalProjectServerIfPossible } from './lsp';
 import { initializeNewProject, SecretEntry, SecretKeeper } from './project/mod';

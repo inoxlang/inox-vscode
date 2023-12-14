@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { InoxExtensionContext } from "../inox-extension-context"
-import { INOX_FS_SCHEME } from '../inox-fs';
+import { INOX_FS_SCHEME } from '../inoxfs/mod';
 import { NodeSpan } from '../parse/ast';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { stringifyCatchedValue } from '../utils';
