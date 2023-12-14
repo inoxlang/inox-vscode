@@ -44,7 +44,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 	private _cache?: OnDiskFileCache
 	private _remote = new Remote()
 
-
 	//TODO
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
 
@@ -114,7 +113,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 		])
 	}
 
-
 	set ctx(ctx: InoxExtensionContext) {
 		if (this._ctx !== undefined) {
 			throw new Error('context already set')
@@ -132,8 +130,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 
 		//add disposables
 		this.ctx.base.subscriptions.push(this._statusBarItem, this._emitter)
-
-
 
 		this._projectOpenDisposable = ctx.onProjectOpen(() => {
 			this.updateStatusBarItem()
@@ -156,10 +152,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 		})
 	}
 
-
-
-
-
 	clearFileCache() {
 		return this._cache?.clearOnDiskCache()
 	}
@@ -175,14 +167,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 		return this._ctx
 	}
 
-	get lspClient() {
-		if (this._ctx?.lspClient === undefined) {
-			throw new Error('client not set')
-		}
-		return this._ctx.lspClient
-	}
-
-	get lspClientPresenceSuffix() {
+	private get lspClientPresenceSuffix() {
 		if (this._ctx?.lspClient === undefined) {
 			return '(no LSP client)'
 		}
@@ -272,7 +257,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 		})
 	}
 
-
 	async readFile(uri: vscode.Uri): Promise<Uint8Array> {
 		this.outputChannel.appendLine(`${DEBUG_PREFIX} read file ${uri.toString()} ${this.lspClientPresenceSuffix}`)
 		this.updateStatusBarItem()
@@ -340,7 +324,6 @@ export class InoxFS implements vscode.FileSystemProvider {
 			sentContent = Buffer.from(content)
 		}
 
-
 		const base64Content = sentContent.toString('base64')
 
 		if (base64Content.length < MULTIPART_UPLOAD_B64_SIZE_THRESHOLD) {
@@ -351,7 +334,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 				overwrite: options.overwrite,
 			})
 		} else {
-			await this._remote.writeMutltiPartFile({
+			await this._remote.writeMultiPartFile({
 				uri: uri,
 				base64Content: base64Content,
 				create: options.create,

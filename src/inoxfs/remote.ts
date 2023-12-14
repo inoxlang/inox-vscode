@@ -25,27 +25,18 @@ export class Remote {
 
 	get ctx() {
 		if (this._ctx == undefined) {
-			throw new Error('contetx is not set yey')
+			throw new Error('context is not set')
 		}
 		return this._ctx
 	}
 
-	public set ctx(value: InoxExtensionContext) {
+	set ctx(value: InoxExtensionContext) {
 		this._ctx = value
 	}
 
 	get isUploading() {
 		const now = Date.now()
 		return uploadTimestampsWindow.length > 0 && (now - uploadTimestampsWindow[uploadTimestampsWindow.length - 1]) < ONE_SECOND_MILLIS
-	}
-
-	private createTokenSource() {
-		const tokenSource = new vscode.CancellationTokenSource()
-		setTimeout(() => {
-			tokenSource.cancel()
-			tokenSource.dispose()
-		}, CANCELLATION_TOKEN_TIMEOUT)
-		return tokenSource
 	}
 
 	fetchDirEntries(uri: vscode.Uri) {
@@ -100,7 +91,7 @@ export class Remote {
 		}, tokenSource.token)
 	}
 
-	async writeMutltiPartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
+	async writeMultiPartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
 
 		if (this.clientRunningAndProjectOpen) {
 			throw new Error('LSP client not running')
@@ -224,6 +215,15 @@ export class Remote {
 		return this.ctx.lspClient!.sendRequest('fs/createDir', {
 			uri: uri.toString(),
 		}, tokenSource.token)
+	}
+
+	private createTokenSource() {
+		const tokenSource = new vscode.CancellationTokenSource()
+		setTimeout(() => {
+			tokenSource.cancel()
+			tokenSource.dispose()
+		}, CANCELLATION_TOKEN_TIMEOUT)
+		return tokenSource
 	}
 
 	private writeToDebugChannel(msg: string) {
