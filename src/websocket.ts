@@ -7,7 +7,7 @@ import { URL } from 'url';
 import { isIP } from 'net';
 import {join as joinPosix} from 'path/posix';
 
-const PING_INTERVAL_MILLIS = 5000;
+const PING_INTERVAL_MILLIS = 15_000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
 const WEBSOCKET_LOG_PREFIX = "[Web Socket] "
 
