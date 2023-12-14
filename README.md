@@ -64,7 +64,7 @@ __B) You have a remote machine running Linux (e.g VPS)__
 
 **Running a Program**
 
-- Click on the icon with a bug in the left bar (screenshot).
+- Click on the same icon as in the screenshot.
 - Select the `Launch Current Program` task, the other task always executes `/main.ix`.
 - Click on the green arrow.
 
