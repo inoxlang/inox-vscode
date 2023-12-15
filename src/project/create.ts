@@ -95,7 +95,8 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
         await _initializeNewProject(ctx, projectName)
 
         vscode.window.showInformationMessage(
-            "The project should have been created on the server. You can open it by clicking 'Open Workspace' in the `<project>.code-workspace` file.",
+            "The project should have been created on the server. "+
+            `You can open it by clicking 'Open Workspace' in the '${projectName}.code-workspace' file.`,
             {
                 modal: true,
                 detail: "If some extensions show an error when the workspace is loaded you can disable them in it."
