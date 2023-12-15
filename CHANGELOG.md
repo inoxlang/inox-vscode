@@ -56,3 +56,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Rename the project creation command
 - Minor internal improvements
+
+## [0.1.14] - Release
+
+- Update the WASM Module parsing Inox code
+- Improve a success message
