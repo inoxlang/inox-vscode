@@ -70,7 +70,7 @@ __B) You have a remote machine running Linux (e.g VPS)__
 
 **😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
 
-**Running a Program**
+**Running and debugging a program**
 
 - Click on the same icon as in the screenshot.
 - Select the `Launch Current Program` task, the other task always executes `/main.ix`.
@@ -78,7 +78,7 @@ __B) You have a remote machine running Linux (e.g VPS)__
 
 ![run & debug](assets/docs/run-debug.png)
 
-Learn about debug actions: https://code.visualstudio.com/Docs/editor/debugging#_debug-actions.
+Learn about debug actions and breakpoints: https://code.visualstudio.com/Docs/editor/debugging#_debug-actions.
 
 ![debug action bar](https://code.visualstudio.com/assets/docs/editor/debugging/toolbar.png)
 
