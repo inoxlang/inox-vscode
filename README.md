@@ -43,6 +43,14 @@ __B) You have a remote machine running Linux (e.g VPS)__
 - Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically.
 - update the **Websocket Endpoint** setting to the following value: `wss://<server-ip>:8305`
 
+<details>
+
+**<summary>How to change an extension setting.</summary>**
+
+![websocket setting change](./assets/docs/websocket-setting-change.gif)
+
+</details>
+
 ## Usage
 
 **Creating a project**
