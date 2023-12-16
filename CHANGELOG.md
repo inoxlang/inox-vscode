@@ -61,3 +61,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Update the WASM Module parsing Inox code
 - Improve a success message
+
+## [0.1.15] - Release
+
+- Update grammar
+- Improve the extension's documentation
