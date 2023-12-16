@@ -78,6 +78,10 @@ __B) You have a remote machine running Linux (e.g VPS)__
 
 ![run & debug](assets/docs/run-debug.png)
 
+Learn about debug actions: https://code.visualstudio.com/Docs/editor/debugging#_debug-actions.
+
+![debug action bar](https://code.visualstudio.com/assets/docs/editor/debugging/toolbar.png)
+
 ## Tutorials
 
 Create a file named `learn.tut.ix` inside an Inox project and follow the instructions. Happy learning :).
