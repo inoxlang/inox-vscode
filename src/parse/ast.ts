@@ -34,13 +34,13 @@ export interface Chunk {
     "base:chunk": NodeBase
     manifest?: Manifest
     includableChunkDesc?: IncludableChunkDescription
-    statements: Node[]
+    statements?: Node[]
 }
 
 export interface EmbeddedModule {
     "base:embedded-module": NodeBase
     manifest?: Manifest
-    statements: Node[]
+    statements?: Node[]
     isSingleCallExpr: boolean
 }
 

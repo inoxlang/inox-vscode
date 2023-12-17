@@ -3,14 +3,16 @@ import * as fs from 'fs';
 
 import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languageclient';
 import { getConfiguration } from './configuration';
-import { InlineDebugAdapterFactory } from './debug';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inoxfs/mod';
+
 import { registerLearningCodeLensAndCommands } from './learn/mod';
+import { registerRunDebugLensAndCommands, InlineDebugAdapterFactory } from './debug/mod';
+import { registerSpecCodeLensAndCommands } from './testing/mod';
+
 import { createLSPClient, createEmbeddedContentProvider, checkConnAndStartLocalProjectServerIfPossible } from './lsp';
 import { initializeNewProject, SecretEntry, SecretKeeper } from './project/mod';
 import { computeSuggestions } from './suggestions';
-import { registerSpecCodeLensAndCommands } from './testing/mod';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 
@@ -99,6 +101,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     registerLearningCodeLensAndCommands(ctx)
     registerSpecCodeLensAndCommands(ctx)
+    registerRunDebugLensAndCommands(ctx)
+    
 
     //register commands
     {

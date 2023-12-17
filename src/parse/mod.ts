@@ -31,6 +31,16 @@ export async function getSpanLineColumn(ctx: InoxExtensionContext, chunkId: stri
     return result as [number, number]
 }
 
+export async function getSpanEndLineColumn(ctx: InoxExtensionContext, chunkId: string, startIndex: number, endIndex: number) {
+    const { getSpanEndLineColumn: get } = await getExports(ctx)
+
+    const [result, err] = get(chunkId, startIndex, endIndex)
+    if (err != null) {
+        throw new Error(err)
+    }
+    return result as [number, number]
+}
+
 export async function loadWASMParsingModule(ctx: InoxExtensionContext) {
     getExports(ctx)
 }
@@ -42,6 +52,7 @@ const modExports = new Map<InoxExtensionContext, Exports | 'loading'>();
 interface Exports {
     parseChunk: (filepath: string, dirpath: string, content: string) => any
     getSpanLineColumn: (chunkId: string, startIndex: number, endIndex: number) => any
+    getSpanEndLineColumn: (chunkId: string, startIndex: number, endIndex: number) => any
 }
 
 
@@ -62,9 +73,15 @@ async function createInstance(ctx: InoxExtensionContext) {
         if (typeof getSpanLineColumn != 'function') {
             throw new Error('get_span_line_column should be a function not a ' + typeof getSpanLineColumn)
         }
+        
+        const getSpanEndLineColumn = exports.get_span_end_line_column
+        if (typeof getSpanEndLineColumn != 'function') {
+            throw new Error('get_span_end_line_column should be a function not a ' + typeof getSpanEndLineColumn)
+        }
 
         modExports.set(ctx, {
             getSpanLineColumn: getSpanLineColumn,
+            getSpanEndLineColumn: getSpanEndLineColumn,
             parseChunk: parseChunk,
         })
     }, 100)
@@ -91,8 +108,8 @@ async function getExports(ctx: InoxExtensionContext) {
 
 export interface ParseResult {
     completeErrorMessage: string
-    errors: ParseError[]
-    errorPositions: SourcePositionRange[]
+    errors: ParseError[] | null
+    errorPositions?: SourcePositionRange[]
     chunk?: Chunk
     chunkId?: string
 }
