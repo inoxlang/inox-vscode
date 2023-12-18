@@ -1,46 +1,27 @@
 # Change Log
 
-All notable changes to the "Inox" extension will be documented in this file.
+## [0.2.0] - Release
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Add `run and debug` lens above module manifests
 
-## [Unreleased]
+## [0.1.15] - Release
 
-- Initial release
+- Update grammar
+- Improve the extension's documentation
 
-## [0.1.4] - Release
+## [0.1.14] - Release
 
-- Ignore certificate errors for all IP addresses
-- Support Windows paths
-- Various fixes
+- Update the WASM Module parsing Inox code
+- Improve a success message
 
-## [0.1.5] - Release
+## [0.1.13] - Release
 
-- Better handle LSP connection issues
+- Rename the project creation command
+- Minor internal improvements
 
-## [0.1.6] - Release
+## [0.1.12] - Release
 
-- Fix tutorial files on Windows
-- Focus the debug console before program launch 
-
-## [0.1.7] - Release
-
-- Minor syntax colorization fix
-- Remove '-' from word separators
-
-## [0.1.8] - Release
-
-- Prod section: improve some explanations
-- Improve name of the README file created during project initialization
-
-## [0.1.9] - Release
-
-- Create projects with a default web app template
-
-## [0.1.10] - Release
-
-- Fix loading of tutorials in a document
-- Improve README
+- Fix colorization of `<script>` and `<style>` tags
 
 ## [0.1.11] - Release
 
@@ -48,21 +29,44 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Minor changes in README
 - Cleanup refactor of filesystem logic
 
-## [0.1.12] - Release
+## [0.1.10] - Release
 
-- Fix colorization of `<script>` and `<style>` tags
+- Fix loading of tutorials in a document
+- Improve README
 
-## [0.1.13] - Release
+## [0.1.9] - Release
 
-- Rename the project creation command
-- Minor internal improvements
+- Create projects with a default web app template
 
-## [0.1.14] - Release
+## [0.1.8] - Release
 
-- Update the WASM Module parsing Inox code
-- Improve a success message
+- Prod section: improve some explanations
+- Improve name of the README file created during project initialization
 
-## [0.1.15] - Release
+## [0.1.7] - Release
 
-- Update grammar
-- Improve the extension's documentation
+- Minor syntax colorization fix
+- Remove '-' from word separators
+
+## [0.1.6] - Release
+
+- Fix tutorial files on Windows
+- Focus the debug console before program launch
+
+## [0.1.5] - Release
+
+- Better handle LSP connection issues
+
+## [0.1.4] - Release
+
+- Ignore certificate errors for all IP addresses
+- Support Windows paths
+- Various fixes
+
+## [0.1.0] - Release
+
+- LSP support
+- Debugging
+- Tutorials
+- Virtual filesystem
+- Extended syntax colorization
