@@ -1126,7 +1126,7 @@
 					"match": "(?<=\\))\\s*(?=\\{)"
 				},
 				{
-					"match": "(?<=\\))\\s*(?=(and|or|not-in|keyof|match|not-match|substrof|is|is-not)\\b[^-_])",
+					"match": "(?<=\\))\\s*(?=(and|or|not-in|keyof|urlof|match|not-match|substrof|is|is-not)\\b[^-_])",
 					"comment": "ignore binary expressions"
 				},
 				{
@@ -1330,7 +1330,7 @@
 				},
 				{
 					"name": "keyword.operator.expression.inox",
-					"match": "(?<![-_])\\b(and|or|not-in|keyof|match|not-match|substrof|is|is-not)\\b(?![-_])"
+					"match": "(?<![-_])\\b(and|or|not-in|keyof|urlof|match|not-match|substrof|is|is-not)\\b(?![-_])"
 				},
 				{
 					"name": "storage.type",
