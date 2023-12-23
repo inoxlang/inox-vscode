@@ -275,12 +275,17 @@
 			"patterns": [
 				{
 					"name": "string.regexp.url-pattern",
-					"match": "%[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]{0,100})",
+					"match": "%[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b([-a-zA-Z0-9@:%_*+.~#?&//=]{0,100})",
 					"captures": {
 						"1": {
 							"patterns": [
 								{
-									"include": "#path-patterns"
+									"match": "\\*",
+									"name":"constant.language.special.wildcard.url-pattern.inox"
+								},
+								{
+									"match": "(?<=/)%[a-zA-Z_][a-zA-Z0-9_-]*(?=/?)",
+									"name":"constant.language.special.path-segment.url-pattern.inox"
 								}
 							]
 						}
