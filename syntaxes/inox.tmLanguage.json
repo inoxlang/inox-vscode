@@ -1126,7 +1126,7 @@
 					"match": "(?<=\\))\\s*(?=\\{)"
 				},
 				{
-					"match": "(?<=\\))\\s*(?=(and|or|not-in|keyof|match|not-match|substrof|is|is-not)[^-_])",
+					"match": "(?<=\\))\\s*(?=(and|or|not-in|keyof|match|not-match|substrof|is|is-not)\\b[^-_])",
 					"comment": "ignore binary expressions"
 				},
 				{
@@ -1303,7 +1303,7 @@
 		"binary-match-rhs": {
 			"patterns": [
 				{
-					"begin": "(?<!^\\s*)\\b(match|not-match)\\s*(?=[a-zA-Z{\\[\\|\\(%])",
+					"begin": "(?<!^\\s*)\\b(match|not-match)\\b\\s*(?=[$a-zA-Z0-9{\\[\\|\\(%])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
