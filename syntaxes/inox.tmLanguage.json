@@ -153,12 +153,12 @@
 		"variables": {
 			"patterns": [
 				{
-					"name": "variable.name",
-					"match": "[$][_a-zA-Z-]*\\b"
+					"name": "variable.name.global",
+					"match": "[$][$]([_a-zA-Z-]*\\b)?"
 				},
 				{
-					"name": "variable.name.global",
-					"match": "[$][$][_a-zA-Z-]*\\b"
+					"name": "variable.name",
+					"match": "[$]([_a-zA-Z-]*\\b)?"
 				}
 			]
 		},
