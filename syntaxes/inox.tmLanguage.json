@@ -39,6 +39,12 @@
 			"include": "#pattern-namespace-declarations"
 		},
 		{
+			"include": "#struct-definitions"
+		},
+		{
+			"include": "#anon-struct-literals"
+		},
+		{
 			"include": "#pattern-conversions"
 		},
 		{
@@ -281,11 +287,11 @@
 							"patterns": [
 								{
 									"match": "\\*",
-									"name":"constant.language.special.wildcard.url-pattern.inox"
+									"name": "constant.language.special.wildcard.url-pattern.inox"
 								},
 								{
 									"match": "(?<=/)%[a-zA-Z_][a-zA-Z0-9_-]*(?=/?)",
-									"name":"constant.language.special.path-segment.url-pattern.inox"
+									"name": "constant.language.special.path-segment.url-pattern.inox"
 								}
 							]
 						}
@@ -961,7 +967,6 @@
 					]
 				},
 				{
-
 					"match": "^\\s*(pattern\\b)(?:\\s*$|[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)",
 					"captures": {
 						"1": {
@@ -992,6 +997,65 @@
 							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					}
+				}
+			]
+		},
+		"struct-definitions": {
+			"begin": "^\\s*(struct)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(\\{)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.inox"
+				},
+				"2": {
+					"name": "entity.name.type.inox"
+				},
+				"3": {
+					"name": "punctuation.begin.bracket.curly.inox"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket.curly.inox"
+				}
+			},
+			"patterns": [
+				{
+					"match": "^\\s*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)(?=\\s*($|#.*))",
+					"captures": {
+						"1": {
+							
+							"name": "variable.field.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						}
+					}
+				},
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"anon-struct-literals": {
+			"begin": "\\b(struct)(\\{)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.inox"
+				},
+				"2": {
+					"name": "punctuation.begin.bracket.curly.inox"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket.curly.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "$self"
 				}
 			]
 		},
@@ -1995,7 +2059,9 @@
 					"begin": "(?=<style)",
 					"end": "((?<=[<]/style>[\\s|\\n]*)|(?!(<)\\s*(?:([_$[:alpha:]][-_$[:alnum:].]*)(?<!\\.|-)(:))?((?:[a-z][a-z0-9]*|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-))?\\s*(>)))",
 					"patterns": [
-						{"include": "#style-tag"}
+						{
+							"include": "#style-tag"
+						}
 					]
 				},
 				{
@@ -2048,7 +2114,9 @@
 				}
 			},
 			"patterns": [
-				{"include": "#script-tag-inner"}
+				{
+					"include": "#script-tag-inner"
+				}
 			]
 		},
 		"script-tag": {
@@ -2065,7 +2133,9 @@
 				}
 			},
 			"patterns": [
-				{"include": "#script-tag-inner"}
+				{
+					"include": "#script-tag-inner"
+				}
 			]
 		},
 		"script-tag-inner": {
@@ -2275,7 +2345,9 @@
 				}
 			},
 			"patterns": [
-				{"include": "#style-tag-inner"}
+				{
+					"include": "#style-tag-inner"
+				}
 			]
 		},
 		"style-tag": {
@@ -2293,7 +2365,9 @@
 				}
 			},
 			"patterns": [
-				{"include": "#style-tag-inner"}
+				{
+					"include": "#style-tag-inner"
+				}
 			]
 		},
 		"style-tag-inner": {
@@ -2625,10 +2699,9 @@
 					"patterns": [
 						{
 							"match": "[_a-zA-Z-]+",
-							"name":"variable.signal.inox"
+							"name": "variable.signal.inox"
 						},
 						{
-
 							"begin": "'",
 							"end": "'",
 							"patterns": [
@@ -2639,7 +2712,7 @@
 						},
 						{
 							"match": "[^\\S:]+",
-							"name":"invalid.illegal.attribute.inox"
+							"name": "invalid.illegal.attribute.inox"
 						}
 					]
 				},
