@@ -42,7 +42,13 @@
 			"include": "#struct-definitions"
 		},
 		{
+			"include": "#struct-literals"
+		},
+		{
 			"include": "#anon-struct-literals"
+		},
+		{
+			"include": "#new-expressions"
 		},
 		{
 			"include": "#pattern-conversions"
@@ -1053,6 +1059,67 @@
 				}
 			]
 		},
+		"struct-literals": {
+			"begin": "\\b(struct).([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.inox"
+				},
+				"2": {
+					"name": "entity.name.function"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket.curly.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"new-expressions": {
+			"patterns": [
+				{
+					"comment": "without initialization",
+					"match": "\\b(new)\\s*([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(?!\\{)",
+					"captures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type"
+						}
+					}
+				},
+				{
+					"comment": "with initialization",
+					"begin": "\\b(new)\\s*([a-zA-Z_][a-zA-Z0-9_-]*)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
 		"anon-struct-literals": {
 			"begin": "\\b(struct)(\\{)",
 			"beginCaptures": {
@@ -1402,7 +1469,7 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|globalvar|assign|Mapping|treedata|concat|self|pnamespace)\\b(?![-_])"
+					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|globalvar|assign|Mapping|treedata|concat|self|pnamespace|new|struct)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",
@@ -2748,6 +2815,15 @@
 		},
 		"expressions-and-comments": {
 			"patterns": [
+				{
+					"include": "#struct-literals"
+				},
+				{
+					"include": "#anon-struct-literals"
+				},
+				{
+					"include": "#new-expressions"
+				},
 				{
 					"include": "#script-tag-expression"
 				},
