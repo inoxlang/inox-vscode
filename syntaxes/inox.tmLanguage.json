@@ -1490,6 +1490,18 @@
 					"end": "(?<=[)])(?=\\s*(\\{|=>))"
 				},
 				{
+					"comment": "return type is a pointer type",
+					"match": "(?<=\\))\\s*[*]([a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\s*\\{|\\s*=>|\\s+$)",
+					"captures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					}
+				},
+				{
 					"comment": "other return types",
 					"begin": "(?<=\\))\\s*(?=[_%\\[])",
 					"patterns": [
