@@ -2812,12 +2812,32 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|{|\\[|%|\\.|\\/[^>]|[a-zA-Z_]|\\$|/\\*|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z_]|\\$|/\\*|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
 			"begin": "\"",
 			"end": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.inox"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#xml-entities"
+				}
+			]
+		},
+		"xml-string-back-quoted": {
+			"name": "string.quoted.double.inox",
+			"begin": "`",
+			"end": "`",
 			"beginCaptures": {
 				"0": {
 					"name": "punctuation.definition.string.begin.inox"
