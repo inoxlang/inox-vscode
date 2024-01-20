@@ -36,6 +36,9 @@
 			"include": "#pattern-declarations"
 		},
 		{
+			"include": "#pattern-calls"
+		},
+		{
 			"include": "#pattern-namespace-declarations"
 		},
 		{
@@ -978,6 +981,56 @@
 						},
 						"2": {
 							"name": "entity.name.type.inox"
+						}
+					}
+				}
+			]
+		},
+		"pattern-calls": {
+			"patterns": [
+				{
+					"comment": "prefixed pattern call",
+					"begin": "(%[a-zA-Z_][a-zA-Z0-9_.-]*)([(])",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "[)]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					}
+				},
+				{
+					"comment": "prefixed pattern call with shorthand syntax",
+					"begin": "(%[a-zA-Z_][a-zA-Z0-9_.-]*)([{])",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type.inox"
+						},
+						"2": {
+							"name": "punctuation.begin.curly.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "[}]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.curly.bracket.inox"
 						}
 					}
 				}
