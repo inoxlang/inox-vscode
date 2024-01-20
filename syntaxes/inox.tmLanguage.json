@@ -3015,6 +3015,9 @@
 					"include": "#union-patterns"
 				},
 				{
+					"include": "#pattern-calls"
+				},
+				{
 					"include": "#pattern-conversions"
 				},
 				{
