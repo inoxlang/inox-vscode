@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023-2024 GraphR00t
+Copyright (c) 2023-2024 GraphR00t (GitHub user of ID 113632189 created on 2022-09-15)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
