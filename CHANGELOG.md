@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.2.3] - Release
+
+- Update syntax colorization
+- Update the WASM Module parsing Inox code
+
 ## [0.2.2] - Release
 
 - Improve syntax colorization
