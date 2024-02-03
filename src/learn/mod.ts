@@ -62,7 +62,7 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
 
         const selectSeriesCommand: vscode.Command = {
             command: SELECT_TUTORIAL_SERIES_CMD_NAME,
-            title: 'Select Tutorial Series',
+            title: '📄 Select Tutorial Series',
             arguments: [document]
         }
 
@@ -70,13 +70,13 @@ export class TutorialCodeLensProvider implements vscode.CodeLensProvider {
 
         const nextTutorialCommand: vscode.Command = {
             command: NEXT_TUTORIAL_CMD_NAME,
-            title: 'Next Tutorial',
+            title: '▶️ Next Tutorial',
             arguments: [document]
         }
 
         const selectTutorialCommand: vscode.Command = {
             command: SELECT_TUTORIAL_CMD_NAME,
-            title: 'Select Tutorial',
+            title: '🔻 Select Tutorial',
             arguments: [document]
         }
 
