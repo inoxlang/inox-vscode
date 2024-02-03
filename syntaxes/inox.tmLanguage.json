@@ -78,9 +78,6 @@
 			"include": "#keywords"
 		},
 		{
-			"include": "#context-variables"
-		},
-		{
 			"include": "#function-calls"
 		},
 		{
@@ -1629,10 +1626,6 @@
 				}
 			]
 		},
-		"context-variables": {
-			"match": "\\bctx-[_a-zA-Z-]*\\b",
-			"name":"variable.language.context.inox"
-		},
 		"regex": {
 			"patterns": [
 				{
@@ -3035,9 +3028,6 @@
 				},
 				{
 					"include": "#keywords"
-				},
-				{
-					"include": "#context-variables"
 				},
 				{
 					"include": "#function-call-expressions"
