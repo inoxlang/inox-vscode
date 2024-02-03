@@ -1188,7 +1188,7 @@
 			"patterns": [
 				{
 					"comment": "with initialization",
-					"begin": "\\b(new)\\s*([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(\\{)",
+					"begin": "\\b(new)\\s+([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -1211,7 +1211,7 @@
 				},
 				{
 					"comment": "without initialization",
-					"match": "\\b(new)\\s*([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(?!\\{)",
+					"match": "\\b(new)\\s+([a-zA-Z_][a-zA-Z0-9_-]*)\\s*(?!\\{)",
 					"captures": {
 						"1": {
 							"name": "keyword.other.inox"
