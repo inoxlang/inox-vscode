@@ -6,15 +6,16 @@ import { sleep } from '../utils';
 const CANCELLATION_TOKEN_TIMEOUT = 5000
 const ONE_SECOND_MILLIS = 1000
 const DEFAULT_MAX_UPLOAD_PART_RATE = 10 //up to 10 parts each second
+const DEFAULT_MAX_OPERATION_RATE = 30 //up to 30 fs-related operations each second
 const UPLOAD_CANCELLATION_TOKEN_TIMEOUT = 20_000
 
 export const MULTIPART_UPLOAD_B64_SIZE_THRESHOLD = 95_000
 
-const uploadTimestampsWindow: number[] = []
-
 export class Remote {
 
 	private _ctx: InoxExtensionContext | undefined
+	private uploadTimestampsWindow: number[] = []
+	private operationTimestampsWindow: number[] = []
 
 	constructor() {
 	}
@@ -36,10 +37,12 @@ export class Remote {
 
 	get isUploading() {
 		const now = Date.now()
-		return uploadTimestampsWindow.length > 0 && (now - uploadTimestampsWindow[uploadTimestampsWindow.length - 1]) < ONE_SECOND_MILLIS
+		return this.uploadTimestampsWindow.length > 0 && (now - this.uploadTimestampsWindow[this.uploadTimestampsWindow.length - 1]) < ONE_SECOND_MILLIS
 	}
 
-	fetchDirEntries(uri: vscode.Uri) {
+	async fetchDirEntries(uri: vscode.Uri) {
+		await this.operationIndependentThrottle()
+
 		const tokenSource = this.createTokenSource()
 
 		return this.ctx.lspClient!.sendRequest('fs/readDir', {
@@ -59,6 +62,7 @@ export class Remote {
 	}
 
 	async fetchStat(uri: vscode.Uri) {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
 
 		return this.ctx.lspClient!.sendRequest('fs/fileStat', {
@@ -72,7 +76,8 @@ export class Remote {
 		})
 	}
 
-	fetchBase64Content(uri: vscode.Uri): Promise<string> {
+	async fetchBase64Content(uri: vscode.Uri): Promise<string> {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
 
 		return this.ctx.lspClient!.sendRequest('fs/readFile', {
@@ -80,7 +85,8 @@ export class Remote {
 		}, tokenSource.token)
 	}
 
-	writeSinglePartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
+	async writeSinglePartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
 
 		return this.ctx.lspClient!.sendRequest('fs/writeFile', {
@@ -92,6 +98,7 @@ export class Remote {
 	}
 
 	async writeMultiPartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
+		await this.operationIndependentThrottle()
 
 		if (this.clientRunningAndProjectOpen) {
 			throw new Error('LSP client not running')
@@ -132,7 +139,7 @@ export class Remote {
 
 		//upload subsequent parts
 		let startIndex = MULTIPART_UPLOAD_B64_SIZE_THRESHOLD
-		uploadTimestampsWindow.push(Date.now())
+		this.uploadTimestampsWindow.push(Date.now())
 
 		for (
 			let endIndex = 2 * MULTIPART_UPLOAD_B64_SIZE_THRESHOLD;
@@ -153,17 +160,15 @@ export class Remote {
 
 			const isLast = endIndex >= args.base64Content.length
 
-			//update uploadTimestampsWindow & pause while necessary
+			//Update this.uploadTimestampsWindow & sleep while necessary.
 			while (true) {
-				//remove timestamps older than one second
-				while (uploadTimestampsWindow.length > 0 && (Date.now() - uploadTimestampsWindow[0]) > ONE_SECOND_MILLIS) {
-					uploadTimestampsWindow.shift()
-				}
+				this.removeOldUploadTimestamps()
 
-				if (uploadTimestampsWindow.length >= DEFAULT_MAX_UPLOAD_PART_RATE - 1) {
-					this.writeToDebugChannel(`pause upload a short time to avoid being rate limited`)
+				if (this.uploadTimestampsWindow.length >= DEFAULT_MAX_UPLOAD_PART_RATE - 1) {
+					this.writeToDebugChannel(`delay upload in order to avoid being rate limited`)
 					await sleep(250)
 				} else {
+					this.uploadTimestampsWindow.push(Date.now())
 					break
 				}
 			}
@@ -181,19 +186,14 @@ export class Remote {
 				break
 			}
 
-			//remove timestamps older than one second
-			{
-				const now = Date.now()
-				uploadTimestampsWindow.push(Date.now())
-				while (uploadTimestampsWindow.length > 0 && (now - uploadTimestampsWindow[0]) > ONE_SECOND_MILLIS) {
-					uploadTimestampsWindow.shift()
-				}
-			}
+			this.removeOldUploadTimestamps()
 		}
 	}
 
 	async renameFile(args: { oldUri: vscode.Uri, newUri: vscode.Uri, overwrite: boolean }): Promise<void> {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
+
 		return this.ctx.lspClient!.sendRequest('fs/renameFile', {
 			uri: args.oldUri.toString(),
 			newUri: args.newUri.toString(),
@@ -202,7 +202,9 @@ export class Remote {
 	}
 
 	async delete(uri: vscode.Uri): Promise<void> {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
+
 		return this.ctx.lspClient!.sendRequest('fs/deleteFile', {
 			uri: uri.toString(),
 			recursive: true
@@ -210,6 +212,7 @@ export class Remote {
 	}
 
 	async createDir(uri: vscode.Uri): Promise<void> {
+		await this.operationIndependentThrottle()
 		const tokenSource = this.createTokenSource()
 
 		return this.ctx.lspClient!.sendRequest('fs/createDir', {
@@ -219,6 +222,7 @@ export class Remote {
 
 	private createTokenSource() {
 		const tokenSource = new vscode.CancellationTokenSource()
+
 		setTimeout(() => {
 			tokenSource.cancel()
 			tokenSource.dispose()
@@ -230,6 +234,34 @@ export class Remote {
 		this.ctx.debugChannel.appendLine(DEBUG_PREFIX + ' ' + msg)
 	}
 
+	private async operationIndependentThrottle(){
+		//Update this.operationTimestampsWindow & sleep while necessary.
+		while (true) {
+			this.removeOldOperationTimestamps()
+
+			if (this.operationTimestampsWindow.length >= DEFAULT_MAX_OPERATION_RATE - 1) {
+				this.writeToDebugChannel(`delay sending message to remote to avoid being rate limited`)
+				await sleep(50)
+			} else {
+				this.operationTimestampsWindow.push(Date.now())
+				break
+			}
+		}
+	}
+
+	private removeOldUploadTimestamps(){
+		//remove timestamps older than one second
+		while (this.uploadTimestampsWindow.length > 0 && (Date.now() - this.uploadTimestampsWindow[0]) > ONE_SECOND_MILLIS) {
+			this.uploadTimestampsWindow.shift()
+		}
+	}
+
+	private removeOldOperationTimestamps(){
+		//remove timestamps older than one second
+		while (this.operationTimestampsWindow.length > 0 && (Date.now() - this.operationTimestampsWindow[0]) > ONE_SECOND_MILLIS) {
+			this.operationTimestampsWindow.shift()
+		}
+	}
 }
 
 export type RemoteDirEntry = {
