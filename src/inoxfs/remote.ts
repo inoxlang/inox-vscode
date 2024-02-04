@@ -100,8 +100,8 @@ export class Remote {
 	async writeMultiPartFile(args: { uri: vscode.Uri, base64Content: string, create: boolean, overwrite: boolean }) {
 		await this.operationIndependentThrottle()
 
-		if (this.clientRunningAndProjectOpen) {
-			throw new Error('LSP client not running')
+		if (! this.clientRunningAndProjectOpen) {
+			throw vscode.FileSystemError.Unavailable('LSP client not running or project is not open')
 		}
 
 		const lspClient = this.ctx.lspClient!
@@ -165,7 +165,7 @@ export class Remote {
 				this.removeOldUploadTimestamps()
 
 				if (this.uploadTimestampsWindow.length >= DEFAULT_MAX_UPLOAD_PART_RATE - 1) {
-					this.writeToDebugChannel(`delay upload in order to avoid being rate limited`)
+					this.writeToDebugChannel(`delay part upload in order to avoid being rate limited`)
 					await sleep(250)
 				} else {
 					this.uploadTimestampsWindow.push(Date.now())
