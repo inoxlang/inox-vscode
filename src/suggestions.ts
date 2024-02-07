@@ -140,6 +140,11 @@ async function computeExtensionUpdateSuggestion(ctx: InoxExtensionContext): Prom
         //Fetch version numbers.
         const installedVersion = parseSemverParts(version)
         const tagLists: { name: string }[] = await fetch(TAGS_ENDPOINT).then(r => r.json())
+        
+        if (!Array.isArray(tagLists)) {
+            return null
+        }
+
         const versions = tagLists.map(e => parseSemverParts(e.name))
         if (versions.length == 0) {
             return null
@@ -166,7 +171,7 @@ async function computeExtensionUpdateSuggestion(ctx: InoxExtensionContext): Prom
             }
         })
     } catch (reason) {
-        vscode.window.showInformationMessage(stringifyCatchedValue(reason))
+        ctx.debugChannel.appendLine(stringifyCatchedValue(reason))
         return null
     }
 }
