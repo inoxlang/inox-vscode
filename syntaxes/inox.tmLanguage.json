@@ -471,7 +471,6 @@
 					],
 					"end": "(`|\n)"
 				},
-				
 				{
 					"comment": "unquoted path expression",
 					"name": "string.interpolated.path-expression",
@@ -768,6 +767,43 @@
 				},
 				{
 					"include": "#unprefixed-object-patterns"
+				},
+				{
+					"comment": "exact values starting with '$'",
+					"begin": "(?=\\$)",
+					"patterns": [
+						{
+							"begin": "(?=)\\[",
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "(?<=\\])"
+						},
+						{
+							"begin": "(?=)\\{",
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "(?<=\\})"
+						},
+						{
+							"begin": "(?=)\\(",
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "(?<=\\))"
+						},
+						{
+							"include": "$self"
+						}
+					],
+					"end": "(?<=[,:)\\}\\]])"
 				},
 				{
 					"include": "$self"
