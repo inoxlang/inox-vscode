@@ -160,6 +160,14 @@ export class InoxExtensionContext {
         return this._projectOpen
     }
 
+    get extensionVersion(): string {
+        const version = this.base.extension.packageJSON.version
+        if(typeof version != 'string'){
+            throw new Error('failed to get version of extension')
+        }
+        return version
+    }
+
     markProjectAsOpen(args: {canProjectBeDeployedInProd: boolean}) {
         this._projectOpen = true
         this._projectOpenEmitter.fire()

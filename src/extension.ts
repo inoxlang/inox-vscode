@@ -139,10 +139,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         })
     }
 
-    computeSuggestions(ctx, 2).forEach(suggestion => {
+    computeSuggestions(ctx, 2).then(suggestion => suggestion.forEach(suggestion => {
         suggestion.show()
-    })
-
+    }))
 }
 
 export function deactivate(): Thenable<void> | undefined {

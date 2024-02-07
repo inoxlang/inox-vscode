@@ -37,3 +37,32 @@ export function getNonce() {
 	}
 	return text;
 }
+
+
+export function parseSemverParts(s: string): [number, number, number] {
+    if (s[0] == 'v'){
+        s = s.slice(1)
+    }
+
+    const parts = s.split('.')
+    const ints = parts.map(p => parseInt(p))
+    switch(ints.length){
+    case 1:
+        return [ints[0], 0, 0]
+    case 2:
+        return [ints[0], ints[1], 0]
+    case 3:
+        return ints as [number, number, number]
+    default:
+        throw new Error('invalid semver: ' + s)
+    }
+}
+
+
+export function greaterOrEqualSemver(a: [number, number, number], b: [number, number, number]): boolean {
+    return a.every((part, index) => part >= b[index])
+}
+
+export function equalSemver(a: [number, number, number], b: [number, number, number]): boolean {
+    return a.every((part, index) => part == b[index])
+}

@@ -1,13 +1,20 @@
 import * as vscode from 'vscode';
 import { EXTENSION_DOC_RECOMMENDENTATION_MSG } from './errors';
 import { InoxExtensionContext } from "./inox-extension-context";
+import { equalSemver, greaterOrEqualSemver, parseSemverParts, stringifyCatchedValue } from './utils';
 
 const SUGGESTION_COMPUTATON_INTERVAL_MILLIS = 3_000
 const USER_IDLE_THRESHOLD_MILLIS = 5_000
+const MAX_EXTENSION_UPDATE_MUTE_DURATION = 7 * 86400 //~ 7 days
+
 const ONBOARDING_KEY_PREFIX = 'onboarding.'
+const UPDATE_SUGGESTIONS_KEY_PREFIX = 'update-suggestions.'
 const NEVER_SHOW_AGAIN_STATUS = 'never-show-again'
 const DISMISSED_ONCE_STATUS = 'dismissed-once'
 
+
+const MARKETPLACE_URL = 'https://marketplace.visualstudio.com/items?itemName=graphr00t.inox'
+const TAGS_ENDPOINT = 'https://api.github.com/repos/inoxlang/inox-vscode/tags'
 
 let isWindowFocused = true
 let isUserIDLE = false //not accurate
@@ -84,15 +91,80 @@ export function startSuggestionLoop() {
 
 
 
-export function computeSuggestions(ctx: InoxExtensionContext, maxNonCrucialCount: number): Suggestion[] {
+export async function computeSuggestions(ctx: InoxExtensionContext, maxNonCrucialCount: number): Promise<Suggestion[]> {
     const suggestions = [
-        ...computeOnboardingSuggestions(ctx)
+        ...await computeUpdateSuggestions(ctx),
+        ...computeOnboardingSuggestions(ctx),
     ]
 
     suggestions.sort((s1, s2) => s1.data.importance - s2.data.importance)
     const crucialCount = suggestions.filter(s => s.data.importance == SuggestionImportance.CRUCIAL).length
 
     return suggestions.slice(0, maxNonCrucialCount + crucialCount + 1)
+}
+
+
+async function computeUpdateSuggestions(ctx: InoxExtensionContext): Promise<Suggestion[]> {
+    const extensionUpdateSuggestion = await computeExtensionUpdateSuggestion(ctx)
+
+    if (extensionUpdateSuggestion) {
+        return [extensionUpdateSuggestion]
+    }
+
+    return []
+}
+
+async function computeExtensionUpdateSuggestion(ctx: InoxExtensionContext): Promise<Suggestion | null> {
+    const LAST_EXTENSION_UPDATE_MUTE_TIMESTAMP = 'last-extension-update-mute-timestamp'
+
+    const setStateValue = (key: string, value: unknown) => ctx.setStateValue(UPDATE_SUGGESTIONS_KEY_PREFIX + key, value)
+    const getStateValue = (key: string) => ctx.getStateValue(UPDATE_SUGGESTIONS_KEY_PREFIX + key)
+
+    const version = ctx.extensionVersion
+    if (!version) {
+        return null
+    }
+
+    const lastMuteTimestamp = getStateValue(LAST_EXTENSION_UPDATE_MUTE_TIMESTAMP)
+    //Check if the suggestion should be muted.
+    vscode.window.showInformationMessage(lastMuteTimestamp as string)
+    if ((typeof lastMuteTimestamp == 'number') && Date.now() - lastMuteTimestamp < MAX_EXTENSION_UPDATE_MUTE_DURATION) {
+        return null
+    }
+
+    try {
+        //Fetch version numbers.
+        const installedVersion = parseSemverParts(version)
+        const tagLists: { name: string }[] = await fetch(TAGS_ENDPOINT).then(r => r.json())
+        const versions = tagLists.map(e => parseSemverParts(e.name))
+        if (versions.length == 0) {
+            return null
+        }
+
+        //Sort in descending order.
+        versions.sort((a, b) => greaterOrEqualSemver(a, b) ? -1 : 1)
+        const currentVersion = versions[0]
+
+        //Check that the current version is not less or equal to the installed version.
+        if (greaterOrEqualSemver(installedVersion, currentVersion)) {
+            return null
+        }
+
+        const OK = 'Ok'
+
+        return new Suggestion({
+            importance: SuggestionImportance.IMPORTANT,
+            items: [OK],
+            message: `A new version of the Inox extension is available (v${currentVersion.join('.')}). Make sure to update it. `+
+                `If you use VSCodium you can download the VSIX file [on this page](${MARKETPLACE_URL}).`,
+            async onAction() {
+                setStateValue(LAST_EXTENSION_UPDATE_MUTE_TIMESTAMP, Date.now())
+            }
+        })
+    } catch (reason) {
+        vscode.window.showInformationMessage(stringifyCatchedValue(reason))
+        return null
+    }
 }
 
 function computeOnboardingSuggestions(ctx: InoxExtensionContext): Suggestion[] {
