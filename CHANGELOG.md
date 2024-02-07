@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.2.4] - Release
+
+- Inform user when a new version of the extension is available
+- Update syntax colorization
+- Update the WASM Module parsing Inox code
+
 ## [0.2.3] - Release
 
 - Update syntax colorization
