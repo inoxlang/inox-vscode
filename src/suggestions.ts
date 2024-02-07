@@ -105,13 +105,17 @@ export async function computeSuggestions(ctx: InoxExtensionContext, maxNonCrucia
 
 
 async function computeUpdateSuggestions(ctx: InoxExtensionContext): Promise<Suggestion[]> {
-    const extensionUpdateSuggestion = await computeExtensionUpdateSuggestion(ctx)
+    try {
+        const extensionUpdateSuggestion = await computeExtensionUpdateSuggestion(ctx)
 
-    if (extensionUpdateSuggestion) {
-        return [extensionUpdateSuggestion]
+        if (extensionUpdateSuggestion) {
+            return [extensionUpdateSuggestion]
+        }
+    
+        return []
+    } catch {
+        return []
     }
-
-    return []
 }
 
 async function computeExtensionUpdateSuggestion(ctx: InoxExtensionContext): Promise<Suggestion | null> {
@@ -127,7 +131,7 @@ async function computeExtensionUpdateSuggestion(ctx: InoxExtensionContext): Prom
 
     const lastMuteTimestamp = getStateValue(LAST_EXTENSION_UPDATE_MUTE_TIMESTAMP)
     //Check if the suggestion should be muted.
-    vscode.window.showInformationMessage(lastMuteTimestamp as string)
+
     if ((typeof lastMuteTimestamp == 'number') && Date.now() - lastMuteTimestamp < MAX_EXTENSION_UPDATE_MUTE_DURATION) {
         return null
     }
