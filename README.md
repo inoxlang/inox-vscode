@@ -32,6 +32,13 @@ This extension provides support for the Inox programming language.
 
 This extension should work on **all platforms**. It requires a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
 
+<details>
+
+**<summary>How to change an extension setting.</summary>**
+![WebSocket setting change](./assets/docs/websocket-setting-change.gif)
+
+</details>
+
 __A) You have a local VM running Linux__
 
 Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
@@ -53,14 +60,6 @@ __C) You have a remote machine running Linux (e.g VPS)__
 - Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically.
 - Update the **WebSocket Endpoint** setting to the following value: `wss://<server-ip>:8305`
 
-<details>
-
-**<summary>How to change an extension setting.</summary>**
-
-![WebSocket setting change](./assets/docs/websocket-setting-change.gif)
-
-</details>
-
 ## Usage
 
 **Creating a project**
@@ -77,6 +76,11 @@ __C) You have a remote machine running Linux (e.g VPS)__
 - Subsequent times you can directly go in **File** > **Open Recent**:
 
   ![recent workspace](./assets/docs/recent-workspace.png)
+
+
+The connection status to the server is indicated near the bottom right corner of the window. If the connection is established
+the status should be the following:\
+![remote FS status](./assets/docs/fs-status.png)
 
 **😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
 
