@@ -91,8 +91,9 @@
 					"items": {
 						"type": "string"
 					},
-					"default": [],
-					"description": "The command to start a local Inox project server. The first item is the command name and each of the other items is a single CLI argument."
+					"default": ["inox", "project-server"],
+					"markdownDescription": "The command to start a local Inox project server on **Linux**. The first item is the command name and each of the other items is a single CLI argument. You can change the projects' location by adding an item with the following value: `-config={\"projectsDir\":\"/home/username/other-dir\"}`. ⚠️ **If you already have created projects make sure to update the setting globally (`User`) and in workspaces, and create a copy of the previous directory at the new location .**",
+					"description": "The command to start a local Inox project server on Linux. The first item is the command name and each of the other items is a single CLI argument. You can change the projects' location by adding an item with the following value: -config={\"projectsDir\":\"/home/username/other-dir\"}. ⚠️ If you already have created projects make sure to update the setting globally (`User`) and in workspaces, and create a copy of the previous directory at the new location."
 				},
 				"inox.localProjectServerEnv": {
 					"order": 3,

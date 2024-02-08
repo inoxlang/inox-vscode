@@ -43,7 +43,7 @@ export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExt
   }
 
   const command = ctx.config.localProjectServerCommand
-  if (command.length == 0) {
+  if (command.length == 0 || process.platform != 'linux') {
     vscode.window.showErrorMessage(fmtFailedToConnectToLSPServer(ctx))
     return false
   }

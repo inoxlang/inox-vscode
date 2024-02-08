@@ -35,7 +35,6 @@ export class InoxExtensionContext {
     readonly debugChannel: vscode.OutputChannel
     readonly testChannel: vscode.OutputChannel
 
-
     readonly base: vscode.ExtensionContext
     readonly virtualWorkspace: boolean
     readonly onProjectOpen = this._projectOpenEmitter.event
