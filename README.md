@@ -32,13 +32,13 @@ This extension provides support for the Inox programming language.
 
 This extension should work on **all platforms**. It requires a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
 
-__A) 📦 You have a local VM running Linux__
+__A) You have a local VM running Linux__
 
 Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
 
 **Make sure to forward the TCP port 8305 to the VM.**
 
-__B) 🐧 You have a local machine running Linux__
+__B) You have a local machine running Linux__
 
 The extension will automatically start the project server. By default the launch command is `inox project-server`, and projects
 are stored in `$HOME/inox-projects`. You can change the launch command in the settings: for configuring the projects' location
@@ -46,7 +46,7 @@ add `-config={"projectsDir":"/home/username/other-dir"}`. **It is recommended to
 
 <!-- You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ -->
 
-__C) ☁️ You have a remote machine running Linux (e.g VPS)__
+__C) You have a remote machine running Linux (e.g VPS)__
 
 **⚠️ This setup is not recommended for now: the Inox binary is not production ready and probably has memory leaks.**
 

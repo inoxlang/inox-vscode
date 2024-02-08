@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { LanguageClient, State } from 'vscode-languageclient/node';
 import { Configuration } from './configuration';
 import { InoxFS } from './inoxfs/mod';
-import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp';
+import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp/mod';
 import { stringifyCatchedValue } from './utils';
 
 const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'

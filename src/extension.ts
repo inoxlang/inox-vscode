@@ -10,11 +10,12 @@ import { registerLearningCodeLensAndCommands } from './learn/mod';
 import { registerRunDebugLensAndCommands, InlineDebugAdapterFactory } from './debug/mod';
 import { registerSpecCodeLensAndCommands } from './testing/mod';
 
-import { createLSPClient, createEmbeddedContentProvider, checkConnAndStartLocalProjectServerIfPossible } from './lsp';
+import { createLSPClient, checkConnAndStartLocalProjectServerIfPossible } from './lsp/mod';
 import { initializeNewProject, SecretEntry, SecretKeeper } from './project/mod';
 import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
+import { createEmbeddedContentProvider } from './embedded-support';
 
 // after this duration the local file cache is used as a fallack
 const LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = 3000;

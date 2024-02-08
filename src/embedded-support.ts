@@ -1,4 +1,6 @@
 import { LanguageService, TokenType } from 'vscode-html-languageservice';
+import { InoxExtensionContext } from './inox-extension-context';
+import * as vscode from 'vscode';
 
 interface EmbeddedRegion {
 	languageId: string | undefined;
@@ -80,3 +82,14 @@ export function getEmbeddedBlockVirtualContent(
 
 	return content;
 }
+
+
+export function createEmbeddedContentProvider(ctx: InoxExtensionContext): vscode.TextDocumentContentProvider {
+	return {
+	  provideTextDocumentContent: uri => {
+		const originalUri = uri.path.slice(1).slice(0, -4);
+		const decodedUri = decodeURIComponent(originalUri);
+		return ctx.virtualDocumentContents.get(decodedUri);
+	  }
+	}
+  }
