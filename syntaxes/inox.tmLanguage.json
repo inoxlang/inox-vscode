@@ -206,7 +206,7 @@
 							"name": "invalid.illegal.hex-char"
 						}
 					],
-					"end": "\\]",
+					"end": "[\\])}]",
 					"endCaptures": {
 						"0": {
 							"name": "constant.numeric"
