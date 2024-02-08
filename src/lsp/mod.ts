@@ -5,25 +5,13 @@ import { InoxExtensionContext } from "../inox-extension-context";
 import { INOX_FS_SCHEME } from "../inoxfs/mod";
 import { openProject } from '../project/mod';
 import { sleep } from '../utils';
-import { connectToWebsocketServer as createConnectToWebsocketServer } from "../websocket";
 import { makeProvideCompletionItemFn } from './completion-middleware';
+import { getLspServerOptions } from './project-server';
 
 export { checkConnAndStartLocalProjectServerIfPossible } from './project-server';
-
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
 const LSP_CLIENT_LOG_PREFIX = '[LSP client] '
-
-
-function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
-  if (!ctx.config.websocketEndpoint) {
-    vscode.window.showErrorMessage('inox extension: no websocket endpoint specified')
-    throw new Error('abort')
-  } else {
-    ctx.outputChannel.appendLine('use websocket')
-    return createConnectToWebsocketServer(ctx)
-  }
-}
 
 export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: boolean) {
   const serverOptions = getLspServerOptions(ctx)
@@ -33,65 +21,16 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
     documentScheme = 'file'
   }
 
-  let client: LanguageClient
-  let lastCloseTimes = [0, 0]
+  const clientOptionsWithMiddleware = getClientOptionsWithMiddleware(ctx, documentScheme)
 
+  const client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptionsWithMiddleware);
+  client.onRequest('cursor/setPosition', handleSetPosition)
+  registerOnDidChangeStateHandler(ctx, client)
 
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: documentScheme, language: 'inox', pattern: '**/*.ix' }],
-    synchronize: {
-      configurationSection: 'Inox',
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
-    },
-    outputChannel: ctx.outputChannel,
-    traceOutputChannel: ctx.debugChannel,
-    middleware: {
-      provideCompletionItem: makeProvideCompletionItemFn(ctx)
-    },
-    errorHandler: {
-      error(error, message, count) {
-        ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + error)
-        return {
-          action: ErrorAction.Continue,
-          handled: false
-        }
-      },
-      async closed() {
-        const now = Date.now()
+  return client
+}
 
-        if (lastCloseTimes.every(time => (now - time) < 10_000)) {
-          ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + 'connection was closed too many times')
-          return {
-            action: CloseAction.DoNotRestart,
-            handled: false,
-          }
-        }
-
-        await sleep(500)
-
-        // [T1, T2] --> [T2, now]
-        lastCloseTimes.shift()
-        lastCloseTimes.push(now)
-
-        return {
-          action: CloseAction.Restart,
-          handled: true,
-          message: 'restart LSP client'
-        }
-      }
-    }
-  };
-
-  client = new LanguageClient('Inox language server', 'Inox Language Server', serverOptions, clientOptions);
-  client.onRequest('cursor/setPosition', (params: Range) => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      return
-    }
-    const newCursorPosition = new vscode.Position(params.start.line, params.start.character)
-    const newSelection = new vscode.Selection(newCursorPosition, newCursorPosition);
-    editor.selections = [newSelection]
-  })
+function registerOnDidChangeStateHandler(ctx: InoxExtensionContext, client: LanguageClient){
 
   const disposable = client.onDidChangeState(async e => {
     //dispose the listener if client is not the current LSP client
@@ -137,8 +76,63 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
 
     handle = setTimeout(retry, delay)
   })
-
-  return client
 }
 
+function handleSetPosition(params: Range) {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return
+  }
+  const newCursorPosition = new vscode.Position(params.start.line, params.start.character)
+  const newSelection = new vscode.Selection(newCursorPosition, newCursorPosition);
+  editor.selections = [newSelection]
+}
 
+function getClientOptionsWithMiddleware(ctx: InoxExtensionContext, documentScheme: string): LanguageClientOptions{
+  let lastCloseTimes = [0, 0]
+
+  return {
+    documentSelector: [{ scheme: documentScheme, language: 'inox', pattern: '**/*.ix' }],
+    synchronize: {
+      configurationSection: 'Inox',
+      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
+    },
+    outputChannel: ctx.outputChannel,
+    traceOutputChannel: ctx.debugChannel,
+    middleware: {
+      provideCompletionItem: makeProvideCompletionItemFn(ctx),
+    },
+    errorHandler: {
+      error(error, message, count) {
+        ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + error)
+        return {
+          action: ErrorAction.Continue,
+          handled: false
+        }
+      },
+      async closed() {
+        const now = Date.now()
+
+        if (lastCloseTimes.every(time => (now - time) < 10_000)) {
+          ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + 'connection was closed too many times')
+          return {
+            action: CloseAction.DoNotRestart,
+            handled: false,
+          }
+        }
+
+        await sleep(500)
+
+        // [T1, T2] --> [T2, now]
+        lastCloseTimes.shift()
+        lastCloseTimes.push(now)
+
+        return {
+          action: CloseAction.Restart,
+          handled: true,
+          message: 'restart LSP client'
+        }
+      }
+    }
+  };
+}

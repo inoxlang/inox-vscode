@@ -1,5 +1,8 @@
 import child_process from 'child_process';
 import * as vscode from 'vscode';
+import { ServerOptions } from "vscode-languageclient/node";
+import { connectToWebsocketServer as createConnectToWebsocketServer } from "../websocket";
+
 import { fmtFailedToConnectToLSPServer } from '../errors';
 import { InoxExtensionContext } from "../inox-extension-context";
 import { sleep } from '../utils';
@@ -9,6 +12,16 @@ const LOCAL_LSP_SERVER_LOG_PREFIX = '[Local LSP server] '
 const LSP_SERVER_START_CHECK_INTERVAL_MILLIS = 500
 const LSP_SERVER_START_CHECK_COUNT = 10
 
+
+export function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
+  if (!ctx.config.websocketEndpoint) {
+    vscode.window.showErrorMessage('inox extension: no websocket endpoint specified')
+    throw new Error('abort')
+  } else {
+    ctx.outputChannel.appendLine('use websocket')
+    return createConnectToWebsocketServer(ctx)
+  }
+}
 
 export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExtensionContext): Promise<boolean> {
     //if there is no websocket endpoint nor a command to start a local project server we do nothing
