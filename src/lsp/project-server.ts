@@ -9,8 +9,9 @@ import { sleep } from '../utils';
 import { isWebsocketServerRunning } from "../websocket";
 
 const LOCAL_LSP_SERVER_LOG_PREFIX = '[Local LSP server] '
-const LSP_SERVER_START_CHECK_INTERVAL_MILLIS = 500
-const LSP_SERVER_START_CHECK_COUNT = 10
+const LOCAL_SERVER_START_CHECK_INTERVAL_MILLIS = 500
+const LOCAL_SERVER_START_CHECK_COUNT = 10
+export const MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS = LOCAL_SERVER_START_CHECK_COUNT * LOCAL_SERVER_START_CHECK_INTERVAL_MILLIS
 
 
 export function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
@@ -73,10 +74,10 @@ export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExt
     })
   
     //check if the websocket server is running
-    for (let i = 0; i < LSP_SERVER_START_CHECK_COUNT; i++) {
-      await sleep(LSP_SERVER_START_CHECK_INTERVAL_MILLIS)
+    for (let i = 0; i < LOCAL_SERVER_START_CHECK_COUNT; i++) {
+      await sleep(LOCAL_SERVER_START_CHECK_INTERVAL_MILLIS)
   
-      if (i == Math.ceil(LSP_SERVER_START_CHECK_COUNT/2)) {
+      if (i == Math.ceil(LOCAL_SERVER_START_CHECK_COUNT/2)) {
           vscode.window.showInformationMessage("The local LSP server seems slow to start.")
       }
 

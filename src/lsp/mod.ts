@@ -8,7 +8,7 @@ import { sleep } from '../utils';
 import { makeProvideCompletionItemFn } from './completion-middleware';
 import { getLspServerOptions } from './project-server';
 
-export { checkConnAndStartLocalProjectServerIfPossible } from './project-server';
+export { checkConnAndStartLocalProjectServerIfPossible, MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS } from './project-server';
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
 
 const LSP_CLIENT_LOG_PREFIX = '[LSP client] '

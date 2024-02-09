@@ -10,15 +10,15 @@ import { registerLearningCodeLensAndCommands } from './learn/mod';
 import { registerRunDebugLensAndCommands, InlineDebugAdapterFactory } from './debug/mod';
 import { registerSpecCodeLensAndCommands } from './testing/mod';
 
-import { createLSPClient, checkConnAndStartLocalProjectServerIfPossible } from './lsp/mod';
+import { createLSPClient, checkConnAndStartLocalProjectServerIfPossible, MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS } from './lsp/mod';
 import { initializeNewProject, SecretEntry, SecretKeeper } from './project/mod';
 import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
 
-// after this duration the local file cache is used as a fallack
-const LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = 3000;
+// After this duration the local file cache is used as a fallack.
+const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
 
 let outputChannel: vscode.OutputChannel;
 let debugChannel: vscode.OutputChannel;
@@ -58,7 +58,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             if (!ctx.lspClient?.isRunning()) {
                 ctx.inoxFS?.fallbackOnLocalFileCache()
             }
-        }, LOCAL_FILE_CACHE_FALLBACK_TIMEOUT_MILLIS)
+        }, FILE_CACHE_FALLBACK_TIMEOUT_MILLIS)
 
         const secretKeeper = new SecretKeeper(ctx);
         vscode.window.registerTreeDataProvider('secretKeeper', secretKeeper);
@@ -103,7 +103,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     registerLearningCodeLensAndCommands(ctx)
     registerSpecCodeLensAndCommands(ctx)
     registerRunDebugLensAndCommands(ctx)
-    
+
 
     //register commands
     {
