@@ -10,6 +10,8 @@ import { getStateValue, setStateValue } from './extension-state';
 
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]*$/i
 const DEFAULT_TEMPLATE_NAME = "web-app-min"
+const WAIT_LSP_STEP_MILLIS = 250
+const MAX_WAIT_LSP_DURATION_MILLIS = WAIT_LSP_STEP_MILLIS * 20
 
 export async function initializeNewProject(ctx: InoxExtensionContext) {
     await ctx.updateConfiguration()
@@ -22,15 +24,21 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
     }
 
     if (!ctx.lspClient?.isRunning()) {
-        //try to restart the LSP client if it's not already connecting.
+        //Try to restart the LSP client if it's not already (re)starting.
         await ctx.restartLSPClient(false)
 
-        //wait for the LSP client if it's already connecting.
-        await sleep(500)
+        //Wait for the LSP client to (re)start, and (potentially) for the local server to start.
+        for (let i = 0; i < MAX_WAIT_LSP_DURATION_MILLIS; i += WAIT_LSP_STEP_MILLIS) {
+            await sleep(WAIT_LSP_STEP_MILLIS)
+            
+            if (ctx.lspClient?.isRunning()) {
+                break
+            }
+        }
 
         if (!ctx.lspClient?.isRunning()) {
             //only show error if an error message was not displayed just before.
-            if(ctx.lastFailedToConnectTime == null || (Date.now() - ctx.lastFailedToConnectTime) > 3000){
+            if (ctx.lastFailedToConnectTime == null || (Date.now() - ctx.lastFailedToConnectTime) > 3000) {
                 vscode.window.showErrorMessage(fmtLspClientNotRunning(ctx))
             }
             return
@@ -95,7 +103,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext) {
         await _initializeNewProject(ctx, projectName)
 
         vscode.window.showInformationMessage(
-            "The project should have been created on the server. "+
+            "The project should have been created on the server. " +
             `You can open it by clicking 'Open Workspace' in the '${ctx.fileWorkspaceFolder.name}.code-workspace' file.`,
             {
                 modal: true,
@@ -181,7 +189,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
                 addTutFile: isFirstProject,
                 template: DEFAULT_TEMPLATE_NAME,
             })
-            
+
             if (typeof projectId != 'string') {
                 throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
             }
