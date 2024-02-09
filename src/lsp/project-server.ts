@@ -24,14 +24,14 @@ export function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
 }
 
 export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExtensionContext): Promise<boolean> {
-    //if there is no websocket endpoint nor a command to start a local project server we do nothing
+    //if there is no websocket endpoint nor a command to start a local project server we do nothing.
     if (ctx.config.websocketEndpoint == undefined) {
       return true
     }
   
     let isRunning = await isWebsocketServerRunning(ctx, ctx.config.websocketEndpoint)
     if (isRunning) {
-      ctx.debugChannel.appendLine(LOCAL_LSP_SERVER_LOG_PREFIX + 'Local server is running')
+      ctx.debugChannel.appendLine('LSP server is running')
       return true
     }
   
@@ -76,7 +76,12 @@ export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExt
     for (let i = 0; i < LSP_SERVER_START_CHECK_COUNT; i++) {
       await sleep(LSP_SERVER_START_CHECK_INTERVAL_MILLIS)
   
+      if (i == Math.ceil(LSP_SERVER_START_CHECK_COUNT/2)) {
+          vscode.window.showInformationMessage("The local LSP server seems slow to start.")
+      }
+
       if (child.exitCode != null) {
+        vscode.window.showWarningMessage("The local LSP server process has exited unexpectedly.")
         break
       }
   
