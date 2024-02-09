@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.5] - Release
+
+- Add a default value for the `localProjectServerCommand` setting
+- Update syntax colorization
+- Update the WASM Module parsing Inox code
+- Minor fixes
+
 ## [0.2.4] - Release
 
 - Inform user when a new version of the extension is available
