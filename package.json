@@ -307,8 +307,8 @@
 	"scripts": {
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"package": "npm i; tsc -p ./tsconfig-release.json; npm prune --production; vsce package; npm i",
-		"package:pre-release": "npm i; tsc -p ./tsconfig-release.json && npm prune --production && vsce package --pre-release; npm i"
+		"package": "rm -r ./out/; npm i; tsc -p ./tsconfig-release.json; npm prune --production; vsce package; npm i",
+		"package:pre-release": "rm -r ./out/; npm i; tsc -p ./tsconfig-release.json && npm prune --production && vsce package --pre-release; npm i"
 	},
 	"devDependencies": {
 		"@types/node": "16.11.12",
