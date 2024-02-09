@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.2.6] - Release
+
+- Support slow local project server start
+- Increase maximum wait duration before falling back on file cache
+
 ## [0.2.5] - Release
 
 - Add a default value for the `localProjectServerCommand` setting
