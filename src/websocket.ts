@@ -5,7 +5,7 @@ import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from './vsco
 import { InoxExtensionContext } from './inox-extension-context';
 import { URL } from 'url';
 import { isIP } from 'net';
-import {join as joinPosix} from 'path/posix';
+import { join as joinPosix } from 'path/posix';
 
 const PING_INTERVAL_MILLIS = 15_000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
@@ -13,7 +13,7 @@ const WEBSOCKET_LOG_PREFIX = "[Web Socket] "
 
 let nextId = 0
 
-export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: URL){
+export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: URL) {
     return new Promise<boolean>((resolve, reject) => {
         //reject after timeout.
         setTimeout(() => {
@@ -29,25 +29,28 @@ export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: UR
             webSocket.close()
         })
         webSocket.addEventListener('open', ev => {
-            resolve(true)
-            webSocket.close()
+            webSocket.addEventListener('message', () => {
+                resolve(true)
+                webSocket.close()
+            })
+            webSocket.send('{}')
         })
     })
 }
 
-export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appendPath: string}): () => Promise<MessageTransports> {
+export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { appendPath: string }): () => Promise<MessageTransports> {
     return async () => {
         const websocketId = nextId++
 
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `create websocket (id ${websocketId})`)
 
         let endpoint = ctx.config.websocketEndpoint
-        if(!endpoint){
+        if (!endpoint) {
             ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `no websocket endpoint set`)
             throw new Error(`no websocket endpoint set`)
         }
 
-        if(opts?.appendPath) {
+        if (opts?.appendPath) {
             endpoint.pathname = joinPosix(endpoint.pathname, opts.appendPath)
         }
 
@@ -61,7 +64,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appe
 
         return new Promise((resolve, reject) => {
             let ok = false
-            let closed = {val: false}
+            let closed = { val: false }
 
             //reject after timeout.
             setTimeout(() => {
@@ -71,7 +74,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appe
                 reject()
             }, 1000)
 
-            webSocket.addEventListener('close', function(){
+            webSocket.addEventListener('close', function () {
                 closed.val = true
                 ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `websocket with id ${websocketId} is now closed`)
             })
@@ -81,7 +84,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appe
                 ok = true
 
                 sendPingPeriodically(ctx, webSocket, websocketId, closed)
-                
+
                 //create an object implementing MessageTransports and "return" it.
                 const socket = toSocket(webSocket as any);
                 const reader = new WebSocketMessageReader(socket);
@@ -99,12 +102,12 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: {appe
 }
 
 
-function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, websocketId: number, closed: {val: boolean}){
+function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, websocketId: number, closed: { val: boolean }) {
     //send ping periodically.
     let pingStart = new Date()
     {
         const handle = setInterval(() => {
-            if(closed.val){
+            if (closed.val) {
                 clearTimeout(handle)
             }
 
@@ -113,7 +116,7 @@ function sendPingPeriodically(ctx: InoxExtensionContext, webSocket: _Websocket, 
             webSocket.ping()
         }, PING_INTERVAL_MILLIS)
     }
-    
+
     //log pongs.
     webSocket.on('pong', () => {
         let pingEnd = new Date()
