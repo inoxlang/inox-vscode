@@ -746,6 +746,9 @@
 					"include": "#url-patterns"
 				},
 				{
+					"include": "#unprefixed-string-patterns"
+				},
+				{
 					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![-a-zA-Z0-9_]*[?]?:)",
 					"comment": "unprefixed pattern name, the regex does not support last pattern names in union patterns",
 					"name": "entity.name.type.inox"
@@ -2225,6 +2228,32 @@
 			"patterns": [
 				{
 					"begin": "(?<!\\w)(%str)([(])",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.type"
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#complex-string-pattern-content"
+						}
+					],
+					"end": "[)]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					}
+				}
+			]
+		},
+		"unprefixed-string-patterns": {
+			"patterns": [
+				{
+					"begin": "(?<!\\w)(str)([(])",
 					"beginCaptures": {
 						"1": {
 							"name": "entity.name.type"
