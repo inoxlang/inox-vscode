@@ -8,7 +8,6 @@ import { InoxExtensionContext } from './inox-extension-context';
 
 const COMMUNITY_SERVER_ENDPOINT = "wss://community-server.inoxlang.dev"
 
-const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
 const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
@@ -17,6 +16,7 @@ const ACCOUNT_ID_FIELD = 'account-id'
 
 const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
 
+export const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 export let forceUseCommunityServer = {value: false}
 

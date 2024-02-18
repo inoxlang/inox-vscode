@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import { InoxExtensionContext } from "../inox-extension-context";
 import { join, basename } from 'path';
 import { stringifyCatchedValue, sleep } from '../utils';
-import { saveTempTokens } from '../configuration';
+import { WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
 import { fmtLspClientNotRunning } from '../errors';
 import { getStateValue, setStateValue } from './extension-state';
 
@@ -154,6 +154,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         ],
         "settings": {
             "inox.enableProjectMode": true,
+            ["inox." + WS_ENDPOINT_CONFIG_ENTRY]: ctx.config.websocketEndpoint!.toString(),
             "files.autoSave": "afterDelay"
         },
         "launch": {
