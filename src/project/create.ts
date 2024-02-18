@@ -13,7 +13,7 @@ const DEFAULT_TEMPLATE_NAME = "web-app-min"
 const WAIT_LSP_STEP_MILLIS = 250
 const MAX_WAIT_LSP_DURATION_MILLIS = WAIT_LSP_STEP_MILLIS * 20
 
-export async function initializeNewProject(ctx: InoxExtensionContext) {
+export async function initializeNewProject(ctx: InoxExtensionContext, onCommunitServer: boolean) {
     await ctx.updateConfiguration()
 
     if (ctx.config.projectFilePresent) {

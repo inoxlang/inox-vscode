@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languageclient';
-import { getConfiguration } from './configuration';
+import { getConfiguration, forceUseCommunityServer } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inoxfs/mod';
 
@@ -32,7 +32,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     debugChannel = vscode.window.createOutputChannel('Inox Extension (Debug)');
     testChannel = vscode.window.createOutputChannel('Inox Tests');
-
 
     const config = await getConfiguration(outputChannel)
     if (!config) {
@@ -73,7 +72,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.window.registerWebviewViewProvider('prodOverview', prodOverview);
     }
 
-    ctx.restartLSPClient(false)
+    //The LSP client is started after a short delay. The delay is required because if the extension is activated by
+    //the execution of the command `inox.project.create-on-community-server`, we have to have for forceUseCommunityServer.value
+    //to be set true
+    setTimeout(() => {
+        ctx.restartLSPClient(false)
+    }, 500)
 
     //register formatting provider
 
@@ -136,7 +140,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         })
 
         vscode.commands.registerCommand('inox.project.create', async () => {
-            return initializeNewProject(ctx)
+            return initializeNewProject(ctx, false)
+        })
+
+        vscode.commands.registerCommand('inox.project.create-on-community-server', async () => {
+            forceUseCommunityServer.value = true
+            return initializeNewProject(ctx, true)
         })
     }
 

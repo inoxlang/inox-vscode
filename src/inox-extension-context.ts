@@ -60,8 +60,6 @@ export class InoxExtensionContext {
     }
 
     async updateConfiguration() {
-        const previousConfig = this.config
-
         const newConfig = await this._args.getCurrentConfig(this.outputChannel)
         if (newConfig != undefined) {
 

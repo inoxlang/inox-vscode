@@ -6,6 +6,8 @@ import {join, dirname} from 'path'
 import { OutputChannel } from "vscode"
 import { InoxExtensionContext } from './inox-extension-context';
 
+const COMMUNITY_SERVER_ENDPOINT = "wss://community-server.inoxlang.dev"
+
 const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
 const INOX_PROJECT_FILENAME = 'inox-project.json'
@@ -13,11 +15,10 @@ const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
 const ACCOUNT_ID_FIELD = 'account-id'
 
-
-export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
 
-
+export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
+export let forceUseCommunityServer = {value: false}
 
 export type Configuration = {
     websocketEndpoint?: URL
@@ -49,7 +50,7 @@ export type TempTokens = {
 export async function getConfiguration(outputChannel: OutputChannel): Promise<Configuration | undefined> {
     // read & check user settings
     const config = vscode.workspace.getConfiguration('inox')
-    const websocketEndpoint = config.get(WS_ENDPOINT_CONFIG_ENTRY)
+    const websocketEndpoint = forceUseCommunityServer ? COMMUNITY_SERVER_ENDPOINT : config.get(WS_ENDPOINT_CONFIG_ENTRY)
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>

@@ -118,6 +118,11 @@
 			},
 			{
 				"category": "Inox",
+				"command": "inox.project.create-on-community-server",
+				"title": "[Remote Community Server] Create New Temporary Project in Current Folder"
+			},
+			{
+				"category": "Inox",
 				"command": "inox.lsp.restart",
 				"title": "Restart LSP client"
 			},
