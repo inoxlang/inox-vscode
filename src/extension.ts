@@ -144,7 +144,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         })
 
         vscode.commands.registerCommand('inox.project.create-on-community-server', async () => {
-            forceUseCommunityServer.value = true
+            if(ctx.config.project === undefined){
+                forceUseCommunityServer.value = true
+            }
             return initializeNewProject(ctx, true)
         })
     }
