@@ -82,8 +82,8 @@
 					"order": 1,
 					"type": "string",
 					"default": "wss://localhost:8305",
-					"description": "The Websocket endpoint of the project server. If the server is running locally it should be set to wss://localhost:8305. If the server is running on a remote machine it should be set to wss://remote-ip-address:8305",
-					"pattern": "^(|wss://.*:\\d{1,5})$"
+					"description": "The Websocket endpoint of the project server. If the server is running locally it should be set to wss://localhost:8305. If the server is running on a remote machine it should be set to wss://remote-ip-address:port or wss://remote-ip-address (port 443).",
+					"pattern": "^(|wss://.*(:\\d{1,5})?)$"
 				},
 				"inox.localProjectServerCommand": {
 					"order": 2,
