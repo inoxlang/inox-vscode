@@ -51,7 +51,7 @@ export type TempTokens = {
 export async function getConfiguration(outputChannel: OutputChannel): Promise<Configuration | undefined> {
     // read & check user settings
     const config = vscode.workspace.getConfiguration('inox')
-    const websocketEndpoint = forceUseCommunityServer ? COMMUNITY_SERVER_ENDPOINT : config.get(WS_ENDPOINT_CONFIG_ENTRY)
+    const websocketEndpoint = forceUseCommunityServer.value ? COMMUNITY_SERVER_ENDPOINT : config.get(WS_ENDPOINT_CONFIG_ENTRY)
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
