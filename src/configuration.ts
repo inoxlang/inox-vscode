@@ -38,6 +38,7 @@ export type Configuration = {
 
 export type ProjectConfiguration = {
     id?: string
+    memberId?: string
     cloudflare?: {
         "additional-tokens-api-token": string
         "account-id": string

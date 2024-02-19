@@ -1,11 +1,11 @@
-import * as fs from 'fs'
-import * as vscode from 'vscode'
+import * as fs from 'fs';
+import * as vscode from 'vscode';
 
-import { InoxExtensionContext } from "../inox-extension-context";
-import { join, basename } from 'path';
-import { stringifyCatchedValue, sleep, assertNotNil } from '../utils';
-import { COMMUNITY_SERVER_HOST, DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, REMOTE_INOX_PROJECT_FILENAME, WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
+import { basename, join } from 'path';
+import { DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, ProjectConfiguration, REMOTE_INOX_PROJECT_FILENAME, WS_ENDPOINT_CONFIG_ENTRY } from '../configuration';
 import { fmtLspClientNotRunning } from '../errors';
+import { InoxExtensionContext } from "../inox-extension-context";
+import { assertNotNil, sleep, stringifyCatchedValue } from '../utils';
 import { getStateValue, setStateValue } from './extension-state';
 
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]*$/i
@@ -13,11 +13,6 @@ const DEFAULT_TEMPLATE_NAME = "web-app-min"
 const WAIT_LSP_STEP_MILLIS = 250
 const MAX_WAIT_LSP_DURATION_MILLIS = WAIT_LSP_STEP_MILLIS * 20
 
-
-interface InoxProjectFileContent {
-    id: string //project id
-    memberId: string
-}
 
 export async function initializeNewProject(ctx: InoxExtensionContext, onCommunitServer: boolean) {
     await ctx.updateConfiguration()
@@ -36,7 +31,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext, onCommunit
         //Wait for the LSP client to (re)start, and (potentially) for the local server to start.
         for (let i = 0; i < MAX_WAIT_LSP_DURATION_MILLIS; i += WAIT_LSP_STEP_MILLIS) {
             await sleep(WAIT_LSP_STEP_MILLIS)
-            
+
             if (ctx.lspClient?.isRunning()) {
                 break
             }
@@ -183,7 +178,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         'The next time you can directly click on File / Open Recent / ... (Workspace).'
     ].join('\n')
 
-    const inoxProjectFileContent: Partial<InoxProjectFileContent> = {}
+    const inoxProjectFileContent: Partial<ProjectConfiguration> = {}
 
     if (!fs.existsSync(workspaceFile)) {
         await fs.promises.writeFile(workspaceFile, JSON.stringify(workspaceFileContent, null, '  '))
@@ -207,7 +202,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
                 throw new Error('project server answered with a malformed response')
             }
 
-            const {projectId, ownerId} = response as Record<string, unknown>
+            const { projectId, ownerId } = response as Record<string, unknown>
 
             if (typeof projectId != 'string') {
                 throw new Error('project ID returned by the project server should be a string but is a(n) ' + (typeof projectId))

@@ -21,6 +21,7 @@ export async function openProject(ctx: InoxExtensionContext) {
 
     const lspClient = ctx.lspClient
     const projectId = ctx.config.project?.id
+    const memberId = ctx.config.project?.memberId
 
     if (!projectId) {
         vscode.window.showWarningMessage('failed to open project: missing .id in project configuration')
@@ -31,6 +32,7 @@ export async function openProject(ctx: InoxExtensionContext) {
         ctx.debugChannel.appendLine("Send 'project/open' request")
         const resp = await lspClient.sendRequest('project/open', {
             projectId: projectId,
+            memberId: memberId,
             config: ctx.config.project ?? {},
             tempTokens: ctx.config.tempTokens
         })
