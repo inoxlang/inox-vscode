@@ -10,12 +10,12 @@ export const COMMUNITY_SERVER_HOST = "community-server.inoxlang.dev"
 const COMMUNITY_SERVER_ENDPOINT = "wss://"+COMMUNITY_SERVER_HOST
 
 const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
-const INOX_PROJECT_FILENAME = 'inox-project.json'
 const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
 const ACCOUNT_ID_FIELD = 'account-id'
 const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
 
+export const REMOTE_INOX_PROJECT_FILENAME = 'remote-inox-project.json'
 export const DEFAULT_LOCALHOT_PROXY_PORT_ENTRY = 'defaultLocalhostProxyPort'
 export const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
@@ -118,7 +118,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     }
 
     //check project config file even if not in project mode
-    const inoxProjectConfigURI = localFolder.with({ path: localFolder.fsPath + '/' + INOX_PROJECT_FILENAME })
+    const inoxProjectConfigURI = localFolder.with({ path: localFolder.fsPath + '/' + REMOTE_INOX_PROJECT_FILENAME })
     const tempTokensURI = getTempTokensURI(localFolder)
 
     //try to read the project configuration file.
@@ -145,13 +145,13 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
                 } else {
                     const parsed = JSON.parse(text)
                     if ((typeof parsed != 'object') || parsed == null) {
-                        vscode.window.showErrorMessage('invalid ' + INOX_PROJECT_FILENAME)
+                        vscode.window.showErrorMessage('invalid ' + REMOTE_INOX_PROJECT_FILENAME)
                         return
                     }
                     projectConfig = parsed
                 }
             } catch (err) {
-                vscode.window.showErrorMessage(`failed to parse ${INOX_PROJECT_FILENAME}: ` + String(err))
+                vscode.window.showErrorMessage(`failed to parse ${REMOTE_INOX_PROJECT_FILENAME}: ` + String(err))
                 return
             }
 

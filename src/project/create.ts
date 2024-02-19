@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import { InoxExtensionContext } from "../inox-extension-context";
 import { join, basename } from 'path';
 import { stringifyCatchedValue, sleep, assertNotNil } from '../utils';
-import { COMMUNITY_SERVER_HOST, DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
+import { COMMUNITY_SERVER_HOST, DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, REMOTE_INOX_PROJECT_FILENAME, WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
 import { fmtLspClientNotRunning } from '../errors';
 import { getStateValue, setStateValue } from './extension-state';
 
@@ -12,6 +12,12 @@ const PROJECT_NAME_REGEX = /^[a-z][a-z0-9_-]*$/i
 const DEFAULT_TEMPLATE_NAME = "web-app-min"
 const WAIT_LSP_STEP_MILLIS = 250
 const MAX_WAIT_LSP_DURATION_MILLIS = WAIT_LSP_STEP_MILLIS * 20
+
+
+interface InoxProjectFileContent {
+    id: string //project id
+    memberId: string
+}
 
 export async function initializeNewProject(ctx: InoxExtensionContext, onCommunitServer: boolean) {
     await ctx.updateConfiguration()
@@ -140,7 +146,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
 
     const localProjectRoot = ctx.fileWorkspaceFolder.uri.fsPath
     const workspaceFile = join(localProjectRoot, `${ctx.fileWorkspaceFolder.name}.code-workspace`)
-    const inoxProjectFile = join(localProjectRoot, 'inox-project.json')
+    const inoxProjectFile = join(localProjectRoot, REMOTE_INOX_PROJECT_FILENAME)
     const readmeFile = join(localProjectRoot, 'README--open-workspace-file-to-open-project.txt')
 
     const workspaceFileContent = {
@@ -177,7 +183,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         'The next time you can directly click on File / Open Recent / ... (Workspace).'
     ].join('\n')
 
-    const inoxProjectFileContent: Record<string, unknown> = {}
+    const inoxProjectFileContent: Partial<InoxProjectFileContent> = {}
 
     if (!fs.existsSync(workspaceFile)) {
         await fs.promises.writeFile(workspaceFile, JSON.stringify(workspaceFileContent, null, '  '))
@@ -191,16 +197,29 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         const isFirstProject = getStateValue(ctx, 'first-created') !== true
 
         try {
-            const projectId = await lspClient.sendRequest('project/create', {
+            const response = await lspClient.sendRequest('project/create', {
                 name: projectName,
                 addTutFile: isFirstProject,
                 template: DEFAULT_TEMPLATE_NAME,
             })
 
-            if (typeof projectId != 'string') {
-                throw new Error('project ID returned by LSP server should be a string but is a(n) ' + (typeof projectId))
+            if (typeof response != 'object') {
+                throw new Error('project server answered with a malformed response')
             }
+
+            const {projectId, ownerId} = response as Record<string, unknown>
+
+            if (typeof projectId != 'string') {
+                throw new Error('project ID returned by the project server should be a string but is a(n) ' + (typeof projectId))
+            }
+
+            if (typeof ownerId != 'string') {
+                throw new Error('owner ID returned by the project server should be a string but is a(n) ' + (typeof ownerId))
+            }
+
             inoxProjectFileContent.id = projectId
+            inoxProjectFileContent.memberId = ownerId
+
             await fs.promises.writeFile(inoxProjectFile, JSON.stringify(inoxProjectFileContent, null, ' '))
 
             await setStateValue(ctx, 'first-created', true)
@@ -210,7 +229,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
             vscode.window.showErrorMessage(msg)
         }
     } else {
-        vscode.window.showWarningMessage('an inox-project.json file is already present')
+        vscode.window.showWarningMessage(`${basename(inoxProjectFile)} is already present`)
     }
 
 }
