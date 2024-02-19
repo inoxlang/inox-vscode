@@ -16,6 +16,7 @@ import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
+import { startLocalhostProxyServer } from './localhost/mod';
 
 // After this duration the local file cache is used as a fallack.
 const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
@@ -76,6 +77,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     //the execution of the command `inox.project.create-on-community-server`, we have to have for forceUseCommunityServer.value
     //to be set true
     setTimeout(() => {
+        ctx.onProjectOpen(() => {
+            startLocalhostProxyServer(ctx)
+        })
         ctx.restartLSPClient(false)
     }, 500)
 

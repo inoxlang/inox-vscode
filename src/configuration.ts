@@ -14,9 +14,9 @@ const INOX_PROJECT_FILENAME = 'inox-project.json'
 const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
 const ACCOUNT_ID_FIELD = 'account-id'
-
 const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
 
+export const DEFAULT_LOCALHOT_PROXY_PORT_ENTRY = 'defaultLocalhostProxyPort'
 export const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 export let forceUseCommunityServer = {value: false}
@@ -33,6 +33,7 @@ export type Configuration = {
     localProjectServerCommand: string[]
     localProjectServerEnv: Record<string, string>
 
+    defaultLocalhostProxyPort: number,
 }
 
 export type ProjectConfiguration = {
@@ -55,6 +56,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
+    const defaultLocalhostProxyPort = config.get(DEFAULT_LOCALHOT_PROXY_PORT_ENTRY) as number
 
     const inVirtualWorkspace = vscode.workspace.workspaceFolders != undefined &&
         vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file');
@@ -193,6 +195,8 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
         localProjectRoot: localFolder,
         localProjectServerCommand: localProjectServerCommand,
         localProjectServerEnv: localProjectServerEnv,
+
+        defaultLocalhostProxyPort: defaultLocalhostProxyPort,
     }
 
     if (websocketEndpoint !== "") {

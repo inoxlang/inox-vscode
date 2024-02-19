@@ -3,8 +3,8 @@ import * as vscode from 'vscode'
 
 import { InoxExtensionContext } from "../inox-extension-context";
 import { join, basename } from 'path';
-import { stringifyCatchedValue, sleep } from '../utils';
-import { WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
+import { stringifyCatchedValue, sleep, assertNotNil } from '../utils';
+import { COMMUNITY_SERVER_HOST, DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, WS_ENDPOINT_CONFIG_ENTRY, saveTempTokens } from '../configuration';
 import { fmtLspClientNotRunning } from '../errors';
 import { getStateValue, setStateValue } from './extension-state';
 
@@ -126,6 +126,8 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         return
     }
 
+    assertNotNil(ctx.config.websocketEndpoint)
+
     let initialLaunchConfigurations: any[]
     try {
         initialLaunchConfigurations =
@@ -154,7 +156,11 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
         ],
         "settings": {
             "inox.enableProjectMode": true,
-            ["inox." + WS_ENDPOINT_CONFIG_ENTRY]: ctx.config.websocketEndpoint!.toString(),
+            ["inox." + WS_ENDPOINT_CONFIG_ENTRY]: ctx.config.websocketEndpoint.toString(),
+
+            //Enable the localhost proxy if the server is remote.
+            ["inox." + DEFAULT_LOCALHOT_PROXY_PORT_ENTRY]: (ctx.config.websocketEndpoint.hostname == 'localhost') ? 0 : 8080,
+
             "files.autoSave": "afterDelay"
         },
         "launch": {
