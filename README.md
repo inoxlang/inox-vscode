@@ -41,11 +41,21 @@ This extension should work on **all platforms**. It requires a project server to
 
 __A) You have a local VM running Linux__
 
+<details> 
+
+**<summary>Installation instructions</summary>**
+
 Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
 
 **Make sure to forward the TCP port 8305 to the VM.**
 
+</details>
+
 __B) You have a local machine running Linux__
+
+<details> 
+
+**<summary>Installation instructions</summary>**
 
 The extension will automatically start the project server. By default the launch command is `inox project-server`, and projects
 are stored in `$HOME/inox-projects`. You can change the launch command in the settings: for configuring the projects' location
@@ -53,12 +63,21 @@ add `-config={"projectsDir":"/home/username/other-dir"}`. **It is recommended to
 
 <!-- You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ -->
 
+</details>
+
 __C) You have a remote machine running Linux (e.g VPS)__
+
+<details> 
+
+**<summary>Installation instructions</summary>**
 
 **⚠️ This setup is not recommended for now: the Inox binary is not production ready and probably has memory leaks.**
 
 - Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically.
 - Update the **WebSocket Endpoint** setting to the following value: `wss://<server-ip>:8305`
+
+</details>
+
 
 ## Usage
 
