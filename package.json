@@ -111,7 +111,7 @@
 				"inox.defaultLocalhostProxyPort": {
 					"order": 1001,
 					"type": "number",
-					"default": 8080,
+					"default": 8090,
 					"description": "Default port of the localhost proxy. All requests to this proxy are sent to localhost:8080 on the project server. The localhost proxy is not created if the port is 0."
 				}
 			}
