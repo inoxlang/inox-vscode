@@ -115,7 +115,7 @@ You can now [open the project](#opening-a-project).
 
 You can now [open the project](#opening-a-project).
 
-_Note: programs running on the community server can only make HTTP requests to a few domains: `localhost`, `jsonplaceholder.typicode.com`, and `example.com`._
+_Note: programs running on the community server are only allowed to make HTTP requests to the following hosts: `localhost`, `jsonplaceholder.typicode.com`, and `example.com`._
 
 </details>
 
