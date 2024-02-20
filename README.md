@@ -31,7 +31,7 @@ This extension provides support for the Inox programming language.
 ## Requirements
 
 This extension should work on **all platforms**. If you only want to start playing with the language without installing
-the binary, go [here](#creating-a-project-on-the-community-server).
+the binary, you can create a project on the [community server](#creating-a-project-on-the-community-server).
 
 By default the extension a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
 
@@ -107,8 +107,7 @@ You can now [open the project](#opening-a-project).
 
 <details>
 
-<summary>Instructions</summary>
-
+<summary>Instructions (no account needed)</summary>
 
 - Create a folder (example: `inox-web-app`)
 - Open the folder in a **new VSCode window**
