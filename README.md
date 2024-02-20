@@ -34,7 +34,7 @@ This extension should work on **all platforms**. It requires a project server to
 
 <details>
 
-**<summary>How to change an extension setting.</summary>**
+<summary>How to change an extension setting.</summary>
 ![WebSocket setting change](./assets/docs/websocket-setting-change.gif)
 
 </details>
@@ -43,7 +43,7 @@ __A) You have a local VM running Linux__
 
 <details> 
 
-**<summary>Installation instructions</summary>**
+<summary>Show installation instructions</summary>
 
 Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
 
@@ -55,10 +55,12 @@ __B) You have a local machine running Linux__
 
 <details> 
 
-**<summary>Installation instructions</summary>**
+<summary>Show installation instructions</summary>
 
 The extension will automatically start the project server. By default the launch command is `inox project-server`, and projects
-are stored in `$HOME/inox-projects`. You can change the launch command in the settings: for configuring the projects' location
+are stored in `$HOME/inox-projects`.
+
+You can change the launch command in the settings: for configuring the projects' location
 add `-config={"projectsDir":"/home/username/other-dir"}`. **It is recommended to update the launch command setting before creating any project.**
 
 <!-- You can either install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ -->
@@ -69,7 +71,7 @@ __C) You have a remote machine running Linux (e.g VPS)__
 
 <details> 
 
-**<summary>Installation instructions</summary>**
+<summary>Show installation instructions</summary>
 
 **⚠️ This setup is not recommended for now: the Inox binary is not production ready and probably has memory leaks.**
 
