@@ -78,7 +78,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     //to be set true
     setTimeout(() => {
         ctx.onProjectOpen(() => {
-            startLocalhostProxyServer(ctx)
+            if(ctx.config.defaultLocalhostProxyPort != 0){
+                startLocalhostProxyServer(ctx)
+            }
         })
         ctx.restartLSPClient(false)
     }, 500)

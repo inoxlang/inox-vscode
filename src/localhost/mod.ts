@@ -27,6 +27,9 @@ export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
 
     try {
         server.listen(localhostPort, 'localhost')
+        server.on('error', err => {
+            vscode.window.showErrorMessage(`failed to start localhost server (port ${localhostPort}) on local machine: ${err.message}. Another Inox project may be open. You can fix this by changing the 'Default Localhost Proxy Port' in the extension settings (workspace).`)
+        })
     } catch (reason) {
         vscode.window.showErrorMessage("localhost server on local machine: " + stringifyCatchedValue(reason))
     }
