@@ -30,11 +30,15 @@ This extension provides support for the Inox programming language.
 
 ## Requirements
 
-This extension should work on **all platforms**. It requires a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
+This extension should work on **all platforms**. If you only want to start playing with the language without installing
+the binary, go [here](#creating-a-project-on-the-community-server).
+
+By default the extension a project server to be listening on `wss://localhost:8305`. This server can only run on Linux for now.
 
 <details>
 
 <summary>How to change an extension setting.</summary>
+
 ![WebSocket setting change](./assets/docs/websocket-setting-change.gif)
 
 </details>
@@ -83,7 +87,11 @@ __C) You have a remote machine running Linux (e.g VPS)__
 
 ## Usage
 
-**Creating a project**
+### Creating a project
+
+<details>
+
+<summary>Instructions</summary>
 
 - Create a folder (example: `inox-web-app`)
 - Open the folder in a **new VSCode window**
@@ -91,21 +99,49 @@ __C) You have a remote machine running Linux (e.g VPS)__
 
 👉 If you created the project server **after** having opened the folder you can use the command `Developer: Reload Window` to restart the LSP client.
 
-**Opening a project**
+You can now [open the project](#opening-a-project).
+
+</details>
+
+### Creating a project on the community server
+
+<details>
+
+<summary>Instructions</summary>
+
+
+- Create a folder (example: `inox-web-app`)
+- Open the folder in a **new VSCode window**
+- Execute the VSCode command `Inox: [Remote Community Server] Create New Temporary Project in Current Folder`
+
+You can now [open the project](#opening-a-project).
+
+_Note: programs running on the community server can only make HTTP requests to a few domains: `localhost`, `jsonplaceholder.typicode.com`, and `example.com`._
+
+</details>
+
+
+### Opening a project
+
+<details>
+
+<summary>Instructions</summary>
 
 - The first time open the `<name>.code-workspace` file and click on the floating button '**Open Workspace**'
 - Subsequent times you can directly go in **File** > **Open Recent**:
 
-  ![recent workspace](./assets/docs/recent-workspace.png)
-
+![recent workspace](./assets/docs/recent-workspace.png)
 
 The connection status to the server is indicated near the bottom right corner of the window. If the connection is established
 the status should be the following:\
 ![remote FS status](./assets/docs/fs-status.png)
 
+</details>
+
+
 **😡 Having an issue ? You are welcome to join the [Inox Discord Server](https://discord.gg/53YGx8GzgE) and ask for help.**
 
-**Running and debugging a program**
+### Running and debugging a program
 
 - Click on the same icon as in the screenshot.
 - Select the `Launch Current Program` task, the other task always executes `/main.ix`.
