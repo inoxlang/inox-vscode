@@ -33,7 +33,7 @@ export type Configuration = {
     localProjectServerCommand: string[]
     localProjectServerEnv: Record<string, string>
 
-    defaultLocalhostProxyPort: number,
+    defaultLocalhostProxyPort: number, //0 if the localhost proxy should not be started.
 }
 
 export type ProjectConfiguration = {

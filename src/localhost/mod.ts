@@ -1,10 +1,17 @@
 import * as vscode from 'vscode'
-
+import * as https from 'https'
 import * as http from 'http'
+
+import { LanguageClient } from 'vscode-languageclient/node'
+import { generate } from 'selfsigned'
 
 import { InoxExtensionContext } from '../inox-extension-context'
 import { stringifyCatchedValue } from '../utils'
-import { LanguageClient } from 'vscode-languageclient/node'
+import { getSelfSignedCertificate } from './certs'
+
+
+export const PROJECT_SERVER_DEV_PORT_0 = 8080
+
 
 const HTTP_REQUEST_ASYNC_METHOD = "httpClient/requestAsync"
 const HTTP_RESPONSE_EVENT_METHOD = "httpClient/responseEvent"
@@ -13,23 +20,28 @@ const LSP_NOTIF_WAIT_TIMEOUT_MILLIS = 25_000
 
 const LOCALHOST_PROXY_LOG_PREFIX = "[Localhost Proxy] "
 
+//Mapping request ID -> {resolve, reject}.
 const pendindgRequests = new Map<string, { method: string, url: string, resolve: Function, reject: Function }>()
 const lspClients = new WeakSet<LanguageClient>()
 
 export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
     const localhostPort = ctx.config.defaultLocalhostProxyPort
+    const serverOptions = getServerOptions(ctx, localhostPort)
 
-    //Mapping request ID -> {resolve, reject}.
-
-    const server = http.createServer((req, resp) => handleRequest(ctx, req, resp))
-
-    ctx.outputChannel.appendLine(`start proxy listening on localhost:${localhostPort} (local machine)`)
+    const server = https.createServer(serverOptions, ((req, resp) => handleRequest(ctx, req, resp)))
 
     try {
-        server.listen(localhostPort, 'localhost')
-        server.on('error', err => {
-            vscode.window.showErrorMessage(`failed to start localhost server (port ${localhostPort}) on local machine: ${err.message}. Another Inox project may be open. You can fix this by changing the 'Default Localhost Proxy Port' in the extension settings (workspace).`)
+        //Start server.
+        server.on('listening', () => {
+            ctx.outputChannel.appendLine(`start proxy listening on localhost:${localhostPort} (local machine)`)
         })
+        server.on('error', err => {
+            const message = `failed to start localhost server (port ${localhostPort}) on local machine: ${err.message}.` +
+                `Another Inox project may be open. You can fix this by changing the 'Default Localhost Proxy Port' in the extension settings (workspace).`
+
+            vscode.window.showErrorMessage(message)
+        })
+        server.listen(localhostPort, 'localhost')
     } catch (reason) {
         vscode.window.showErrorMessage("localhost server on local machine: " + stringifyCatchedValue(reason))
     }
@@ -59,7 +71,7 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
         lspClient.onNotification(HTTP_RESPONSE_EVENT_METHOD, lspMessage => {
             const reqID = lspMessage.reqID
             const pendindgRequest = pendindgRequests.get(reqID)
-            if(pendindgRequest === undefined){
+            if (pendindgRequest === undefined) {
                 ctx.debugChannel.appendLine(LOCALHOST_PROXY_LOG_PREFIX + `Error/Response of unregistered pending request received from project server.`)
                 return
             }
@@ -122,7 +134,7 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
     const body = Buffer.concat(chunks)
     const base64RequestBody = body.toString('base64')
 
-    const url = new URL(req.url, 'https://localhost:8080')
+    const url = new URL(req.url, 'https://localhost:' + PROJECT_SERVER_DEV_PORT_0)
     const reqID = String(Math.random())
 
     const params = {
@@ -196,9 +208,9 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
 
     const base64Body = object.body
 
-    let buffer: Buffer|undefined;
+    let buffer: Buffer | undefined;
 
-    if(base64Body){
+    if (base64Body) {
         try {
             buffer = Buffer.from((base64Body as any), 'base64')
         } catch (reason) {
@@ -214,8 +226,16 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
     const headers = object.headers as Record<string, string[]>
     resp.writeHead(statusCode, headers)
 
-    if(buffer){
+    if (buffer) {
         resp.write(buffer)
     }
     resp.end()
+}
+
+function getServerOptions(ctx: InoxExtensionContext, localhostPort: number): https.ServerOptions {
+    const { cert, key } = getSelfSignedCertificate(ctx)
+    return {
+        cert: cert,
+        key: key,
+    }
 }

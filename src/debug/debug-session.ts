@@ -11,6 +11,7 @@ import {
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { fmtLspClientNotRunning } from '../errors';
 import { InoxExtensionContext } from '../inox-extension-context';
+import { PROJECT_SERVER_DEV_PORT_0 } from '../localhost/mod';
 const { Subject } = require('await-notify')
 
 
@@ -76,6 +77,18 @@ class InoxDebugSession extends DebugSession {
      */
     protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
         const lsp = this.lspClient;
+        const defaultLocalhostProxyPort = this.ctx.config.defaultLocalhostProxyPort
+        const projectServerDevPort = PROJECT_SERVER_DEV_PORT_0
+
+        let urlRegexp: RegExp|undefined
+        let replacementExpression = ''
+        
+        if(defaultLocalhostProxyPort != 0){
+            urlRegexp = new RegExp(`https://localhost:${projectServerDevPort}([-a-zA-Z0-9@:%_*+.~#?&//=]*)`, 'g')
+            replacementExpression = `<https://localhost:${this.ctx.config.defaultLocalhostProxyPort}$1 on your machine>`
+        }
+
+        let firstOutput = true
 
         lsp.onNotification("debug/terminatedEvent", () => {
             this.sendEvent(new TerminatedEvent())
@@ -86,6 +99,19 @@ class InoxDebugSession extends DebugSession {
         })
 
         lsp.onNotification("debug/outputEvent", event => {
+            if(event.body != undefined){
+                if(urlRegexp){ //rewrte host
+                    event.body.output = (event.body.output as string).replace(urlRegexp, replacementExpression)
+
+                    if(firstOutput){ //print rewrite information
+                        event.body.output = 
+                            `[localhost:${defaultLocalhostProxyPort} on your machine forwards HTTP requests to localhost:${projectServerDevPort} on the project server]\n` + 
+                            event.body.output
+                        firstOutput = false
+                    }
+                }
+            }
+           
             this.sendEvent(event as DebugProtocol.OutputEvent)
         })
 
