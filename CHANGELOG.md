@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.3.0] - Release
+
+- Add a proxy on localhost that forwards requests to localhost:8080 on the project server
+- Support creating projects on the community server
+- Update syntax colorization
+- Update the WASM Module parsing Inox code
+- Minor fixes
+- Improve README
+
+
 ## [0.2.6] - Release
 
 - Support slow local project server start
