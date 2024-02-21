@@ -20,11 +20,11 @@
         ],
         "description": "empty manifest"
     },
-    "includable-chunk": {
+    "includable-file": {
         "scope": "Inox",
-        "prefix": "includable-chunk",
+        "prefix": "includable-file",
         "body": [
-            "includable-chunk"
+            "includable-file"
         ],
         "description": "empty manifest"
     },

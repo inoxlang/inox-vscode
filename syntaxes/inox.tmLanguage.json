@@ -1649,7 +1649,7 @@
 			"patterns": [
 				{
 					"name": "keyword.other",
-					"match": "(?<![-_])\\b(manifest|includable-chunk|drop-perms|import|as|const|var|globalvar|assign|Mapping|treedata|concat|self|pnamespace|new|struct)\\b(?![-_])"
+					"match": "(?<![-_])\\b(manifest|includable-file|drop-perms|import|as|const|var|globalvar|assign|Mapping|treedata|concat|self|pnamespace|new|struct)\\b(?![-_])"
 				},
 				{
 					"name": "keyword.control.inox",

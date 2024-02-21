@@ -49,7 +49,7 @@ export interface Manifest {
 }
 
 export interface IncludableChunkDescription {
-    "base:includable-chunk-desc": NodeBase
+    "base:includable-file-desc": NodeBase
 }
 
 export interface TestSuiteExpression {
