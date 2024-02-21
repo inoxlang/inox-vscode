@@ -205,7 +205,6 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
 
     //Create the response the LSP response.
     const statusCode = object.statusCode as number
-
     const base64Body = object.body
 
     let buffer: Buffer | undefined;
@@ -213,6 +212,14 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
     if (base64Body) {
         try {
             buffer = Buffer.from((base64Body as any), 'base64')
+
+            const bodyS = buffer.toString('utf-8')
+            if(bodyS.includes('This server is not expected to receive requests from a browser')){
+                resp.statusCode = 500
+                resp.write("No target server is listening.")
+                resp.end()
+                return
+            }
         } catch (reason) {
             resp.statusCode = 500
             resp.write("failed to deserialize response body in message sent by project server")
