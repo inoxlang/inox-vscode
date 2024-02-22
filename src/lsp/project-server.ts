@@ -38,10 +38,16 @@ export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExt
     }
   
     const command = ctx.config.localProjectServerCommand
-    if (command.length == 0 || process.platform != 'linux' || ctx.config.websocketEndpoint.host == COMMUNITY_SERVER_HOST) {
+    if (
+      command.length == 0  //We cannot start a local LSP server.
+      || process.platform != 'linux' //same
+      || ctx.config.websocketEndpoint.hostname != 'localhost' //The LSP server is not local.
+    ) {
       vscode.window.showErrorMessage(fmtFailedToConnectToLSPServer(ctx))
       return false
     }
+
+    //Try to start a local LSP server.
   
     const msg = LOCAL_LSP_SERVER_LOG_PREFIX + 'LSP server is not running, executing command to start local server: ' + command.join(' ')
     ctx.outputChannel.appendLine(msg)
