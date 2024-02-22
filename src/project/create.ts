@@ -160,9 +160,7 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
             ["inox." + WS_ENDPOINT_CONFIG_ENTRY]: ctx.config.websocketEndpoint.toString(),
 
             //Enable the localhost proxy if the server is remote.
-            ["inox." + DEFAULT_LOCALHOT_PROXY_PORT_ENTRY]: 
-                (ctx.config.websocketEndpoint.hostname == 'localhost') ? 0 
-                : 8090,
+            ["inox." + DEFAULT_LOCALHOT_PROXY_PORT_ENTRY]: 8090,
 
             "files.autoSave": "afterDelay"
         },
