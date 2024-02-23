@@ -82,7 +82,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                 startLocalhostProxyServer(ctx)
             }
         })
-        ctx.restartLSPClient(false)
+        ctx.restartLSPClient({forceProjetMode: false})
     }, 500)
 
     //register formatting provider
@@ -142,7 +142,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         vscode.commands.registerCommand('inox.lsp.restart', async () => {
             await ctx.updateConfiguration()
-            return ctx.restartLSPClient(false)
+            return ctx.restartLSPClient({forceProjetMode: false})
         })
 
         vscode.commands.registerCommand('inox.project.create', async () => {
