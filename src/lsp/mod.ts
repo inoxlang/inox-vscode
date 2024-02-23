@@ -131,10 +131,13 @@ function getClientOptionsWithMiddleware(ctx: InoxExtensionContext, documentSchem
                 lastCloseTimes.shift()
                 lastCloseTimes.push(now)
 
+                //Prevent the LSP language client to restart because this operation is handled
+                //by the extension (see registerOnDidChangeStateHandler).
+
                 return {
-                    action: CloseAction.Restart,
+                    action: CloseAction.DoNotRestart,
                     handled: true,
-                    message: 'restart LSP client'
+                    message: 'Restart LSP client'
                 }
             }
         }
