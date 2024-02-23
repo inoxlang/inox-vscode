@@ -17,6 +17,7 @@ import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
 import { isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
+import { SourceControl, registerSourceControlCommands } from './source-control/mod';
 
 // After this duration the local file cache is used as a fallack.
 const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
@@ -54,6 +55,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     if (config.project) {
         ctx.inoxFS = createAndRegisterInoxFs(ctx)
         ctx.inoxFS.ctx = ctx
+
+        registerSourceControlCommands(ctx)
+        ctx.sourceControl = new SourceControl(ctx)
+
         setTimeout(() => {
             if (!ctx.lspClient?.isRunning()) {
                 ctx.inoxFS?.fallbackOnLocalFileCache()

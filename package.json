@@ -166,6 +166,12 @@
 				"category": "Inox",
 				"command": "inox.get-project-file-cache-dir",
 				"title": "Get Project's File Cache Dir"
+			},
+			{
+				"title": "Inox-git: Commit",
+				"command": "inox.scm.commit",
+				"shortTitle": "Commit",
+				"icon": "$(check)"
 			}
 		],
 		"breakpoints": [
@@ -304,6 +310,13 @@
 					"when": "view == secretKeeper && viewItem == secret",
 					"group": "inline"
 				}
+			],
+			"scm/title": [
+				{
+					"command": "inox.scm.commit",
+					"group": "navigation",
+					"when": "scmProvider == git-inox"
+				  }
 			]
 		}
 	},

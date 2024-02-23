@@ -6,6 +6,7 @@ import { InoxFS } from './inoxfs/mod';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp/mod';
 import { stringifyCatchedValue } from './utils';
 import { fmtFailedToConnectToLSPServer } from './errors';
+import { SourceControl } from './source-control/mod';
 
 const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'
 
@@ -43,7 +44,7 @@ export class InoxExtensionContext {
     readonly virtualDocumentContents = new Map<string, string>();
 
     inoxFS: InoxFS | undefined
-
+    sourceControl: SourceControl|undefined
 
     constructor(args: InoxExtensionContextArgs) {
         this._args = args

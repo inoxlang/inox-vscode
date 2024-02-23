@@ -35,6 +35,17 @@ export function createAndRegisterInoxFs(ctx: InoxExtensionContext) {
 	return fs
 }
 
+
+export function makeInoxSchemeURL(absolutePath: string): vscode.Uri {
+	if(absolutePath[0] != '/'){
+		throw new Error('path argument is not absolute')
+	}
+	return vscode.Uri.from({
+		scheme: INOX_FS_SCHEME,
+		path: absolutePath
+	})
+}
+
 export class InoxFS implements vscode.FileSystemProvider {
 
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();

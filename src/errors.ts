@@ -1,7 +1,7 @@
 import { InoxExtensionContext } from "./inox-extension-context";
 
 export const EXTENSION_DOC_RECOMMENDENTATION_MSG = "Make sure to read the 'Requirements' and 'Usage' sections in the extension's details."
-
+export const SOURCE_CONTROL_NOT_AVAILABLE_MSG = 'Source control is not available.'
 
 export function fmtLspClientNotRunning(ctx: InoxExtensionContext){
     return `LSP client is not running. The project server at ${ctx.config.websocketEndpoint} may not be running or there may be certificate issues. ` +
@@ -19,3 +19,4 @@ export function fmtLostConnectionToServer(ctx: InoxExtensionContext){
   let msg = `Lost connection to server.`
   return msg
 }
+
