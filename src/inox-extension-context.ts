@@ -70,7 +70,7 @@ export class InoxExtensionContext {
 
     //start or restart the LSP client.
     async restartLSPClient(forceProjetMode: boolean): Promise<void> {
-        if (this._restartingClient) {
+        if (this._restartingClient || (this._lspClient != undefined && this._lspClient.isRunning())) {
             return
         }
         this._projectOpen = false

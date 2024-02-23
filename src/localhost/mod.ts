@@ -24,6 +24,12 @@ const LOCALHOST_PROXY_LOG_PREFIX = "[Localhost Proxy] "
 const pendindgRequests = new Map<string, { method: string, url: string, resolve: Function, reject: Function }>()
 const lspClients = new WeakSet<LanguageClient>()
 
+let _isLocalhostProxyRunning = false
+
+export function isLocalhostProxyRunning(){
+    return _isLocalhostProxyRunning
+}
+
 export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
     const localhostPort = ctx.config.defaultLocalhostProxyPort
     const serverOptions = getServerOptions(ctx, localhostPort)
@@ -32,17 +38,26 @@ export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
 
     try {
         //Start server.
+
         server.on('listening', () => {
+            _isLocalhostProxyRunning = true
             ctx.outputChannel.appendLine(`start proxy listening on localhost:${localhostPort} (local machine)`)
         })
+
+        server.on('close', () => {
+            _isLocalhostProxyRunning = false
+        })
+
         server.on('error', err => {
             const message = `failed to start localhost server (port ${localhostPort}) on local machine: ${err.message}.` +
                 `Another Inox project may be open. You can fix this by changing the 'Default Localhost Proxy Port' in the extension settings (workspace).`
 
             vscode.window.showErrorMessage(message)
         })
+
         server.listen(localhostPort, 'localhost')
     } catch (reason) {
+        _isLocalhostProxyRunning = false
         vscode.window.showErrorMessage("localhost server on local machine: " + stringifyCatchedValue(reason))
     }
 }

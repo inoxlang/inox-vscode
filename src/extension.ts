@@ -16,7 +16,7 @@ import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
-import { startLocalhostProxyServer } from './localhost/mod';
+import { isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
 
 // After this duration the local file cache is used as a fallack.
 const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
@@ -78,7 +78,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     //to be set true
     setTimeout(() => {
         ctx.onProjectOpen(() => {
-            if(ctx.config.defaultLocalhostProxyPort != 0){
+            if(ctx.config.defaultLocalhostProxyPort != 0 && !isLocalhostProxyRunning()){
                 startLocalhostProxyServer(ctx)
             }
         })

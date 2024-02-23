@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { inspect } from 'util';
 import { MessageTransports } from 'vscode-languageclient/node';
 import { WebSocket as _Websocket, ClientOptions } from 'ws';
@@ -6,6 +7,7 @@ import { InoxExtensionContext } from './inox-extension-context';
 import { URL } from 'url';
 import { isIP } from 'net';
 import { join as joinPosix } from 'path/posix';
+import { sleep } from './utils';
 
 const PING_INTERVAL_MILLIS = 15_000;
 const WEBSOCKET_SERVER_CHECK_TIMEOUT = 2000
@@ -23,23 +25,54 @@ export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: UR
 
 
         const webSocket = new _Websocket(endpoint, getWebsocketOptions(endpoint))
-        webSocket.addEventListener('error', ev => {
+        webSocket.addEventListener('error', async ev => {
+            webSocket.close()
+            await sleep(200) //Make sure the WebSocket is closed.
+
             ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + ev.message)
             resolve(false)
-            webSocket.close()
         })
+
+        webSocket.addEventListener('close', () => {
+            ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `temporary websocket is now closed`)
+        })
+
         webSocket.addEventListener('open', ev => {
-            webSocket.addEventListener('message', () => {
-                resolve(true)
+            webSocket.addEventListener('message', async () => {
                 webSocket.close()
+                await sleep(200) //Make sure the WebSocket is closed.
+
+                resolve(true)
             })
-            webSocket.send('{}')
+
+            //Send a message to make the server sends a response with an 'MethodNotFound' error.
+            webSocket.send('{}') 
         })
     })
 }
 
 export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { appendPath: string }): () => Promise<MessageTransports> {
+
+    let current: _Websocket|undefined;
+
     return async () => {
+        if(current != undefined){
+            current.close()
+
+            //Wait for the previous connection to be closed.
+            for(let i = 0; i < 10; i++){
+                await sleep(50)
+                if(current == undefined){
+                    break
+                }
+            }
+
+            if(current != undefined){
+                //Almost impossible
+                throw new Error('Failed to stop WebSocket of previous LSP session')
+            }
+        }
+
         const websocketId = nextId++
 
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `create websocket (id ${websocketId})`)
@@ -57,6 +90,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { app
         ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`)
 
         const webSocket = new _Websocket(endpoint, getWebsocketOptions(endpoint))
+        current = webSocket
 
         webSocket.onerror = ev => {
             ctx.outputChannel.appendLine(inspect(ev))
@@ -76,6 +110,7 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { app
 
             webSocket.addEventListener('close', function () {
                 closed.val = true
+                current = undefined
                 ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `websocket with id ${websocketId} is now closed`)
             })
 
