@@ -5,6 +5,7 @@ import { Configuration } from './configuration';
 import { InoxFS } from './inoxfs/mod';
 import { LSP_CLIENT_STOP_TIMEOUT_MILLIS } from './lsp/mod';
 import { stringifyCatchedValue } from './utils';
+import { fmtFailedToConnectToLSPServer } from './errors';
 
 const GLOBAL_STATE_ENTRY_PREFIX = 'inox/'
 
@@ -69,7 +70,7 @@ export class InoxExtensionContext {
     }
 
     //start or restart the LSP client.
-    async restartLSPClient(forceProjetMode: boolean): Promise<void> {
+    async restartLSPClient(args: {forceProjetMode: boolean, doNotShowFailedToConnectError?: boolean}): Promise<void> {
         if (this._restartingClient || (this._lspClient != undefined && this._lspClient.isRunning())) {
             return
         }
@@ -79,18 +80,23 @@ export class InoxExtensionContext {
         if (! await this._args.checkConnAndStartLocalProjectServerIfPossible(this)) {
             this._lastFailedToConnectTime = Date.now()
 
-            this.debugChannel.appendLine('LSP server is not running, abort client restart')
+            this.debugChannel.appendLine('LSP server is not running, abort client restart.')
+
+            if(args.doNotShowFailedToConnectError !== true){
+                vscode.window.showErrorMessage(fmtFailedToConnectToLSPServer(this))
+            }
+
             this._restartingClient = false
             return
         }
         this._lastFailedToConnectTime = null
 
         if (this._lspClient === undefined) {
-            this._lspClient = this._args.createLSPClient(this, forceProjetMode)
+            this._lspClient = this._args.createLSPClient(this, args.forceProjetMode)
             this.base.subscriptions.push(this._lspClient)
         } else if (this._lspClientFailedStart) {
             //note: no need to call this._lspClient.dispose() because close() will be called.
-            this._lspClient = this._args.createLSPClient(this, forceProjetMode)
+            this._lspClient = this._args.createLSPClient(this, args.forceProjetMode)
             this.base.subscriptions.push(this._lspClient)
         } else {
             if (this._lspClient.needsStop()) {

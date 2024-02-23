@@ -26,7 +26,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext, onCommunit
 
     if (!ctx.lspClient?.isRunning()) {
         //Try to restart the LSP client if it's not already (re)starting.
-        await ctx.restartLSPClient(false)
+        await ctx.restartLSPClient({forceProjetMode: false})
 
         //Wait for the LSP client to (re)start, and (potentially) for the local server to start.
         for (let i = 0; i < MAX_WAIT_LSP_DURATION_MILLIS; i += WAIT_LSP_STEP_MILLIS) {
@@ -79,7 +79,7 @@ export async function initializeNewProject(ctx: InoxExtensionContext, onCommunit
 
 
     ctx.debugChannel.appendLine('[project/initialize] restart LSP client in project mode')
-    await ctx.restartLSPClient(true)
+    await ctx.restartLSPClient({forceProjetMode: true})
 
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Window,

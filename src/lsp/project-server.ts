@@ -26,14 +26,14 @@ export function getLspServerOptions(ctx: InoxExtensionContext): ServerOptions {
 }
 
 export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExtensionContext): Promise<boolean> {
-    //If there is no websocket endpoint nor a command to start a local project server we do nothing.
+    //If there is no websocket endpoint we do nothing.
     if (ctx.config.websocketEndpoint == undefined) {
       return true
     }
   
     let isRunning = await isWebsocketServerRunning(ctx, ctx.config.websocketEndpoint)
     if (isRunning) {
-      ctx.debugChannel.appendLine('LSP server is running')
+      ctx.debugChannel.appendLine('LSP server is running.')
       return true
     }
   
@@ -43,7 +43,6 @@ export async function checkConnAndStartLocalProjectServerIfPossible(ctx: InoxExt
       || process.platform != 'linux' //same
       || ctx.config.websocketEndpoint.hostname != 'localhost' //The LSP server is not local.
     ) {
-      vscode.window.showErrorMessage(fmtFailedToConnectToLSPServer(ctx))
       return false
     }
 

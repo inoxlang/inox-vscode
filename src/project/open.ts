@@ -9,7 +9,7 @@ import { fmtLspClientNotRunning } from '../errors';
 export async function openProject(ctx: InoxExtensionContext) {
     if (!ctx.lspClient || !ctx.lspClient.isRunning()) {
         //try to restart the LSP client if it's not already connecting.
-        await ctx.restartLSPClient(false)
+        await ctx.restartLSPClient({forceProjetMode: false})
 
         //wait for the LSP client if it's already connecting.
         await sleep(500)

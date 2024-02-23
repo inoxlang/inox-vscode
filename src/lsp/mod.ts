@@ -7,9 +7,12 @@ import { openProject } from '../project/mod';
 import { sleep } from '../utils';
 import { makeProvideCompletionItemFn } from './completion-middleware';
 import { getLspServerOptions } from './project-server';
+import { fmtLostConnectionToServer } from '../errors';
 
 export { checkConnAndStartLocalProjectServerIfPossible, MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS } from './project-server';
 export const LSP_CLIENT_STOP_TIMEOUT_MILLIS = 2000
+const RECONNECTION_DELTA_MILLIS = 2000
+const MAX_RECONNECT_TRY_COUNT = 5
 
 const LSP_CLIENT_LOG_PREFIX = '[LSP client] '
 
@@ -32,8 +35,11 @@ export function createLSPClient(ctx: InoxExtensionContext, forceProjetMode: bool
 
 function registerOnDidChangeStateHandler(ctx: InoxExtensionContext, client: LanguageClient) {
 
+
+    let retryTimestamp = 0
+
     const disposable = client.onDidChangeState(async e => {
-        //dispose the listener if client is not the current LSP client
+        //Dispose the listener if client is not the current LSP client.
         if (ctx.lspClient !== undefined && ctx.lspClient !== client) {
             disposable.dispose()
             return
@@ -47,6 +53,10 @@ function registerOnDidChangeStateHandler(ctx: InoxExtensionContext, client: Lang
                 openProject(ctx)
             }
 
+            if(Date.now() - retryTimestamp < RECONNECTION_DELTA_MILLIS){
+                vscode.window.showInformationMessage('Reconnected')
+            }
+
             return
         }
 
@@ -56,25 +66,37 @@ function registerOnDidChangeStateHandler(ctx: InoxExtensionContext, client: Lang
 
         // Try to restart several times if the client is still not running one second after.
         // We wait one second more before each try.
-        let trials = 5
+        let remainingTrials = MAX_RECONNECT_TRY_COUNT
         let delay = 1000
 
         let handle: NodeJS.Timeout
 
         const retry = () => {
-            ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + ' restart - decision not made by LSP client itself')
-            clearInterval(handle)
+            clearTimeout(handle)
 
-            if (trials <= 0 || ctx.lspClient != client || client.state != State.Stopped) {
+            if (remainingTrials <= 0 || ctx.lspClient != client || client.state != State.Stopped) {
                 if (ctx.lspClient != client) {
                     disposable.dispose()
                 }
                 return
             }
 
-            trials--
+            ctx.debugChannel.appendLine(LSP_CLIENT_LOG_PREFIX + ' restart - decision not made by LSP client itself')
+            
+            const isFirstRetry = remainingTrials == MAX_RECONNECT_TRY_COUNT
+            const isSecondRetry = remainingTrials == MAX_RECONNECT_TRY_COUNT - 1
+
+            if(isSecondRetry){
+                vscode.window.showWarningMessage(fmtLostConnectionToServer(ctx))
+            }
+
+            remainingTrials--
             delay += 1000
-            ctx.restartLSPClient(ctx.config.project !== undefined)
+            retryTimestamp = Date.now()
+            ctx.restartLSPClient({
+                forceProjetMode: ctx.config.project !== undefined,
+                doNotShowFailedToConnectError: isFirstRetry || isSecondRetry,
+            })
             handle = setTimeout(retry, delay)
         }
 
