@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.3.1] - Release
+
+- Improve error handling and error messages related to connection
+- Update start conditions of localhost proxy 
+
 ## [0.3.0] - Release
 
 - Add a proxy on localhost that forwards requests to localhost:8080 on the project server
@@ -8,7 +13,6 @@
 - Update the WASM Module parsing Inox code
 - Minor fixes
 - Improve README
-
 
 ## [0.2.6] - Release
 
