@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { join } from 'path';
-import { join as joinPosix, extname as extnamePosix } from 'path/posix'
+import { join as joinPosix, extname as extnamePosix, basename as basenamePosix } from 'path/posix'
 import * as fs from 'fs'
 
 import { InoxExtensionContext } from '../inox-extension-context';
@@ -25,7 +25,7 @@ const CACHED_CONTENT_EXTENSIONS = [
     '.json', '.yaml', '.yml'
 ]
 const MSG_TYPE_OF_FILE_NOT_CACHED = "[This type of file is never cached by default]"
-
+const IGNORED_FOLDER_NAMES = ['.git']
 
 export class PersistedFileCache {
     private _localFileCacheDir: string //project specific cache dir
@@ -192,6 +192,14 @@ export class PersistedFileCache {
     // the only 'awaited' IO operations performed in this function are a single fs.promises.mkdir call  
     // and a single fs.promises.readdir call. Other non-awaited IO operations are also performed.
     async scheduleCachingOfDirEntries(uri: vscode.Uri, entries: RemoteDirEntry[]) {
+
+        if(IGNORED_FOLDER_NAMES.includes(basenamePosix(uri.path))){
+            return
+        }
+
+        //Remove ignored folders.
+        entries = entries.filter(e => !(e.type == vscode.FileType.Directory && IGNORED_FOLDER_NAMES.includes(basenamePosix(e.name))))
+
         try {
             //asynchronously create the entries of type dir in the file cache
             const dirPath = join(this._localFileCacheDir!, uri.path)
