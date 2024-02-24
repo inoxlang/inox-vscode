@@ -168,10 +168,29 @@
 				"title": "Get Project's File Cache Dir"
 			},
 			{
-				"title": "Inox-git: Commit",
-				"command": "inox.scm.commit",
+				"command": "inox.git.commit",
+				"title": "Git Inox: Commit",
+				"category": "Git-Inox",
 				"shortTitle": "Commit",
 				"icon": "$(check)"
+			},
+			{
+				"command": "inox.git.stage",
+				"title": "Git Inox: Stage Changes",
+				"category": "Git-Inox",
+				"icon": "$(add)"
+			},
+			{
+				"command": "inox.git.unstage",
+				"title": "Git Inox: Unstage Changes",
+				"category": "Git-Inox",
+				"icon": "$(add)"
+			},
+			{
+				"command": "inox.git.refresh",
+				"title": "Git Inox: Refresh",
+				"category": "Git-Inox",
+				"icon": "$(refresh)"
 			}
 		],
 		"breakpoints": [
@@ -313,10 +332,35 @@
 			],
 			"scm/title": [
 				{
-					"command": "inox.scm.commit",
+					"command": "inox.git.commit",
 					"group": "navigation",
 					"when": "scmProvider == git-inox"
-				  }
+				},
+				{
+					"command": "inox.git.refresh",
+					"group": "navigation",
+					"when": "scmProvider == git-inox"
+				}
+			],
+			"scm/resourceFolder/context": [
+				{
+					"command": "inox.git.stage",
+					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+				},
+				{
+					"command": "inox.git.unstage",
+					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+				}
+			],
+			"scm/resourceState/context": [
+				{
+					"command": "inox.git.stage",
+					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+				},
+				{
+					"command": "inox.git.unstage",
+					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+				}
 			]
 		}
 	},
