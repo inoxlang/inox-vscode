@@ -4,7 +4,9 @@ import { InoxExtensionContext } from '../inox-extension-context';
 import { makeInoxSchemeURL } from '../inoxfs/mod';
 import { RemoteSourceControl } from './remote-git';
 import { CommitInfo } from './data_types';
+import { SourceControlPanel } from './view';
 
+export * from './view'
 
 const COMMIT_COMMAND = 'inox.scm.commit'
 const STAGE_COMMAND = 'inox.scm.stage' //Should be disabled if an operation is in progress (see operationInProgress in git extension).
@@ -48,22 +50,25 @@ export function registerSourceControlCommands(ctx: InoxExtensionContext) {
         vscode.commands.registerCommand(SHOW_LOG_COMMAND, async (e) => {
             checkSourceControlDefined(ctx.sourceControl)
 
-            const result = await ctx.sourceControl.getLastDevCommitHash()
-            if(result === null){
-                vscode.window.showInformationMessage('No last dev commit')
-                return
-            }
-            if(result instanceof Error){
-                vscode.window.showErrorMessage('Failed to get last dev commit: ' + result.message)
-                return
-            }
-            const logResult = await ctx.sourceControl.getDevLog(result)
-            if(logResult instanceof Error){
-                vscode.window.showErrorMessage('Failed to get dev commit log: ' + logResult.message)
-                return
-            }
 
-            vscode.window.showInformationMessage(  logResult.map(commit => commit.message).join('||'))
+            SourceControlPanel.createOrShow()
+
+            // const result = await ctx.sourceControl.getLastDevCommitHash()
+            // if(result === null){
+            //     vscode.window.showInformationMessage('No last dev commit')
+            //     return
+            // }
+            // if(result instanceof Error){
+            //     vscode.window.showErrorMessage('Failed to get last dev commit: ' + result.message)
+            //     return
+            // }
+            // const logResult = await ctx.sourceControl.getDevLog(result)
+            // if(logResult instanceof Error){
+            //     vscode.window.showErrorMessage('Failed to get dev commit log: ' + logResult.message)
+            //     return
+            // }
+
+            // vscode.window.showInformationMessage(  logResult.map(commit => commit.message).join('||'))
         }),
     )
 }

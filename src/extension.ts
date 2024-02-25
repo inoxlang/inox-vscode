@@ -17,7 +17,7 @@ import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
 import { isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
-import { SourceControl, registerSourceControlCommands } from './source-control/mod';
+import { SourceControl, registerSourceControlCommands, SourceControlPanel } from './source-control/mod';
 
 // After this duration the local file cache is used as a fallack.
 const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
@@ -76,6 +76,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         const prodOverview = new ProdOverview(ctx);
         vscode.window.registerWebviewViewProvider('prodOverview', prodOverview);
+
+        SourceControlPanel.ctx = ctx
     }
 
     //The LSP client is started after a short delay. The delay is required because if the extension is activated by
