@@ -168,29 +168,35 @@
 				"title": "Get Project's File Cache Dir"
 			},
 			{
-				"command": "inox.git.commit",
+				"command": "inox.scm.commit",
 				"title": "Git Inox: Commit",
 				"category": "Git-Inox",
 				"shortTitle": "Commit",
 				"icon": "$(check)"
 			},
 			{
-				"command": "inox.git.stage",
+				"command": "inox.scm.stage",
 				"title": "Git Inox: Stage Changes",
 				"category": "Git-Inox",
 				"icon": "$(add)"
 			},
 			{
-				"command": "inox.git.unstage",
+				"command": "inox.scm.unstage",
 				"title": "Git Inox: Unstage Changes",
 				"category": "Git-Inox",
 				"icon": "$(add)"
 			},
 			{
-				"command": "inox.git.refresh",
+				"command": "inox.scm.refresh",
 				"title": "Git Inox: Refresh",
 				"category": "Git-Inox",
 				"icon": "$(refresh)"
+			},
+			{
+				"command": "inox.scm.show-log",
+				"title": "Git Inox: Show Log",
+				"category": "Git-Inox",
+				"icon": "$(list-unordered)"
 			}
 		],
 		"breakpoints": [
@@ -332,34 +338,39 @@
 			],
 			"scm/title": [
 				{
-					"command": "inox.git.commit",
+					"command": "inox.scm.commit",
 					"group": "navigation",
 					"when": "scmProvider == git-inox"
 				},
 				{
-					"command": "inox.git.refresh",
+					"command": "inox.scm.refresh",
+					"group": "navigation",
+					"when": "scmProvider == git-inox"
+				},
+				{
+					"command": "inox.scm.show-log",
 					"group": "navigation",
 					"when": "scmProvider == git-inox"
 				}
 			],
 			"scm/resourceFolder/context": [
 				{
-					"command": "inox.git.stage",
+					"command": "inox.scm.stage",
 					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
 				},
 				{
-					"command": "inox.git.unstage",
-					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+					"command": "inox.scm.unstage",
+					"when": "scmProvider == git-inox && scmResourceGroup == index"
 				}
 			],
 			"scm/resourceState/context": [
 				{
-					"command": "inox.git.stage",
+					"command": "inox.scm.stage",
 					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
 				},
 				{
-					"command": "inox.git.unstage",
-					"when": "scmProvider == git-inox && scmResourceGroup == workingTree"
+					"command": "inox.scm.unstage",
+					"when": "scmProvider == git-inox && scmResourceGroup == index"
 				}
 			]
 		}
