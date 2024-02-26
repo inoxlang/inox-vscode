@@ -15,7 +15,7 @@ tab and clicking here:\
 
 </details>
 
-This extension provides support for the Inox programming language.
+This extension provides support for the Inox programming language and for [Hyperscript](https://hyperscript.org/) code embedded in Inox programs.
 
 - [Tutorials](#tutorials)
 - Syntax highlighting
@@ -161,3 +161,13 @@ Create a file named `learn.tut.ix` inside an Inox project and follow the instruc
 ## Debugging
 
 ![img](assets/docs/debug-demo.png)
+
+
+## Hyperscript
+
+The extension provides support for Hyperscript code in Inox programs **only**.
+
+The language's grammar and configuration are from https://github.com/dz4k/vscode-hyperscript (Copyright 2021 Deniz Akşimşek, MIT Licensed).
+
+- [_hyperscript-inox.tmLanguage.json](./syntaxes/_hyperscript-inox.tmLanguage.json)
+- [hyperscript-language-configuration.json](./hyperscript-language-configuration.json)

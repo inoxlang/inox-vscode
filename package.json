@@ -28,14 +28,32 @@
 				],
 				"configuration": "./language-configuration.json",
 				"firstLine": "(\\s*#!.*\\binox\\b.*|manifest\\s*[{])"
-			}
+			},
+			{
+                "id": "_hyperscript-inox",
+                "aliases": [
+                    "_hyperscript-inox"
+                ],
+				"extensions": [
+					"._hs"
+				],
+                "configuration": "./hyperscript-language-configuration.json"
+            }
 		],
 		"grammars": [
 			{
 				"language": "inox",
 				"scopeName": "source.inox",
 				"path": "./syntaxes/inox.tmLanguage.json"
-			}
+			},
+			{
+                "language": "_hyperscript-inox",
+                "scopeName": "source._hyperscript-inox",
+                "path": "./syntaxes/_hyperscript-inox.tmLanguage.json",
+                "embeddedLanguages": {
+                    "meta.embedded.line.js": "javascript"
+                }
+            }
 		],
 		"snippets": [
 			{
