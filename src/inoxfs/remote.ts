@@ -110,6 +110,8 @@ export class Remote {
 
 		const tokenSource = new vscode.CancellationTokenSource()
 		setTimeout(() => {
+			//Timeout for the whole upload, not a for a single LSP operation.
+
 			tokenSource.cancel()
 			//tokenSource.dispose()
 		}, UPLOAD_CANCELLATION_TOKEN_TIMEOUT)
@@ -142,9 +144,11 @@ export class Remote {
 		this.uploadTimestampsWindow.push(Date.now())
 
 		for (
-			let endIndex = 2 * MULTIPART_UPLOAD_B64_SIZE_THRESHOLD;
+			let endIndex = Math.min(startIndex + MULTIPART_UPLOAD_B64_SIZE_THRESHOLD, args.base64Content.length);
 			endIndex <= args.base64Content.length;
 			endIndex = Math.min(endIndex + MULTIPART_UPLOAD_B64_SIZE_THRESHOLD, args.base64Content.length)) {
+
+			const tokenSource = new vscode.CancellationTokenSource()
 
 			const part = args.base64Content.slice(startIndex, endIndex)
 			startIndex = endIndex
