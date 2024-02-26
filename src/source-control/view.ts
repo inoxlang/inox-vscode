@@ -1,11 +1,18 @@
 import * as vscode from 'vscode';
-import DOMPurify from 'isomorphic-dompurify';
+import * as path from 'path'
+import * as fs from 'fs'
 
 import { InoxExtensionContext } from "../inox-extension-context";
 import { assertNotNil, getNonce, stringifyCatchedValue } from '../utils';
 import { getBaseStylesheet as makeBaseStyleeshet } from '../style/stylesheet';
 import { WebSocket as _Websocket } from 'ws';
 import { CommitInfo } from './data_types';
+import { CSS_SCOPE_INLINE_JS, HYPER_SCRIPT_MIN_JS } from './js';
+import { renderLog } from './log-view';
+
+let surrealJS: string | undefined
+let cssScopeInlineJS: string | undefined
+
 
 export class SourceControlPanel {
 
@@ -39,7 +46,7 @@ export class SourceControlPanel {
             SourceControlPanel.viewType,
             'Source Control',
             column || vscode.ViewColumn.One,
-            getWebviewOptions(this._ctx.base.extensionUri),
+            getWebviewOptions(this._ctx),
         );
 
         SourceControlPanel.currentPanel = new SourceControlPanel(panel);
@@ -59,31 +66,31 @@ export class SourceControlPanel {
     ) {
 
         // Set the webview's initial html content
-		this._update();
+        this._update();
 
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programmatically
-		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+        // Listen for when the panel is disposed
+        // This happens when the user closes the panel or when the panel is closed programmatically
+        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-		// Update the content based on view changes
-		this._panel.onDidChangeViewState(
-			e => {
-				if (this._panel.visible) {
-					this._update();
-				}
-			},
-			null,
-			this._disposables
-		);
+        // Update the content based on view changes
+        this._panel.onDidChangeViewState(
+            e => {
+                if (this._panel.visible) {
+                    this._update();
+                }
+            },
+            null,
+            this._disposables
+        );
 
-		// Handle messages from the webview
-		this._panel.webview.onDidReceiveMessage(
-			message => {
-				switch (message.command) {}
-			},
-			null,
-			this._disposables
-		);
+        // Handle messages from the webview
+        this._panel.webview.onDidReceiveMessage(
+            message => {
+                switch (message.command) { }
+            },
+            null,
+            this._disposables
+        );
     }
 
 
@@ -101,32 +108,32 @@ export class SourceControlPanel {
         }
     }
 
-    private get sourceControl(){
+    private get sourceControl() {
         const sourceControl = SourceControlPanel._ctx!.sourceControl
         assertNotNil(sourceControl)
         return sourceControl
     }
 
     private async _update() {
-		const webview = this._panel.webview;
+        const webview = this._panel.webview;
 
         const hash = await this.sourceControl.getLastDevCommitHash()
 
         let commits: CommitInfo[] = []
 
-        if(typeof hash == 'string'){
+        if (typeof hash == 'string') {
             const result = await this.sourceControl.getDevLog(hash)
-            if(Array.isArray(result)){
+            if (Array.isArray(result)) {
                 commits = result
             } else {
                 vscode.window.showWarningMessage('Failed to get commit log: ' + result.message)
             }
-        } else if(hash instanceof Error){
+        } else if (hash instanceof Error) {
             vscode.window.showWarningMessage('Failed to get last dev commit: ' + hash.message)
-        } 
+        }
 
         webview.html = await this.getHTML(webview, commits)
-	}
+    }
 
 
     private async getHTML(webview: vscode.Webview, commits: CommitInfo[]) {
@@ -151,8 +158,15 @@ export class SourceControlPanel {
                 ${this.makeStylesheet()}
             </style>
 
+            <script nonce='${scriptNonce}'>
+                ${HYPER_SCRIPT_MIN_JS}
+
+                ${CSS_SCOPE_INLINE_JS}
+            </script>
+
+
             <main>
-                ${this.renderLog(commits)}
+                ${renderLog(commits, cssNonce)}
             </main>
 
             <footer>
@@ -163,25 +177,12 @@ export class SourceControlPanel {
                 //https://code.visualstudio.com/api/extension-guides/webview
 
                 const vscode = acquireVsCodeApi();
-                const oldState = vscode.getState() || { };
+                const oldState = vscode.getState() || { };                
             </script>
         </body>
         </html>`;
     }
 
-   
-
-    private renderLog(commits: CommitInfo[]) {
-
-        const renderedCommits = commits.map(commit => {
-            const message = DOMPurify.sanitize(commit.message)
-
-            return /*html*/`<li class='commit'>
-                <span>${message}</span>
-            </li>`;
-        })
-        return /*html*/`<ul class='commits'>${renderedCommits}</ul>`
-    }
 
     private makeStylesheet() {
         return /*css*/`
@@ -190,19 +191,11 @@ export class SourceControlPanel {
             }
 
             main {
-                display: flex;
-                flex-direction: column;
+                display: grid;
+                grid-template-columns: 40% 60%;
                 width: 100%;
                 align-items: start;
                 gap: 20px;
-            }
-
-            .applications, .actions {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                align-items: start;
-                gap: 5px;
             }
 
             form {
@@ -232,15 +225,17 @@ export class SourceControlPanel {
                 width: 100%;
             }
 
-            .commits {
-                display: flex;
-                flex-direction: column;
+            .hidden {
+                display: none;
             }
         `
     }
 }
 
-function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
+function getWebviewOptions(ctx: InoxExtensionContext): vscode.WebviewOptions {
+
+    const extensionUri = ctx.base.extensionUri
+
     return {
         // Enable javascript in the webview
         enableScripts: true,

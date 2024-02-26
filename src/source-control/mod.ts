@@ -44,6 +44,7 @@ export function registerSourceControlCommands(ctx: InoxExtensionContext) {
             checkSourceControlDefined(ctx.sourceControl)
 
             ctx.sourceControl.commit(control.inputBox.value).then(() => {
+                control.inputBox.value = ''
                 ctx.sourceControl?.refreshGroups()
             })
         }),
