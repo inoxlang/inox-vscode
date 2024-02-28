@@ -78,17 +78,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.window.registerWebviewViewProvider('prodOverview', prodOverview);
 
         SourceControlPanel.ctx = ctx
+
+        ctx.onProjectOpen(() => {
+            if(ctx.config.defaultLocalhostProxyPort != 0 && !isLocalhostProxyRunning()){
+                startLocalhostProxyServer(ctx)
+            }
+        })
     }
 
     //The LSP client is started after a short delay. The delay is required because if the extension is activated by
     //the execution of the command `inox.project.create-on-community-server`, we have to have for forceUseCommunityServer.value
     //to be set true
     setTimeout(() => {
-        ctx.onProjectOpen(() => {
-            if(ctx.config.defaultLocalhostProxyPort != 0 && !isLocalhostProxyRunning()){
-                startLocalhostProxyServer(ctx)
-            }
-        })
         ctx.restartLSPClient({forceProjetMode: false})
     }, 500)
 
