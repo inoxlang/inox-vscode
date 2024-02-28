@@ -399,8 +399,6 @@
 		}
 	},
 	"activationEvents": [
-		"workspaceContains:**/*.ix",
-		"workspaceContains:remote-inox-project.json",
 		"onFileSystem:inox"
 	],
 	"main": "./out/extension",
