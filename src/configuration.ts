@@ -9,11 +9,14 @@ import { InoxExtensionContext } from './inox-extension-context';
 export const COMMUNITY_SERVER_HOST = "community-server.inoxlang.dev"
 const COMMUNITY_SERVER_ENDPOINT = "wss://"+COMMUNITY_SERVER_HOST
 
-const ENABLE_PROJECT_MODE_CONFIG_ENTRY = 'enableProjectMode'
+const ENABLE_PROJECT_MODE_ENTRY = 'enableProjectMode'
+const ENABLE_LOCAL_CACHE_ENTRY = 'enableLocalCache'
+
 const TEMP_TOKENS_FILENAME = 'temp-tokens.json'
 const ADDITIONAL_TOKENS_API_TOKEN_FIELD = 'additional-tokens-api-token'
 const ACCOUNT_ID_FIELD = 'account-id'
 const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
+
 
 export const REMOTE_INOX_PROJECT_FILENAME = 'remote-inox-project.json'
 export const DEFAULT_LOCALHOT_PROXY_PORT_ENTRY = 'defaultLocalhostProxyPort'
@@ -24,6 +27,7 @@ export let forceUseCommunityServer = {value: false}
 export type Configuration = {
     websocketEndpoint?: URL
     project?: ProjectConfiguration
+    enableLocalCache: boolean,
     tempTokens?: TempTokens //not present if project is undefined
     projectFilePresent: boolean
 
@@ -54,10 +58,11 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     // read & check user settings
     const config = vscode.workspace.getConfiguration('inox')
     const websocketEndpoint = forceUseCommunityServer.value ? COMMUNITY_SERVER_ENDPOINT : config.get(WS_ENDPOINT_CONFIG_ENTRY)
-    const inProjectMode = config.get(ENABLE_PROJECT_MODE_CONFIG_ENTRY) === true
+    const inProjectMode = config.get(ENABLE_PROJECT_MODE_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
     const defaultLocalhostProxyPort = config.get(DEFAULT_LOCALHOT_PROXY_PORT_ENTRY) as number
+    const enableLocalCache = config.get(ENABLE_LOCAL_CACHE_ENTRY) === true && inProjectMode
 
     const inVirtualWorkspace = vscode.workspace.workspaceFolders != undefined &&
         vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file');
@@ -188,6 +193,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
 
     const result: Configuration = {
         project: projectConfig,
+        enableLocalCache: enableLocalCache,
         tempTokens: tempTokens,
         projectFilePresent: projectFilePresent,
 

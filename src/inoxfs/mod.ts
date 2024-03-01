@@ -137,7 +137,7 @@ export class InoxFS implements vscode.FileSystemProvider {
 		this._remote.ctx = ctx
 		const projectId = this.ctx.config.project?.id
 
-		if (projectId) {
+		if (projectId && ctx.config.enableLocalCache) {
 			this._cache = new OnDiskFileCache(ctx, this._remote, projectId)
 		}
 
