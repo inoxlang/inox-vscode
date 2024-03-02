@@ -13,7 +13,7 @@ export function isInsideEmbeddedRegion(
 	languageService: LanguageService,
 	documentText: string,
 	offset: number,
-	lang: 'css' | 'js'
+	lang: 'css' | 'js' | 'hyperscript'
 ) {
 	const scanner = languageService.createScanner(documentText);
 

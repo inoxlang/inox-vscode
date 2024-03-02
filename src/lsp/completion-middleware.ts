@@ -4,6 +4,7 @@ import { getLanguageService } from 'vscode-html-languageservice';
 
 import { getEmbeddedBlockVirtualContent, isInsideEmbeddedRegion } from '../embedded-support';
 import { InoxExtensionContext } from '../inox-extension-context';
+import { isPositionInHyperscriptScript, parseInoxChunk } from '../parse/mod';
 
 const htmlLanguageService = getLanguageService();
 
@@ -12,11 +13,19 @@ export function makeProvideCompletionItemFn(ctx: InoxExtensionContext): Completi
     return async (document, position, context, token, next) => {
         const docText = document.getText()
         const offsetAtPosition = document.offsetAt(position)
+     
+        let inHyperscriptScript = false
+        {
+            const result = await parseInoxChunk(ctx, document.uri.path, document.getText())
+            if(result.chunk){
+                inHyperscriptScript = isPositionInHyperscriptScript(result.chunk, offsetAtPosition)
+            }
+        }
 
-        const inCSS = isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'css')
-        const inJS = isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'js')
+        const inCSS = !inHyperscriptScript && isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'css')
+        const inJS = !inHyperscriptScript && isInsideEmbeddedRegion(htmlLanguageService, docText, offsetAtPosition, 'js')
 
-        //if not in CSS or JS do no forward request forwarding
+        //If not in CSS or JS do no forward request forwarding.
         if (!inCSS && !inJS) {
             return await next(document, position, context, token);
         }

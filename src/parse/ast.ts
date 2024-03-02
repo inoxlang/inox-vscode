@@ -28,7 +28,7 @@ export interface NodeBase {
 
 export type Node = |
     Chunk | EmbeddedModule | Manifest | IncludableChunkDescription |
-    TestSuiteExpression | TestCaseExpression | {unknown: never}
+    TestSuiteExpression | TestCaseExpression | XMLElement | {unknown: never}
 
 export interface Chunk {
     "base:chunk": NodeBase
@@ -60,5 +60,12 @@ export interface TestSuiteExpression {
 export interface TestCaseExpression {
     "base:test-case-expr": NodeBase
     isStatement: boolean
+}
+
+export interface XMLElement {
+    "base:xml-elem": NodeBase
+    rawElementContentStart: number
+    rawElementContentEnd: number
+    estimatedRawElementType: "js-script" | "hyperscript-script" | "css-style"
 }
 
