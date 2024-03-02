@@ -22,7 +22,8 @@ export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: UR
             resolve(false)
             webSocket.close()
         }, WEBSOCKET_SERVER_CHECK_TIMEOUT)
-
+        
+        let manuallyClosed = false
 
         const webSocket = new _Websocket(endpoint, getWebsocketOptions(endpoint))
         webSocket.addEventListener('error', async ev => {
@@ -34,18 +35,23 @@ export function isWebsocketServerRunning(ctx: InoxExtensionContext, endpoint: UR
         })
 
         webSocket.addEventListener('close', () => {
+            //? The handler does not seem to be called after the close() call.
+            if(manuallyClosed){
+                return
+            }
             ctx.debugChannel.appendLine(WEBSOCKET_LOG_PREFIX + `temporary websocket is now closed`)
         })
 
         webSocket.addEventListener('open', ev => {
             webSocket.addEventListener('message', async () => {
+                manuallyClosed = true
                 webSocket.close()
                 await sleep(200) //Make sure the WebSocket is closed.
 
                 resolve(true)
             })
 
-            //Send a message to make the server sends a response with an 'MethodNotFound' error.
+            //Send a message to make the server sends a response with a 'MethodNotFound' error.
             webSocket.send('{}') 
         })
     })
@@ -75,7 +81,9 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { app
 
         const websocketId = nextId++
 
-        ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `create websocket (id ${websocketId})`)
+        let msg = WEBSOCKET_LOG_PREFIX + `create websocket (id ${websocketId})`
+        ctx.outputChannel.appendLine(msg)
+        ctx.debugChannel.appendLine(msg)
 
         let endpoint = ctx.config.websocketEndpoint
         if (!endpoint) {
@@ -87,7 +95,9 @@ export function connectToWebsocketServer(ctx: InoxExtensionContext, opts?: { app
             endpoint.pathname = joinPosix(endpoint.pathname, opts.appendPath)
         }
 
-        ctx.outputChannel.appendLine(WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`)
+        msg = WEBSOCKET_LOG_PREFIX + `endpoint is ${endpoint.toString()}`
+        ctx.outputChannel.appendLine(msg)
+        ctx.debugChannel.appendLine(msg)
 
         const webSocket = new _Websocket(endpoint, getWebsocketOptions(endpoint))
         current = webSocket
