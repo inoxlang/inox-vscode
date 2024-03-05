@@ -46,11 +46,11 @@
             "\t$0$2",
             "}"
         ],
-        "description": "for .. in loop"
+        "description": "walk"
     },
     "for elem in": {
         "scope": "Inox",
-        "prefix": "for_elem_in",
+        "prefix": "for",
         "body": [
             "for ${1:elem} in $2 {",
             "\t$0$3",
@@ -60,7 +60,7 @@
     },
     "for index, elem in": {
         "scope": "Inox",
-        "prefix": "for_index_elem_in",
+        "prefix": "for i, e",
         "body": [
             "for ${1:index}, ${2:elem} in $3 {",
             "\t$0$4",
@@ -70,7 +70,7 @@
     },
     "for i in range": {
         "scope": "Inox",
-        "prefix": "for_i_in_range",
+        "prefix": "for i",
         "body": [
             "for ${1:i} in (0 ..< 10) {",
             "\t$0$2",
@@ -80,7 +80,7 @@
     },
     "for (0 ..< 10)": {
         "scope": "Inox",
-        "prefix": "for_zero_to_ten_exclusive",
+        "prefix": "for (",
         "body": [
             "for (0 ..< 10) {",
             "\t$0$1",
@@ -88,23 +88,16 @@
         ],
         "description": "for .. in loop"
     },
-    "1_10": {
-        "scope": "Inox",
-        "prefix": "1_10",
-        "body": [
-            "(1 .. 10)"
-        ]
-    },
     "1_n": {
         "scope": "Inox",
-        "prefix": "1_n",
+        "prefix": "1.n",
         "body": [
             "(1 .. $1)"
         ]
     },
     "0_n": {
         "scope": "Inox",
-        "prefix": "0_n",
+        "prefix": "0.n",
         "body": [
             "(0 .. $1)"
         ]
@@ -321,7 +314,7 @@
     },
     "testcasesimple": {
         "scope": "Inox",
-        "prefix": "testcase_simple",
+        "prefix": "testcase simple",
         "body": [
             "testcase \"${1:name}\" {",
             "\t$2",
