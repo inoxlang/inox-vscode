@@ -2365,7 +2365,7 @@
 					"include": "#top-xml-tag-in-expression"
 				}
 			],
-			"end": "(?<=(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+			"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
 		},
 		"top-xml-tag-without-attributes-in-expression": {
 			"begin": "(?=(<)\\s*(?:([_$[:alpha:]][-_$[:alnum:].]*)(?<!\\.|-)(:))?((?:[a-z][a-z0-9]*|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-))?\\s*(>))",
