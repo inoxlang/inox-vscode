@@ -16,7 +16,7 @@ import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
 import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
-import { isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
+import { isDevToolsProxyRunning, isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
 import { SourceControl, registerSourceControlCommands, SourceControlPanel } from './source-control/mod';
 
 // After this duration the local file cache is used as a fallack.
@@ -81,7 +81,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
         ctx.onProjectOpen(() => {
             if(ctx.config.defaultLocalhostProxyPort != 0 && !isLocalhostProxyRunning()){
-                startLocalhostProxyServer(ctx)
+                startLocalhostProxyServer(ctx, ctx.config.defaultLocalhostProxyPort)
+            }
+            if(ctx.config.defaultDevToolsProxyPort != 0 && !isDevToolsProxyRunning()){
+                startLocalhostProxyServer(ctx, ctx.config.defaultDevToolsProxyPort)
             }
         })
     }

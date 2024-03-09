@@ -19,7 +19,8 @@ const LOCAL_PROJECT_SERVER_ENV = 'localProjectServerEnv'
 
 
 export const REMOTE_INOX_PROJECT_FILENAME = 'remote-inox-project.json'
-export const DEFAULT_LOCALHOT_PROXY_PORT_ENTRY = 'defaultLocalhostProxyPort'
+export const DEFAULT_LOCALHOST_PROXY_PORT_ENTRY = 'defaultLocalhostProxyPort'
+export const DEFAULT_DEV_TOOLS_PROXY_PORT_ENTRY = 'defaultDevToolsProxyPort'
 export const WS_ENDPOINT_CONFIG_ENTRY = 'websocketEndpoint'
 export const LOCAL_PROJECT_SERVER_COMMAND_ENTRY = 'localProjectServerCommand'
 export let forceUseCommunityServer = {value: false}
@@ -38,6 +39,7 @@ export type Configuration = {
     localProjectServerEnv: Record<string, string>
 
     defaultLocalhostProxyPort: number, //0 if the localhost proxy should not be started.
+    defaultDevToolsProxyPort: number, //0 if the localhost proxy should not be started.
 }
 
 export type ProjectConfiguration = {
@@ -61,7 +63,8 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
     const inProjectMode = config.get(ENABLE_PROJECT_MODE_ENTRY) === true
     const localProjectServerCommand = config.get(LOCAL_PROJECT_SERVER_COMMAND_ENTRY) as string[]
     const localProjectServerEnvEntries = config.get(LOCAL_PROJECT_SERVER_ENV) as Record<string, unknown>
-    const defaultLocalhostProxyPort = config.get(DEFAULT_LOCALHOT_PROXY_PORT_ENTRY) as number
+    const defaultLocalhostProxyPort = config.get(DEFAULT_LOCALHOST_PROXY_PORT_ENTRY) as number
+    const defaultDevToolsProxyPort = config.get(DEFAULT_DEV_TOOLS_PROXY_PORT_ENTRY) as number
     const enableLocalCache = config.get(ENABLE_LOCAL_CACHE_ENTRY) === true && inProjectMode
 
     const inVirtualWorkspace = vscode.workspace.workspaceFolders != undefined &&
@@ -204,6 +207,7 @@ export async function getConfiguration(outputChannel: OutputChannel): Promise<Co
         localProjectServerEnv: localProjectServerEnv,
 
         defaultLocalhostProxyPort: defaultLocalhostProxyPort,
+        defaultDevToolsProxyPort: defaultDevToolsProxyPort,
     }
 
     if (websocketEndpoint !== "") {

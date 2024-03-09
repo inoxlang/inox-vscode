@@ -11,7 +11,7 @@ import { getSelfSignedCertificate } from './certs'
 
 
 export const PROJECT_SERVER_DEV_PORT_0 = 8080
-
+const DEV_TOOLS_PORT = 8082
 
 const HTTP_REQUEST_ASYNC_METHOD = "httpClient/requestAsync"
 const HTTP_RESPONSE_EVENT_METHOD = "httpClient/responseEvent"
@@ -19,33 +19,51 @@ const LSP_REQUEST_TIMEOUT_MILLIS = 5_000
 const LSP_NOTIF_WAIT_TIMEOUT_MILLIS = 25_000
 
 const LOCALHOST_PROXY_LOG_PREFIX = "[Localhost Proxy] "
+const DEVTOOLS_LOG_PREFIX = "[DevTools Proxy] "
+
 
 //Mapping request ID -> {resolve, reject}.
 const pendindgRequests = new Map<string, { method: string, url: string, resolve: Function, reject: Function }>()
 const lspClients = new WeakSet<LanguageClient>()
 
 let _isLocalhostProxyRunning = false
+let _isDevToolsProxyRunning = false
 
 export function isLocalhostProxyRunning(){
     return _isLocalhostProxyRunning
 }
 
-export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
-    const localhostPort = ctx.config.defaultLocalhostProxyPort
-    const serverOptions = getServerOptions(ctx, localhostPort)
+export function isDevToolsProxyRunning(){
+    return _isDevToolsProxyRunning
+}
 
-    const server = https.createServer(serverOptions, ((req, resp) => handleRequest(ctx, req, resp)))
+export function startLocalhostProxyServer(ctx: InoxExtensionContext, localhostPort: number) {
+    const isDevToolsProxy = localhostPort == ctx.config.defaultDevToolsProxyPort
+    if(!isDevToolsProxy && localhostPort != ctx.config.defaultLocalhostProxyPort){
+        vscode.window.showErrorMessage(`internal configuration error for localhost proxy`)
+    }
+
+    const serverOptions = getServerOptions(ctx, localhostPort)
+    const server = https.createServer(serverOptions, ((req, resp) => handleRequest(ctx, req, resp, isDevToolsProxy)))
 
     try {
         //Start server.
 
         server.on('listening', () => {
-            _isLocalhostProxyRunning = true
+            if(isDevToolsProxy){
+                _isDevToolsProxyRunning = true
+            } else {
+                _isLocalhostProxyRunning = true
+            }
             ctx.outputChannel.appendLine(`start proxy listening on localhost:${localhostPort} (local machine)`)
         })
 
         server.on('close', () => {
-            _isLocalhostProxyRunning = false
+            if(isDevToolsProxy){
+                _isDevToolsProxyRunning = false
+            } else {
+                _isLocalhostProxyRunning = false
+            }
         })
 
         server.on('error', err => {
@@ -57,13 +75,18 @@ export function startLocalhostProxyServer(ctx: InoxExtensionContext) {
 
         server.listen(localhostPort, 'localhost')
     } catch (reason) {
-        _isLocalhostProxyRunning = false
+        if(isDevToolsProxy){
+            _isDevToolsProxyRunning = false
+        } else {
+            _isLocalhostProxyRunning = false
+        }
         vscode.window.showErrorMessage("localhost server on local machine: " + stringifyCatchedValue(reason))
     }
 }
 
-async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessage, resp: http.ServerResponse) {
+async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessage, resp: http.ServerResponse, isDevToolsProxy: boolean) {
     const lspClient = ctx.lspClient
+    const logPrefix = isDevToolsProxy ? DEVTOOLS_LOG_PREFIX : LOCALHOST_PROXY_LOG_PREFIX
 
     if (!lspClient?.isRunning()) {
         resp.statusCode = 500
@@ -87,14 +110,14 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
             const reqID = lspMessage.reqID
             const pendindgRequest = pendindgRequests.get(reqID)
             if (pendindgRequest === undefined) {
-                ctx.debugChannel.appendLine(LOCALHOST_PROXY_LOG_PREFIX + `Error/Response of unregistered pending request received from project server.`)
+                ctx.debugChannel.appendLine(logPrefix + `Error/Response of unregistered pending request received from project server.`)
                 return
             }
 
             if (lspMessage.error) {
-                ctx.debugChannel.appendLine(LOCALHOST_PROXY_LOG_PREFIX + `${pendindgRequest.method} ${pendindgRequest.url} (id ${reqID}) - Error received from project server.`)
+                ctx.debugChannel.appendLine(logPrefix + `${pendindgRequest.method} ${pendindgRequest.url} (id ${reqID}) - Error received from project server.`)
             } else {
-                ctx.debugChannel.appendLine(LOCALHOST_PROXY_LOG_PREFIX + `${pendindgRequest.method} ${pendindgRequest.url} (id ${reqID}) - Response received from project server.`)
+                ctx.debugChannel.appendLine(logPrefix + `${pendindgRequest.method} ${pendindgRequest.url} (id ${reqID}) - Response received from project server.`)
             }
 
             pendindgRequest.resolve(lspMessage)
@@ -149,7 +172,9 @@ async function handleRequest(ctx: InoxExtensionContext, req: http.IncomingMessag
     const body = Buffer.concat(chunks)
     const base64RequestBody = body.toString('base64')
 
-    const url = new URL(req.url, 'https://localhost:' + PROJECT_SERVER_DEV_PORT_0)
+    const targetPort = isDevToolsProxy ? DEV_TOOLS_PORT : PROJECT_SERVER_DEV_PORT_0
+
+    const url = new URL(req.url, 'https://localhost:' + targetPort)
     const reqID = String(Math.random())
 
     const params = {

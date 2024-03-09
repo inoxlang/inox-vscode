@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import { basename, join } from 'path';
-import { DEFAULT_LOCALHOT_PROXY_PORT_ENTRY, ProjectConfiguration, REMOTE_INOX_PROJECT_FILENAME, WS_ENDPOINT_CONFIG_ENTRY } from '../configuration';
+import { DEFAULT_DEV_TOOLS_PROXY_PORT_ENTRY, DEFAULT_LOCALHOST_PROXY_PORT_ENTRY, ProjectConfiguration, REMOTE_INOX_PROJECT_FILENAME, WS_ENDPOINT_CONFIG_ENTRY } from '../configuration';
 import { fmtLspClientNotRunning } from '../errors';
 import { InoxExtensionContext } from "../inox-extension-context";
 import { assertNotNil, sleep, stringifyCatchedValue } from '../utils';
@@ -164,8 +164,8 @@ async function _initializeNewProject(ctx: InoxExtensionContext, projectName: str
             "inox.enableProjectMode": true,
             ["inox." + WS_ENDPOINT_CONFIG_ENTRY]: ctx.config.websocketEndpoint.toString(),
 
-            //Enable the localhost proxy if the server is remote.
-            ["inox." + DEFAULT_LOCALHOT_PROXY_PORT_ENTRY]: 8090,
+            ["inox." + DEFAULT_LOCALHOST_PROXY_PORT_ENTRY]: 8090,
+            ["inox." + DEFAULT_DEV_TOOLS_PROXY_PORT_ENTRY]: 8092,
 
             "files.autoSave": "afterDelay"
         },
