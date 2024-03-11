@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.4.0] - Release
+
+- Begin implementation of source control features
+- Add a proxy on localhost that forwards requests to localhost:8082 on the project server (devtools)
+- Update syntax colorization
+- Add support for Hyperscript
+- Minor fixes
+
+
 ## [0.3.1] - Release
 
 - Improve error handling and error messages related to connection
