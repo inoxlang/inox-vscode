@@ -349,7 +349,20 @@
 					"begin": "(@[a-zA-Z0-9_-]+)(?=(/[-a-zA-Z0-9@:%_+.~#?&//=]*)?\\{)",
 					"captures": {
 						"1": {
-							"name": "variable.name"
+							"patterns": [
+								{
+									"name": "variable.name",
+									"match": "@[A-Z_][A-Z0-9_-]*-[a-zA-Z0-9_-]+\\b"
+								},
+								{
+									"name": "variable.other.constant",
+									"match": "@[A-Z_][A-Z0-9_-]*\\b"
+								},
+								{
+									"name": "variable.name",
+									"match": "@[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+								}
+							]
 						}
 					},
 					"patterns": [
@@ -388,7 +401,20 @@
 					"match": "(@[a-zA-Z0-9_-]+)/(?:[-a-zA-Z0-9@:%_+.~#?&//=]{0,100})",
 					"captures": {
 						"1": {
-							"name": "variable.name"
+							"patterns": [
+								{
+									"name": "variable.name",
+									"match": "@[A-Z_][A-Z0-9_-]*-[a-zA-Z0-9_-]+\\b"
+								},
+								{
+									"name": "variable.other.constant",
+									"match": "@[A-Z_][A-Z0-9_-]*\\b"
+								},
+								{
+									"name": "variable.name",
+									"match": "@[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+								}
+							]
 						}
 					}
 				},
@@ -3204,7 +3230,7 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z_]|\\$|/\\*|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z_]|\\$|@|/\\*|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
