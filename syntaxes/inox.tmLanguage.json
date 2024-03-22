@@ -84,6 +84,9 @@
 			"include": "#binary-div-operator"
 		},
 		{
+			"include": "#binary-sub-operator"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -1684,6 +1687,28 @@
 				{
 					"match": "(?<=[a-z0-9_?()\\]}])\\s+(/)(?=\\s+[,a-z0-9_()\\]}])",
 					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match paths or unquoted strings",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.inox"
+						}
+					}
+				}
+			]
+		},
+		"binary-sub-operator": {
+			"patterns": [
+				{
+					"match": "(?<=[a-z0-9_?()\\]}])\\s+(-)(?=\\)|\\s*$)",
+					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.inox"
+						}
+					}
+				},
+				{
+					"match": "(?<=[a-z0-9_?()\\]}])\\s+(-)(?=\\s+[,a-z0-9_()\\]}])",
+					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings",
 					"captures": {
 						"1": {
 							"name": "keyword.operator.inox"
