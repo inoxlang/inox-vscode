@@ -1720,7 +1720,7 @@
 		"binary-match": {
 			"patterns": [
 				{
-					"begin": "(?<!^\\s*|[(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|\\)))",
+					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|\\)))",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
@@ -1734,7 +1734,7 @@
 					"end": "(?=\\))"
 				},
 				{
-					"begin": "(?<!^\\s*|[(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=[$a-zA-Z0-9{\\[\\|\\(%])",
+					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=[$a-zA-Z0-9{\\[\\|\\(%])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
