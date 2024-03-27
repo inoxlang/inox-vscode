@@ -855,7 +855,7 @@
 					"end": "(?=[,:)\\}\\]])"
 				},
 				{
-					"include": "$self"
+					"include": "#expressions-and-comments"
 				}
 			]
 		},
