@@ -188,12 +188,16 @@
 		"variables": {
 			"patterns": [
 				{
-					"name": "variable.name.global",
-					"match": "[$][$]([_a-zA-Z-]*\\b)?"
+					"name": "variable.name",
+					"match": "[$]{1,2}[A-Z_][A-Z0-9_-]*-[a-zA-Z0-9_-]+\\b"
 				},
 				{
-					"name": "variable.name",
-					"match": "[$]([_a-zA-Z-]*\\b)?"
+					"name": "variable.other.constant",
+					"match": "[$]{1,2}[A-Z_][A-Z0-9_-]*\\b"
+				},
+				{
+					"name": "variable.name.global",
+					"match": "[$]{1,2}([_a-zA-Z-]*\\b)?"
 				}
 			]
 		},
