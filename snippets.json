@@ -106,10 +106,11 @@
         "scope": "Inox",
         "prefix": "switch",
         "body": [
-            "switch $1 {",
-            "\t$2 {",
+            "switch ${1:value} {",
+            "\t${2:0} {",
             "\t\t$3",
             "\t}",
+            "\tdefaultcase {}",
             "}"
         ],
         "description": "minimal switch statement"
@@ -118,13 +119,23 @@
         "scope": "Inox",
         "prefix": "match",
         "body": [
-            "match $1 {",
-            "\t$2 {",
+            "match ${1:value} {",
+            "\t${2:0} {",
             "\t\t$3",
             "\t}",
+            "\tdefaultcase {}",
             "}"
         ],
         "description": "minimal match statement"
+    },
+    "defaultcase": {
+        "scope": "Inox",
+        "prefix": "defaultcase",
+        "body": [
+            "defaultcase {",
+            "\t$1",
+            "}"
+        ]
     },
     "assertmatch": {
         "scope": "Inox",
