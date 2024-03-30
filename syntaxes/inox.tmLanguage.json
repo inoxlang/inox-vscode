@@ -2548,12 +2548,55 @@
 			]
 		},
 		"xml-expression": {
-			"begin": "([a-zA-Z][a-zA-Z0-9]*|(?<=\\(\\s*|^\\s*))(?=<[a-zA-Z].*)",
-			"beginCaptures": {
-				"1": {
-					"name": "variable.other"
+			"patterns": [
+				{
+					"comment": "explicit namespace",
+					"begin": "([a-zA-Z][a-zA-Z0-9]*)(?=<[a-zA-Z].*)",
+					"beginCaptures": {
+						"1": {
+							"name": "variable.other"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#xml-expression-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				},
+				{
+					"comment": "implicit namespace",
+					"begin": "(?<=(^\\s*|[:,;}\\]()]\\s*|(if|else|switch|match|for|walk|in|return|yield|assert|comp|on|received|and|or|not-in|keyof|urlof|match|not-match|substrof|is|is-not)\\s+))(?=<[a-zA-Z][a-zA-Z_-]*[ >{/])",
+					"patterns": [
+						{
+							"include": "#xml-expression-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				},
+				{
+					"comment": "implicit namespace, single line",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z]|\\s*[>/]))",
+					"patterns": [
+						{
+							"include": "#xml-expression-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				},
+				{
+					"comment": "implicit namespace, single line, hyperscript (best try)",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*\\s+[{]\\s*([}]|on|def|worker|eventsource|socket|init|behavior|install|require))",
+					"patterns": [
+						{
+							"include": "#xml-expression-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
 				}
-			},
+			]
+		},
+		"xml-expression-inner": {
 			"patterns": [
 				{
 					"begin": "(?=<style)",
@@ -2570,8 +2613,7 @@
 				{
 					"include": "#top-xml-tag-in-expression"
 				}
-			],
-			"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+			]
 		},
 		"top-xml-tag-without-attributes-in-expression": {
 			"begin": "(?=(<)\\s*(?:([_$[:alpha:]][-_$[:alnum:].]*)(?<!\\.|-)(:))?((?:[a-z][a-z0-9]*|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-))?\\s*(>))",
@@ -2601,7 +2643,7 @@
 			]
 		},
 		"js-script-tag-expression": {
-			"begin": "([a-zA-Z][a-zA-Z0-9]*|(?<=\\(\\s*|^\\s*))(?=<[a-zA-Z].*)(?=<script\\b(?!-|.*type=\"text/hyperscript\"|.*\\bh\\b(?!-)))",
+			"begin": "([a-zA-Z][a-zA-Z0-9]*)?(?=<[a-zA-Z].*)(?=<script\\b(?!-|.*type=\"text/hyperscript\"|.*\\bh\\b(?!-)))",
 			"beginCaptures": {
 				"1": {
 					"name": "variable.other"
@@ -2832,7 +2874,7 @@
 			]
 		},
 		"hs-script-tag-expression": {
-			"begin": "([a-zA-Z][a-zA-Z0-9]*|(?<=\\(\\s*|^\\s*))(?=<[a-zA-Z].*)(?=<script\\b(?!-)(?=.*type=\"text/hyperscript\"|.*\\bh\\b(?!-)))",
+			"begin": "([a-zA-Z][a-zA-Z0-9]*)?(?=<[a-zA-Z].*)(?=<script\\b(?!-)(?=.*type=\"text/hyperscript\"|.*\\bh\\b(?!-)))",
 			"beginCaptures": {
 				"1": {
 					"name": "variable.other"
@@ -3063,7 +3105,7 @@
 			]
 		},
 		"style-tag-expression": {
-			"begin": "([a-zA-Z][a-zA-Z0-9]*|(?<=\\(\\s*|^\\s*))(?=<[a-zA-Z].*)(?=<style\\b(?!-))",
+			"begin": "([a-zA-Z][a-zA-Z0-9]*)?(?=<[a-zA-Z].*)(?=<style\\b(?!-))",
 			"beginCaptures": {
 				"1": {
 					"name": "variable.other"
