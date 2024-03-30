@@ -806,8 +806,8 @@
 		"pattern-declarations": {
 			"patterns": [
 				{
-					"comment": "declaration for an object pattern",
-					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\{)",
+					"comment": "declaration for an object or record pattern",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(#?\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -837,8 +837,8 @@
 					]
 				},
 				{
-					"comment": "declaration for a list pattern with an element pattern",
-					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)\\s*(\\])(?=[a-zA-Z_%#{\\[])",
+					"comment": "declaration for a list or tuple pattern with an element pattern",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(#?\\[)\\s*(\\])(?=[a-zA-Z_%#{\\[])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -871,8 +871,8 @@
 					]
 				},
 				{
-					"comment": "declaration for a list pattern with a known length",
-					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)",
+					"comment": "declaration for a list or tuple pattern with a known length",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(#?\\[)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
