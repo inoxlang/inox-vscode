@@ -1639,7 +1639,7 @@
 			"patterns": [
 				{
 					"comment": "Function declarations",
-					"begin": "((?:^\\s*|\\b)fn)(?:\\b|\\[([^\\]]*)\\]?)\\s+(\\w+)\\s*\\(",
+					"begin": "((?:^\\s*|\\b)fn)(?:\\b|\\[([^\\]]*)\\]?)\\s+(?:(\\w+)|(<\\{.*?\\}>))\\s*\\(",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.function.inox"
@@ -1653,6 +1653,11 @@
 						},
 						"3": {
 							"name": "entity.name.function.inox"
+						},
+						"4": {
+							"patterns": [
+								{"include": "$self"}
+							]
 						}
 					},
 					"patterns": [
@@ -3573,7 +3578,7 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z0-9_]|\\$|@|/\\*|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|/\\*|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
