@@ -21,6 +21,9 @@
 			"include": "#css-selectors"
 		},
 		{
+			"include": "#quoted-statements"
+		},
+		{
 			"include": "#complex-string-patterns"
 		},
 		{
@@ -2433,6 +2436,45 @@
 				}
 			]
 		},
+		"quoted-statements": {
+			"begin": "@\\{",
+			"end": "\\}",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.begin.bracket.curly.inox"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.end.bracket.curly.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#unquoted-region"
+				},
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"unquoted-region": {
+			"begin": "<\\{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.template-expression.begin"
+				}
+			},
+			"end": "\\}>",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.template-expression.end"
+				}
+			},
+			"patterns": [
+				{"include": "$self"}
+			]
+		},
 		"complex-string-patterns": {
 			"patterns": [
 				{
@@ -3567,6 +3609,9 @@
 				},
 				{
 					"include": "#css-selectors"
+				},
+				{
+					"include": "#quoted-statements"
 				},
 				{
 					"include": "#complex-string-patterns"
