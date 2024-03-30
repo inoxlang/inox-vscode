@@ -6,6 +6,9 @@
 			"include": "#assignment-operators"
 		},
 		{
+			"include": "#unquoted-region"
+		},
+		{
 			"include": "#hs-script-tag-expression"
 		},
 		{
@@ -749,6 +752,10 @@
 					"match": "\\|"
 				},
 				{
+					"comment": "This pattern needs to be present here because of #unprefixed-object-patterns",
+					"include": "#unquoted-region"
+				},
+				{
 					"include": "#unprefixed-list-patterns"
 				},
 				{
@@ -800,7 +807,7 @@
 			"patterns": [
 				{
 					"comment": "declaration for an object pattern",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*(\\{)",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -809,6 +816,11 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
 							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
@@ -826,7 +838,7 @@
 				},
 				{
 					"comment": "declaration for a list pattern with an element pattern",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)\\s*(\\])(?=[a-zA-Z_%#{\\[])",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)\\s*(\\])(?=[a-zA-Z_%#{\\[])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -835,9 +847,14 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
-							"name": "punctuation.begin.bracket.inox"
+							"patterns": [
+								{"include": "$self"}
+							]
 						},
 						"4": {
+							"name": "punctuation.begin.bracket.inox"
+						},
+						"5": {
 							"name": "punctuation.end.bracket.inox"
 						}
 					},
@@ -855,7 +872,7 @@
 				},
 				{
 					"comment": "declaration for a list pattern with a known length",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\[)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -864,6 +881,11 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
 							"name": "punctuation.begin.bracket.inox"
 						}
 					},
@@ -881,7 +903,7 @@
 				},
 				{
 					"comment": "declaration for a parenthesized pattern",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*(\\()",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -890,6 +912,11 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
 							"name": "punctuation.begin.bracket.curly.inox"
 						}
 					},
@@ -907,7 +934,7 @@
 				},
 				{
 					"comment": "declaration for a pattern call",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\()",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -916,9 +943,14 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
-							"name": "entity.name.type.inox"
+							"patterns": [
+								{"include": "$self"}
+							]
 						},
 						"4": {
+							"name": "entity.name.type.inox"
+						},
+						"5": {
 							"name": "punctuation.begin.bracket.inox"
 						}
 					},
@@ -936,7 +968,7 @@
 				},
 				{
 					"comment": "declaration for a pattern call with the shorthand syntax",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\{)",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)(\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -945,9 +977,14 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
-							"name": "entity.name.type.inox"
+							"patterns": [
+								{"include": "$self"}
+							]
 						},
 						"4": {
+							"name": "entity.name.type.inox"
+						},
+						"5": {
 							"name": "punctuation.begin.bracket.inox"
 						}
 					},
@@ -965,7 +1002,7 @@
 				},
 				{
 					"comment": "declaration for a named pattern or pattern namespace member",
-					"match": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)\\b(?!=\\{|\\()",
+					"match": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*([a-zA-Z_][a-zA-Z0-9_.-]*)\\b(?!=\\{|\\()",
 					"captures": {
 						"1": {
 							"name": "keyword.other.inox"
@@ -974,19 +1011,29 @@
 							"name": "entity.name.type.inox"
 						},
 						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
 							"name": "entity.name.type.inox"
 						}
 					}
 				},
 				{
 					"comment": "declaration for a pattern union",
-					"begin": "^\\s*(pattern)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*=(?:[ \t]*@)?[ \t]*\\|",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*\\|",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
 						},
 						"2": {
 							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
 						}
 					},
 					"end": "(?=(#[ \t!][^\n]*)?\\s*\n)",
@@ -998,13 +1045,18 @@
 				},
 				{
 					"comment": "declaration without a RHS",
-					"match": "^\\s*(pattern\\b)(?:\\s*$|[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*)",
+					"match": "^\\s*(pattern\\b)(?:\\s*$|[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*)",
 					"captures": {
 						"1": {
 							"name": "keyword.other.inox"
 						},
 						"2": {
 							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
 						}
 					}
 				}
@@ -1063,13 +1115,18 @@
 		"pattern-namespace-declarations": {
 			"patterns": [
 				{
-					"match": "^\\s*(pnamespace)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*[.]?)?[ \t]*",
+					"match": "^\\s*(pnamespace)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*[.]?|(<\\{.*?\\}>)))?[ \t]*",
 					"captures": {
 						"1": {
 							"name": "keyword.other.inox"
 						},
 						"2": {
 							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
 						}
 					}
 				}
@@ -1294,7 +1351,7 @@
 		"var-declarations": {
 			"patterns": [
 				{
-					"match": "(?:^[ \t]+)(\\b(?:global)?var)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(?:^[ \t]+)(\\b(?:global)?var)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -1304,6 +1361,11 @@
 						},
 						"3": {
 							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
+							"patterns": [
 								{
 									"include": "#pattern-content"
 								}
@@ -1312,7 +1374,7 @@
 					}
 				},
 				{
-					"match": "(\\b(?:global)?var)[ \t]+([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=)",
+					"match": "(\\b(?:global)?var)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]+(.*?)[ \t]*(?=$|=)",
 					"captures": {
 						"1": {
 							"name": "storage.type.inox"
@@ -1321,6 +1383,11 @@
 							"name": "variable.name.inox"
 						},
 						"3": {
+							"patterns": [
+								{"include": "$self"}
+							]
+						},
+						"4": {
 							"patterns": [
 								{
 									"include": "#pattern-content"
@@ -1356,13 +1423,19 @@
 				}
 			]
 		},
-		"var-declaration": {
-			"match": "(?<=^|,|\\()[ \t]*([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]+(.*?)[ \t]*(?=$|=|\\))",
+		"single-local-var-declaration": {
+			"comment": "TODO: fix",
+			"match": "(?<=^|,|\\()[ \t]*(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]+(.*?)[ \t]*(?=$|=|\\))",
 			"captures": {
 				"1": {
 					"name": "variable.name.inox"
 				},
 				"2": {
+					"patterns": [
+						{"include": "$self"}
+					]
+				},
+				"3": {
 					"patterns": [
 						{
 							"match": "([a-zA-Z_][a-zA-Z0-9._-]*)\\b",
@@ -2451,9 +2524,6 @@
 			},
 			"patterns": [
 				{
-					"include": "#unquoted-region"
-				},
-				{
 					"include": "$self"
 				}
 			]
@@ -2618,7 +2688,7 @@
 				},
 				{
 					"comment": "implicit namespace, single line",
-					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z]|\\s*[>/]))",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z]|\\s*[<>/]))",
 					"patterns": [
 						{
 							"include": "#xml-expression-inner"
@@ -3452,6 +3522,15 @@
 					"include": "#hyperscript-block"
 				},
 				{
+					"begin": "(?=<\\{)",
+					"patterns": [
+						{
+							"include": "#unquoted-region"
+						}
+					],
+					"end": "(?<=\\}>)(?=[=]?)"
+				},
+				{
 					"include": "#xml-tag-attribute-name"
 				},
 				{
@@ -3494,7 +3573,7 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z_]|\\$|@|/\\*|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|[a-zA-Z0-9_]|\\$|@|/\\*|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
