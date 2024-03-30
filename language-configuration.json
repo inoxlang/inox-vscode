@@ -46,5 +46,31 @@
         ["\"", "\""],
         ["'", "'"],
         ["`", "`"],
-    ]
+    ],
+    // hosts, URLs, host patterns, URL patterns
+    // [%]?\\w+://.*(?=^|[\\s})\\],:;] 
+    //
+    // paths and path patterns
+    // %?\\.{0,2}/([:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|])*
+    //
+    // byte slice literals
+    // \\b0[xbd]\\[.*?[\\])}]
+    //
+    // ports
+    // :\\d+(/[a-zA-Z]*)?
+    // 
+    // numbers, quantities and rates
+    // [0-9][%a-zA-Z0-9_-]*(/[a-zA-Z]+)?
+    //
+    // options
+    // %?(-{1,2}[a-zA-Z_][a-zA-Z0-9_-]*)=([a-zA-Z][a-zA-Z0-9_-]*)?
+    //
+    // identifiers
+    // [@$%])?[a-zA-Z_][a-zA-Z0-9_-]*
+    //
+    // regular expressions
+    // %`.*`
+    //
+    // unquoted strings are too complex
+    "wordPattern": "((?:[%]?\\w+://.*(?=^|[\\s})\\],:;]))|(?:%?\\.{0,2}/([:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|])*)|(?:[:]\\d+(/[a-zA-Z]*)?)|(?:\\b0[xbd]\\[.*?[\\])}])|(?:[0-9][%a-zA-Z0-9_-]*(/[a-zA-Z]+)?)|(?:%?(-{1,2}[a-zA-Z_][a-zA-Z0-9_-]*)=([a-zA-Z][a-zA-Z0-9_-]*)?)|(?:[@$%])?[a-zA-Z_][a-zA-Z0-9_-]*)|(?:%`.*`)"
 }
