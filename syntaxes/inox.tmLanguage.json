@@ -135,7 +135,7 @@
 			"include": "#paths"
 		},
 		{
-			"include": "#regex"
+			"include": "#regexps"
 		},
 		{
 			"include": "#option-names"
@@ -321,21 +321,41 @@
 			"patterns": [
 				{
 					"name": "string.regexp.url-pattern",
-					"match": "%[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b([-a-zA-Z0-9@:%_*+.~#?&//=]{0,100})",
+					"match": "%[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b([-a-zA-Z0-9@:%_*+.~#?&//=]{1,100})",
 					"captures": {
 						"1": {
 							"patterns": [
-								{
-									"match": "\\*",
-									"name": "constant.language.special.wildcard.url-pattern.inox"
-								},
-								{
-									"match": "(?<=/)%[a-zA-Z_][a-zA-Z0-9_-]*(?=/?)",
-									"name": "constant.language.special.path-segment.url-pattern.inox"
-								}
+								{"include": "#url-patterns-inner"}
 							]
 						}
 					}
+				}
+			]
+		},
+		"unprefixed-url-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp.url-pattern",
+					"match": "[a-zA-Z][-a-zA-Z0-9+.]*://(?:\\w+|(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,32}\\.[a-zA-Z0-9()]{1,6})\\b([-a-zA-Z0-9@:%_*+.~#?&//=]{1,100})",
+					"captures": {
+						"1": {
+							"patterns": [
+								{"include": "#url-patterns-inner"}
+							]
+						}
+					}
+				}
+			]
+		},
+		"url-patterns-inner": {
+			"patterns": [
+				{
+					"match": "\\*",
+					"name": "constant.language.special.wildcard.url-pattern.inox"
+				},
+				{
+					"match": "(?<=/)%[a-zA-Z_][a-zA-Z0-9_-]*(?=/?)",
+					"name": "constant.language.special.path-segment.url-pattern.inox"
 				}
 			]
 		},
@@ -388,27 +408,7 @@
 					"begin": "%\\.{0,2}/(?:[:]|[^\\s\\[\\]{}(),;:|])*(?=\\{)",
 					"patterns": [
 						{
-							"begin": "\\{",
-							"beginCaptures": {
-								"0": {
-									"name": "punctuation.definition.template-expression.begin"
-								}
-							},
-							"patterns": [
-								{
-									"include": "$self"
-								}
-							],
-							"end": "\\}",
-							"endCaptures": {
-								"0": {
-									"name": "punctuation.definition.template-expression.end"
-								}
-							}
-						},
-						{
-							"match": "(?:[:](?![\\s\\[\\]\\}(),;:|])|[^\\s\\[\\]{}(),;:|])+",
-							"name": "string.regexp.path-pattern-slice"
+							"include": "#path-pattern-interpolation-inner"
 						}
 					],
 					"end": "(?=$|[\\s})\\],;]|:(?=$|[\\s\\[\\]\\}(),;:|]))"
@@ -416,6 +416,51 @@
 				{
 					"name": "string.regexp.path-pattern",
 					"match": "%\\.{0,2}/(?:[:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|])*"
+				}
+			]
+		},
+		"path-pattern-interpolation-inner": {
+			"patterns": [
+				{
+					"begin": "\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.template-expression.begin"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.template-expression.end"
+						}
+					}
+				},
+				{
+					"match": "(?:[:](?![\\s\\[\\]\\}(),;:|])|[^\\s\\[\\]{}(),;:|])+",
+					"name": "string.regexp.path-pattern-slice"
+				}
+			]
+		},
+		"unprefixed-path-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp.path-pattern",
+					"begin": "\\.{0,2}/(?:[:]|[^\\s\\[\\]{}(),;:|])*(?=\\{)",
+					"patterns": [
+						{
+							"include": "#path-pattern-interpolation-inner"
+						}
+					],
+					"end": "(?=$|[\\s})\\],;]|:(?=$|[\\s\\[\\]\\}(),;:|]))"
+				},
+				{
+					"name": "string.regexp.path-pattern",
+					"match": "\\.{0,2}/(?:[:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|])*"
 				}
 			]
 		},
@@ -735,6 +780,15 @@
 					"include": "#unprefixed-string-patterns"
 				},
 				{
+					"include": "#unprefixed-regexps"
+				},
+				{
+					"include": "#unprefixed-path-patterns"
+				},
+				{
+					"include": "#unprefixed-url-patterns"
+				},
+				{
 					"match": "\\b([a-zA-Z_][a-zA-Z0-9._-]*)\\b(?![-a-zA-Z0-9_]*[?]?:)",
 					"comment": "unprefixed pattern name, the regex does not support last pattern names in union patterns",
 					"name": "entity.name.type.inox"
@@ -805,6 +859,31 @@
 		},
 		"pattern-declarations": {
 			"patterns": [
+				{
+					"comment": "declaration for a simple pattern",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=\\s*(?=`|[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							]
+						}
+					},
+					"end": "$",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
 				{
 					"comment": "declaration for an object or record pattern",
 					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(#?\\{)",
@@ -937,6 +1016,42 @@
 					"patterns": [
 						{
 							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "declaration for an complex string pattern",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(%?str)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							]
+						},
+						"4": {
+							"name": "entity.name.type.inox"
+						},
+						"5": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#complex-string-pattern-content"
 						}
 					]
 				},
@@ -1981,11 +2096,25 @@
 				}
 			]
 		},
-		"regex": {
+		"regexps": {
 			"patterns": [
 				{
 					"name": "string.regexp.inox",
 					"begin": "%`",
+					"end": "`",
+					"patterns": [
+						{
+							"include": "#regexp"
+						}
+					]
+				}
+			]
+		},
+		"unprefixed-regexps": {
+			"patterns": [
+				{
+					"name": "string.regexp.inox",
+					"begin": "`",
 					"end": "`",
 					"patterns": [
 						{
@@ -2665,7 +2794,7 @@
 					"include": "#numbers"
 				},
 				{
-					"include": "#regex"
+					"include": "#regexps"
 				}
 			]
 		},
@@ -3800,7 +3929,7 @@
 					"include": "#paths"
 				},
 				{
-					"include": "#regex"
+					"include": "#regexps"
 				},
 				{
 					"include": "#option-names"
