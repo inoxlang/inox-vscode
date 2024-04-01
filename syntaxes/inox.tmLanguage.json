@@ -1868,6 +1868,16 @@
 					"comment": "ignore binary expressions"
 				},
 				{
+					"comment": "return type is a simple pattern",
+					"begin": "(?<=\\))\\s*(?=((`|[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://).*)\\s*(\\{|=>))",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?=\\{|=>)"
+				},
+				{
 					"comment": "return type is a tuple pattern",
 					"begin": "(?<=\\))\\s*(?=#\\[)",
 					"patterns": [
