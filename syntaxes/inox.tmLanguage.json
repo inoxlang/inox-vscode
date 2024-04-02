@@ -1878,8 +1878,18 @@
 					"end": "(?=\\{|=>)"
 				},
 				{
-					"comment": "return type is a tuple pattern",
-					"begin": "(?<=\\))\\s*(?=#\\[)",
+					"comment": "return type is a list or tuple pattern with a an object or record as general element",
+					"begin": "(?<=\\))\\s*(?=#?\\[\\s*\\]#?\\{)",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?<=\\})(?=\\s*\\{)"
+				},
+				{
+					"comment": "return type is a list or tuple pattern",
+					"begin": "(?<=\\))\\s*(?=#?\\[)",
 					"patterns": [
 						{
 							"include": "#pattern-content"
