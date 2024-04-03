@@ -2563,14 +2563,9 @@
 				},
 				{
 					"comment": "shorthand syntax for calls with a single object argument",
-					"begin": "(@[a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\{)",
+					"begin": "(@[a-zA-Z_][a-zA-Z0-9_.-]*)(\\{)",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.name.function"
-						}
-					},
-					"patterns": [
-						{
 							"patterns": [
 								{
 									"include": "#meta-member-expressions"
@@ -2580,8 +2575,13 @@
 								}
 							]
 						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
 					],
-					"end": "}"
+					"end": "\\}"
 				}
 			]
 		},
@@ -2628,7 +2628,7 @@
 				},
 				{
 					"comment": "shorthand syntax for calls with a single object argument",
-					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=\\{)",
+					"begin": "\\b([a-zA-Z][a-zA-Z0-9_-]*)(\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "entity.name.function"
@@ -2639,7 +2639,7 @@
 							"include": "$self"
 						}
 					],
-					"end": "}"
+					"end": "\\}"
 				}
 			]
 		},
@@ -4043,6 +4043,9 @@
 				},
 				{
 					"include": "#keywords"
+				},
+				{
+					"include": "#meta-call-expressions"
 				},
 				{
 					"include": "#meta-member-expressions"
