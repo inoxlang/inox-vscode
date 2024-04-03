@@ -96,6 +96,15 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#meta-call-expressions"
+		},
+		{
+			"include": "#meta-member-expressions"
+		},
+		{
+			"include": "#meta-identifiers"
+		},
+		{
 			"include": "#function-calls"
 		},
 		{
@@ -273,6 +282,16 @@
 		"comments": {
 			"patterns": [
 				{
+					"name": "comment.block.region",
+					"begin": "@'",
+					"end": "'"
+				},
+				{
+					"name": "comment.block.region",
+					"begin": "@`",
+					"end": "`"
+				},
+				{
 					"comment": "tutorial metadata comments",
 					"begin": "(#[ \t](?:Series|Tutorial):\\s*(?:.*))(\\[.*)",
 					"end": "\\n",
@@ -325,7 +344,9 @@
 					"captures": {
 						"1": {
 							"patterns": [
-								{"include": "#url-patterns-inner"}
+								{
+									"include": "#url-patterns-inner"
+								}
 							]
 						}
 					}
@@ -340,7 +361,9 @@
 					"captures": {
 						"1": {
 							"patterns": [
-								{"include": "#url-patterns-inner"}
+								{
+									"include": "#url-patterns-inner"
+								}
 							]
 						}
 					}
@@ -775,6 +798,15 @@
 				},
 				{
 					"include": "#url-patterns"
+				},	
+				{
+					"include": "#meta-call-expressions"
+				},
+				{
+					"include": "#meta-member-expressions"
+				},
+				{
+					"include": "#meta-identifiers"
 				},
 				{
 					"include": "#unprefixed-string-patterns"
@@ -2474,6 +2506,85 @@
 				}
 			]
 		},
+		"meta-call-expressions": {
+			"patterns": [
+				{
+					"comment": "parenthesized call",
+					"begin": "(?:(@[a-zA-Z_][a-zA-Z0-9_.-]*)!?)(\\()",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#meta-member-expressions"
+								},
+								{
+									"include": "#meta-identifiers"
+								}
+							]
+						},
+						"2": {
+							"name": "punctuation.definition.begin.bracket.round"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					],
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.end.bracket.round"
+						}
+					}
+				},
+				{
+					"comment": "shorthand syntax for calls with a single string argument",
+					"begin": "(@[a-zA-Z_][a-zA-Z0-9_.-]*)(?=\")",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#meta-member-expressions"
+								},
+								{
+									"include": "#meta-identifiers"
+								}
+							]
+						}
+					},
+					"patterns": [
+						{
+							"include": "#strings"
+						}
+					],
+					"end": "(?<=\")",
+					"endCaptures": {}
+				},
+				{
+					"comment": "shorthand syntax for calls with a single object argument",
+					"begin": "(@[a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function"
+						}
+					},
+					"patterns": [
+						{
+							"patterns": [
+								{
+									"include": "#meta-member-expressions"
+								},
+								{
+									"include": "#meta-identifiers"
+								}
+							]
+						}
+					],
+					"end": "}"
+				}
+			]
+		},
 		"function-call-expressions": {
 			"patterns": [
 				{
@@ -2824,6 +2935,29 @@
 				{
 					"name": "entity.name.type",
 					"match": "(?<!\\w)%[a-zA-Z_][a-zA-Z0-9_-]*\\b"
+				}
+			]
+		},
+		"meta-member-expressions": {
+			"begin": "(@[a-zA-Z_][a-zA-Z0-9_-]*)(?=\\.)",
+			"captures": {
+				"1": {
+					"name": "variable.other.constant"
+				}
+			},
+			"patterns": [
+				{
+					"name": "variable.other.constant",
+					"match": "[a-zA-Z_][a-zA-Z0-9_-]*"
+				}
+			],
+			"end": "(\\n|(?<=\\.[a-zA-Z_][a-zA-Z0-9_-]*)(?=^|[^.]))"
+		},
+		"meta-identifiers": {
+			"patterns": [
+				{
+					"name": "variable.other.constant",
+					"match": "@[a-zA-Z_][a-zA-Z0-9_-]*\\b"
 				}
 			]
 		},
@@ -3909,6 +4043,12 @@
 				},
 				{
 					"include": "#keywords"
+				},
+				{
+					"include": "#meta-member-expressions"
+				},
+				{
+					"include": "#meta-identifiers"
 				},
 				{
 					"include": "#function-call-expressions"

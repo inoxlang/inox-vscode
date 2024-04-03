@@ -89,6 +89,14 @@
 						"settings": {
 							"foreground": "#3d3d3d8c"
 						}
+					},
+					{
+						"scope": [
+							"comment.block.region"
+						],
+						"settings": {
+							"foreground": "#20b953"
+						}
 					}
 				]
 			}
