@@ -126,7 +126,10 @@
 			"include": "#value-path-literals"
 		},
 		{
-			"include": "#comments"
+			"include": "#regular-comments"
+		},
+		{
+			"include": "#annotated-region-headers"
 		},
 		{
 			"include": "#host-patterns"
@@ -279,18 +282,8 @@
 				}
 			]
 		},
-		"comments": {
+		"regular-comments": {
 			"patterns": [
-				{
-					"name": "comment.block.region",
-					"begin": "@'",
-					"end": "'"
-				},
-				{
-					"name": "comment.block.region",
-					"begin": "@`",
-					"end": "`"
-				},
 				{
 					"comment": "tutorial metadata comments",
 					"begin": "(#[ \t](?:Series|Tutorial):\\s*(?:.*))(\\[.*)",
@@ -313,6 +306,20 @@
 					},
 					"end": "\\n",
 					"name": "comment.line"
+				}
+			]
+		},
+		"annotated-region-headers": {
+			"patterns": [
+				{
+					"name": "comment.block.region",
+					"begin": "@'",
+					"end": "'"
+				},
+				{
+					"name": "comment.block.region",
+					"begin": "@`",
+					"end": "`"
 				}
 			]
 		},
@@ -798,7 +805,7 @@
 				},
 				{
 					"include": "#url-patterns"
-				},	
+				},
 				{
 					"include": "#meta-call-expressions"
 				},
@@ -3777,6 +3784,9 @@
 					"include": "#client-side-xml-interpolation"
 				},
 				{
+					"include": "#annotated-region-headers"
+				},
+				{
 					"include": "#style-tag"
 				},
 				{
@@ -4075,7 +4085,7 @@
 					"include": "#value-path-literals"
 				},
 				{
-					"include": "#comments"
+					"include": "#regular-comments"
 				},
 				{
 					"include": "#host-patterns"
