@@ -807,6 +807,9 @@
 					"include": "#url-patterns"
 				},
 				{
+					"include": "#annotated-region-headers"
+				},
+				{
 					"include": "#meta-call-expressions"
 				},
 				{
