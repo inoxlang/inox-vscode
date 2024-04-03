@@ -323,14 +323,65 @@
 		"annotated-region-headers": {
 			"patterns": [
 				{
-					"name": "comment.block.region",
-					"begin": "@'",
-					"end": "'"
+					"begin": "(?<=^|\\s)(@'.*')",
+					"beginCaptures": {
+						"1": {
+							"name": "comment.block.region",
+							"patterns": [
+								{
+									"begin": "'",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.definition.string.begin.inox"
+										}
+									},
+									"end": "'",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.definition.string.end.inox"
+										}
+									},
+									"patterns": [
+										{
+											"include": "#single-quoted-string-content"
+										}
+									]
+								}
+							]
+						}
+					},
+					"end": "(?<=\\n|;)",
+					"patterns": [
+						{
+							"include": "#meta-call-expressions"
+						},
+						{
+							"include": "#meta-member-expressions"
+						},
+						{
+							"include": "#meta-identifiers"
+						}
+					]
 				},
 				{
-					"name": "comment.block.region",
-					"begin": "@`",
-					"end": "`"
+					"begin": "(?<=^|\\s)(@`.*`)",
+					"beginCaptures": {
+						"1": {
+							"name": "comment.block.region"
+						}
+					},
+					"end": "(?<=\\n|;)",
+					"patterns": [
+						{
+							"include": "#meta-call-expressions"
+						},
+						{
+							"include": "#meta-member-expressions"
+						},
+						{
+							"include": "#meta-identifiers"
+						}
+					]
 				}
 			]
 		},
@@ -2374,7 +2425,7 @@
 					"name": "string.quoted.double.inox",
 					"patterns": [
 						{
-							"include": "#stringcontent"
+							"include": "#double-quoted-string-content"
 						}
 					]
 				},
@@ -2396,10 +2447,22 @@
 				}
 			]
 		},
-		"stringcontent": {
+		"double-quoted-string-content": {
 			"patterns": [
 				{
 					"match": "(?x)                # turn on extended mode\n  \\\\                # a literal backslash\n  (?:               # ...followed by...\n    [\"\\\\/bfnrt]     # one of these characters\n    |               # ...or...\n    u               # a u\n    [0-9a-fA-F]{4}) # and four hex digits",
+					"name": "constant.character.escape.json"
+				},
+				{
+					"match": "\\\\.",
+					"name": "invalid.illegal.unrecognized-string-escape.inox"
+				}
+			]
+		},
+		"single-quoted-string-content": {
+			"patterns": [
+				{
+					"match": "(?x)                # turn on extended mode\n  \\\\                # a literal backslash\n  (?:               # ...followed by...\n    ['\\\\/bfnrt]     # one of these characters\n    |               # ...or...\n    u               # a u\n    [0-9a-fA-F]{4}) # and four hex digits",
 					"name": "constant.character.escape.json"
 				},
 				{
@@ -3982,7 +4045,7 @@
 							"end": "'",
 							"patterns": [
 								{
-									"include": "#stringcontent"
+									"include": "#single-quoted-string-content"
 								}
 							]
 						},
