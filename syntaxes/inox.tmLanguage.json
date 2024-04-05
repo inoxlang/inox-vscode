@@ -9,6 +9,9 @@
 			"include": "#unquoted-region"
 		},
 		{
+			"include": "#prefixed-xml-patterns"
+		},
+		{
 			"include": "#hs-script-tag-expression"
 		},
 		{
@@ -43,9 +46,6 @@
 		},
 		{
 			"include": "#union-patterns"
-		},
-		{
-			"include": "#prefixed-xml-patterns"
 		},
 		{
 			"include": "#pattern-declarations"
@@ -4077,7 +4077,7 @@
 			"patterns": [
 				{
 					"comment": "implicit namespace",
-					"begin": "%(?=<[a-zA-Z][a-zA-Z_-]*[ >{/*+?])",
+					"begin": "%(?=<[a-zA-Z][a-zA-Z_-]*($|[ >{/*+?]))",
 					"patterns": [
 						{
 							"include": "#xml-pattern-inner"
@@ -4388,6 +4388,9 @@
 					"include": "#new-expressions"
 				},
 				{
+					"include": "#prefixed-xml-patterns"
+				},
+				{
 					"include": "#hs-script-tag-expression"
 				},
 				{
@@ -4422,9 +4425,6 @@
 				},
 				{
 					"include": "#union-patterns"
-				},
-				{
-					"include": "#prefixed-xml-patterns"
 				},
 				{
 					"include": "#pattern-calls"
