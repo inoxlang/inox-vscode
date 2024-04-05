@@ -45,6 +45,9 @@
 			"include": "#union-patterns"
 		},
 		{
+			"include": "#prefixed-xml-patterns"
+		},
+		{
 			"include": "#pattern-declarations"
 		},
 		{
@@ -908,6 +911,9 @@
 				},
 				{
 					"match": "\\|"
+				},
+				{
+					"include": "#unprefixed-xml-patterns"
 				},
 				{
 					"comment": "This pattern needs to be present here because of #unprefixed-object-record-patterns",
@@ -2186,7 +2192,7 @@
 				},
 				{
 					"comment": "in 'end' `]` is for list/tuple patterns with a general element pattern starting with '{'",
-					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://|[`$a-zA-Z0-9{\\[\\|\\(%])",
+					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://|[`$a-zA-Z0-9{\\[\\|\\(%<])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
@@ -3772,7 +3778,7 @@
 				}
 			]
 		},
-		"xml-tag-in-expression": {
+		"not-used--xml-tag-in-expression": {
 			"begin": "(?x)\n  (?<!\\+\\+|--)(?<=[({\\[,?=>:*]|&&|\\|\\||\\?|\\*\\/|^await|[^\\._$[:alnum:]]await|^return|[^\\._$[:alnum:]]return|^default|[^\\._$[:alnum:]]default|^yield|[^\\._$[:alnum:]]yield|^)\\s*\n  (?!<\\s*[_$[:alpha:]][_$[:alnum:]]*((\\s+extends\\s+[^=>])|,)) # look ahead is not type parameter of arrow\n  (?=(<)\\s*(?:([_$[:alpha:]][-_$[:alnum:].]*)(?<!\\.|-)(:))?((?:[a-z][a-z0-9]*|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-))(?=((<\\s*)|(\\s+))(?!\\?)|\\/?>))",
 			"end": "(?!(<)\\s*(?:([_$[:alpha:]][-_$[:alnum:].]*)(?<!\\.|-)(:))?((?:[a-z][a-z0-9]*|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-))(?=((<\\s*)|(\\s+))(?!\\?)|\\/?>))",
 			"patterns": [
@@ -3830,9 +3836,6 @@
 					},
 					"end": "(?=[/]?>)",
 					"patterns": [
-						{
-							"include": "#type-arguments"
-						},
 						{
 							"include": "#xml-tag-attributes"
 						}
@@ -3967,6 +3970,7 @@
 			"end": "\\}(\\s*\\.)|(?=\\s*>)"
 		},
 		"xml-tag-attribute-name": {
+			"comment": "Note: /\\*  should be kept",
 			"match": "(?x)\n  \\s*\n  (?:([_$[:alpha:]][-_$[:alnum:].]*)(:))?\n  ([_$[:alpha:]][-_$[:alnum:]]*)\n  (?=\\s|=|/?>|/\\*|//)",
 			"captures": {
 				"1": {
@@ -3982,7 +3986,7 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|/\\*|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|#\\s|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
@@ -4069,6 +4073,306 @@
 			],
 			"end": "\\)"
 		},
+		"prefixed-xml-patterns": {
+			"patterns": [
+				{
+					"comment": "implicit namespace",
+					"begin": "%(?=<[a-zA-Z][a-zA-Z_-]*[ >{/*+?])",
+					"patterns": [
+						{
+							"include": "#xml-pattern-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				},
+				{
+					"comment": "implicit namespace, single line",
+					"begin": "%(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z*+?]|\\s*[<>/]))",
+					"patterns": [
+						{
+							"include": "#xml-pattern-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				}
+			]
+		},
+		"unprefixed-xml-patterns": {
+			"patterns": [
+				{
+					"comment": "implicit namespace",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*[ >{/*+?])",
+					"patterns": [
+						{
+							"include": "#xml-pattern-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				},
+				{
+					"comment": "implicit namespace, single line",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z*+?]|\\s*[<>/*+?]))",
+					"patterns": [
+						{
+							"include": "#xml-pattern-inner"
+						}
+					],
+					"end": "(?<=(/>)|(</)([a-zA-Z_][a-zA-Z0-9_-]*)[ \t]*(>)?)"
+				}
+			]
+		},
+		"xml-pattern-inner": {
+			"patterns": [
+				{
+					"include": "#xml-pattern-tag-without-attributes"
+				},
+				{
+					"include": "#xml-pattern-tag"
+				}
+			]
+		},
+		"xml-tag-without-attributes-in-pattern": {
+			"begin": "\\s*(?=(<)(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)(\\s*[*+?])?\\s*(>))",
+			"end": "(?!(<)(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)\\s*(>))",
+			"patterns": [
+				{
+					"include": "#xml-pattern-tag-without-attributes"
+				}
+			]
+		},
+		"xml-pattern-tag-without-attributes": {
+			"name": "meta.tag.without-attributes.inox",
+			"begin": "(<)(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)(\\s*[*+?])?\\s*(>)",
+			"end": "(</)\\s*(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)\\s*(>)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin.inox"
+				},
+				"2": {
+					"name": "entity.name.type.inox"
+				},
+				"3": {
+					"name": "entity.name.type.inox"
+				},
+				"4": {
+					"patterns": [
+						{
+							"match": "[*+?]",
+							"name": "keyword.operator.quantifier.regexp"
+						}
+					]
+				},
+				"5": {
+					"name": "punctuation.definition.tag.end.inox"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin.inox"
+				},
+				"2": {
+					"name": "entity.name.type.inox"
+				},
+				"3": {
+					"name": "entity.name.type.inox"
+				},
+				"4": {
+					"name": "punctuation.definition.tag.end.inox"
+				}
+			},
+			"contentName": "meta.xml.children.inox",
+			"patterns": [
+				{
+					"include": "#xml-pattern-children"
+				}
+			]
+		},
+		"xml-pattern-tag": {
+			"name": "meta.tag.inox",
+			"begin": "(?=(<)(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)(\\s*[*+?])?(?=(<\\s*|\\s+)(?!\\?)|\\/?>))",
+			"end": "(/>)|(?:(</)\\s*(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)\\s*(>))",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.end.inox"
+				},
+				"2": {
+					"name": "punctuation.definition.tag.begin.inox"
+				},
+				"3": {
+					"name": "entity.name.type.inox"
+				},
+				"4": {
+					"name": "entity.name.type.inox"
+				},
+				"5": {
+					"name": "punctuation.definition.tag.end.inox"
+				}
+			},
+			"patterns": [
+				{
+					"begin": "(<)(?:([a-z][a-z0-9]*)|([_$[:alpha:]][-_$[:alnum:].]*))(?<!\\.|-)(\\s*[*+?])?(?=((<\\s*)|(\\s+))(?!\\?)|\\/?>)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.tag.begin.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"name": "entity.name.type.inox"
+						},
+						"4": {
+							"patterns": [
+								{
+									"match": "[*+?]",
+									"name": "keyword.operator.quantifier.regexp"
+								}
+							]
+						}
+					},
+					"end": "(?=[/]?>)",
+					"patterns": [
+						{
+							"include": "#xml-pattern-tag-attributes"
+						}
+					]
+				},
+				{
+					"begin": "(>)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.tag.end.inox"
+						}
+					},
+					"end": "(?=</)",
+					"contentName": "meta.xml.children.inox",
+					"patterns": [
+						{
+							"include": "#xml-pattern-children"
+						}
+					]
+				}
+			]
+		},
+		"xml-pattern-children": {
+			"patterns": [
+				{
+					"include": "#client-side-xml-interpolation"
+				},
+				{
+					"include": "#annotated-region-headers"
+				},
+				{
+					"include": "#xml-pattern-tag-without-attributes"
+				},
+				{
+					"include": "#xml-pattern-tag"
+				},
+				{
+					"include": "#xml-pattern-evaluated-code"
+				},
+				{
+					"include": "#xml-entities"
+				},
+				{
+					"match": "[*]",
+					"name": "constant.language.special.wildcard.xml-pattern.inox"
+				}
+			]
+		},
+		"xml-pattern-evaluated-code": {
+			"contentName": "meta.embedded.expression.inox",
+			"begin": "\\{",
+			"end": "\\}",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.embedded.begin.inox"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.embedded.end.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#pattern-content"
+				}
+			]
+		},
+		"xml-pattern-tag-attributes": {
+			"name": "meta.tag.attributes.inox",
+			"begin": "\\s+",
+			"end": "(?=[/]?>)",
+			"patterns": [
+				{
+					"include": "#hyperscript-block"
+				},
+				{
+					"begin": "(?=<\\{)",
+					"patterns": [
+						{
+							"include": "#unquoted-region"
+						}
+					],
+					"end": "(?<=\\}>)(?=[=]?)"
+				},
+				{
+					"include": "#xml-pattern-tag-attribute-name"
+				},
+				{
+					"include": "#xml-pattern-tag-attribute-assignment"
+				},
+				{
+					"include": "#xml-pattern-string-double-quoted"
+				},
+				{
+					"include": "#pattern-content"
+				},
+				{
+					"include": "#xml-tag-attributes-illegal"
+				}
+			]
+		},
+		"xml-pattern-tag-attribute-name": {
+			"comment": "Note: /\\*  should be kept",
+			"match": "(?<![=])(?x)\n  \\s*\n  (?:([_$[:alpha:]][-_$[:alnum:].]*)(:))?\n  ([_$[:alpha:]][-_$[:alnum:]]*)\n  (?=\\s|=|/?>|/\\*|//)",
+			"captures": {
+				"1": {
+					"name": "entity.other.attribute-name.namespace.inox"
+				},
+				"2": {
+					"name": "punctuation.separator.namespace.inox"
+				},
+				"3": {
+					"name": "entity.other.attribute-name.inox"
+				}
+			}
+		},
+		"xml-pattern-tag-attribute-assignment": {
+			"name": "keyword.operator.assignment.inox",
+			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|#\\s|//|\\n))"
+		},
+		"xml-pattern-string-double-quoted": {
+			"name": "string.quoted.double.inox",
+			"begin": "\"",
+			"end": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.inox"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.inox"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#xml-entities"
+				}
+			]
+		},
 		"expressions-and-comments": {
 			"patterns": [
 				{
@@ -4118,6 +4422,9 @@
 				},
 				{
 					"include": "#union-patterns"
+				},
+				{
+					"include": "#prefixed-xml-patterns"
 				},
 				{
 					"include": "#pattern-calls"
