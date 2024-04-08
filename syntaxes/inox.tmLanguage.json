@@ -604,7 +604,7 @@
 				{
 					"comment": "unquoted path expression",
 					"name": "string.interpolated.path-expression",
-					"begin": "\\.{0,2}/(?:[:]|[^\\s\\[\\]{}(),;:|])*(?=\\{)",
+					"begin": "\\.{0,2}/(?:[:]|[^\\s\\[\\]{}(),;:|>])*(?=\\{)",
 					"patterns": [
 						{
 							"begin": "\\{",
@@ -635,7 +635,7 @@
 				{
 					"comment": "unquoted path literal",
 					"name": "string.unquoted",
-					"match": "\\.{0,2}/(?:[:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|])*"
+					"match": "\\.{0,2}/(?:[:][^\\s\\[\\]{}(),;:|]|[^\\s\\[\\]{}(),;:|>])*"
 				}
 			]
 		},
