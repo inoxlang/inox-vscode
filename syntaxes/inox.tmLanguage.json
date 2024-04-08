@@ -4055,7 +4055,16 @@
 					"include": "#xml-string-double-quoted"
 				},
 				{
-					"include": "$self"
+					"begin": "\\(",
+					"patterns": [
+						{
+							"include": "#expressions-and-comments"
+						}
+					],
+					"end": "\\)"
+				},
+				{
+					"include": "#expressions-and-comments"
 				},
 				{
 					"include": "#xml-tag-attributes-illegal"
@@ -4070,7 +4079,7 @@
 					"include": "source._hyperscript-inox"
 				}
 			],
-			"end": "\\}(\\s*\\.)|(?=\\s*>)"
+			"end": "\\}((\\s*\\.)|(?=\\s*/?>))"
 		},
 		"xml-tag-attribute-name": {
 			"comment": "Note: /\\*  should be kept",
@@ -4089,7 +4098,7 @@
 		},
 		"xml-tag-attribute-assignment": {
 			"name": "keyword.operator.assignment.inox",
-			"match": "=(?=\\s*(?:'|\"|`|{|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|#\\s|//|\\n))"
+			"match": "=(?=\\s*(?:'|\"|`|{|[(]|\\[|%|\\.|\\/[^>]|<|[a-zA-Z0-9_]|\\$|@|#\\s|//|\\n))"
 		},
 		"xml-string-double-quoted": {
 			"name": "string.quoted.double.inox",
