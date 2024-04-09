@@ -2271,18 +2271,12 @@
 			"patterns": [
 				{
 					"comment": "missing right operand",
-					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|\\)))",
-					"beginCaptures": {
+					"match": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|\\)|or\\b|and\\b))",
+					"captures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
 						}
-					},
-					"patterns": [
-						{
-							"include": "#pattern-content"
-						}
-					],
-					"end": "(?<!\\G)(?=[{)\\n])"
+					}
 				},
 				{
 					"comment": "in 'end' `]` is for list/tuple patterns with a general element pattern starting with '{'",
@@ -2297,7 +2291,7 @@
 							"include": "#pattern-content"
 						}
 					],
-					"end": "(?<!\\G|\\])(?=[{)\\n])"
+					"end": "(?<!\\G|\\])(?=\\s*([{)\\n]|or\\b|and\\b))"
 				}
 			]
 		},
