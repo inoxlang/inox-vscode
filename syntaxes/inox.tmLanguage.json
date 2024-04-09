@@ -87,6 +87,12 @@
 			"include": "#return-type"
 		},
 		{
+			"include": "#misplaced-if-keyword"
+		},
+		{
+			"include": "#misplaced-for-keyword"
+		},
+		{
 			"include": "#binary-match"
 		},
 		{
@@ -4101,6 +4107,10 @@
 					"end": "(?<=\\}>)(?=[=]?)"
 				},
 				{
+					"match": "(?<=[=])(for|if)\\b",
+					"name": "invalid.illegal.misplaced-keyword.inox"
+				},
+				{
 					"include": "#xml-tag-attribute-name"
 				},
 				{
@@ -4485,6 +4495,10 @@
 					"end": "(?<=\\}>)(?=[=]?)"
 				},
 				{
+					"match": "(?<=[=])(for|if)\\b",
+					"name": "invalid.illegal.misplaced-keyword.inox"
+				},
+				{
 					"include": "#xml-pattern-tag-attribute-name"
 				},
 				{
@@ -4603,6 +4617,12 @@
 					"include": "#functions"
 				},
 				{
+					"include": "#misplaced-if-keyword"
+				},
+				{
+					"include": "#misplaced-for-keyword"
+				},
+				{
 					"include": "#keywords"
 				},
 				{
@@ -4682,6 +4702,23 @@
 				},
 				{
 					"include": "#objects"
+				}
+			]
+		},
+		"misplaced-for-keyword":  {
+			"patterns": [
+				{
+					"comment": "misplaced for expressions",
+					"match": "(?<=([a-zA-Z]|[^$a-zA-Z0-9_\\s]=|[-+*/<>?.\\\\])\\s*)for\\b",
+					"name": "invalid.illegal.misplaced-for-keyword.inox"
+				}
+			]
+		},
+		"misplaced-if-keyword": {
+			"patterns": [
+				{
+					"match": "(?<!^\\s*|[({;]\\s*)\\bif\\b",
+					"name": "invalid.illegal.misplaced-if-keyword.inox"
 				}
 			]
 		}
