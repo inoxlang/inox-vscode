@@ -921,6 +921,9 @@
 					"include": "#unprefixed-url-patterns"
 				},
 				{
+					"include": "#unprefixed-pattern-calls"
+				},
+				{
 					"include": "#unprefixed-pattern-names"
 				},
 				{
@@ -1391,6 +1394,64 @@
 							"patterns": [
 								{
 									"include": "#prefixed-pattern-names"
+								}
+							]
+						},
+						"2": {
+							"name": "punctuation.begin.curly.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "[}]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.curly.bracket.inox"
+						}
+					}
+				}
+			]
+		},
+		"unprefixed-pattern-calls": {
+			"patterns": [
+				{
+					"comment": "unprefixed pattern call",
+					"begin": "([a-zA-Z_][a-zA-Z0-9_.-]*)([(])",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#unprefixed-pattern-names"
+								}
+							]
+						},
+						"2": {
+							"name": "punctuation.begin.bracket.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "[)]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.inox"
+						}
+					}
+				},
+				{
+					"comment": "unprefixed pattern call with shorthand syntax",
+					"begin": "([a-zA-Z_][a-zA-Z0-9_.-]*)([{])",
+					"beginCaptures": {
+						"1": {
+							"patterns": [
+								{
+									"include": "#unprefixed-pattern-names"
 								}
 							]
 						},
@@ -2271,7 +2332,7 @@
 			"patterns": [
 				{
 					"comment": "missing right operand",
-					"match": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|\\)|or\\b|and\\b))",
+					"match": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|[)}\\],]|or\\b|and\\b))",
 					"captures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
