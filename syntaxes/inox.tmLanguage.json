@@ -897,9 +897,6 @@
 					"include": "#constants"
 				},
 				{
-					"include": "#keywords"
-				},
-				{
 					"include": "#url-patterns"
 				},
 				{
