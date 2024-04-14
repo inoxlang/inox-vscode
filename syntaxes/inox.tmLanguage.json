@@ -224,6 +224,10 @@
 				{
 					"name": "variable.name",
 					"match": "[$][_a-zA-Z-]*\\b"
+				},
+				{
+					"match": "[$](?![a-zA-Z0-9_])",
+					"name": "variable.name"
 				}
 			]
 		},
@@ -881,7 +885,7 @@
 					"patterns": [
 						{
 							"match": "[a-zA-Z_][a-zA-Z0-9_-]*",
-							"name": "entity.name.type.inox.xy"
+							"name": "entity.name.type.inox"
 						}
 					]
 				}
@@ -985,7 +989,7 @@
 							"include": "$self"
 						}
 					],
-					"end": "(?=[,:)\\}\\]])"
+					"end": "(?=[,:)\\}\\]>]|/>)"
 				},
 				{
 					"include": "#expressions-and-comments"
@@ -3220,7 +3224,7 @@
 				},
 				{
 					"name": "variable.name",
-					"match": "[_a-zA-Z-]*\\b"
+					"match": "[a-z_][a-zA-Z0-9_-]*\\b"
 				}
 			]
 		},
@@ -4497,7 +4501,13 @@
 					"include": "#xml-pattern-string-double-quoted"
 				},
 				{
-					"include": "#pattern-content"
+					"begin": "(?=[$_A-Za-z%\\[{#])",
+					"end": "(?=\\s*[/]?>)",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
 				},
 				{
 					"include": "#xml-tag-attributes-illegal"
