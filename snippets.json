@@ -155,7 +155,7 @@
         "scope": "Inox",
         "prefix": "importmod",
         "body": [
-            "import res$1 https://$2.ix {",
+            "import ${1:res} /${2:name}.ix {",
             "\targuments: {$3}",
             "\tallow: {",
             "\t\t$4",
