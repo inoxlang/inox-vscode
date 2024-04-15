@@ -27,7 +27,11 @@
 					".ix"
 				],
 				"configuration": "./language-configuration.json",
-				"firstLine": "(\\s*#!.*\\binox\\b.*|manifest\\s*[{])"
+				"firstLine": "(\\s*#!.*\\binox\\b.*|manifest\\s*[{])",
+				"icon": {
+					"dark": "assets/inox-fileicon-dark-mode.png",
+					"light": "assets/inox-fileicon-light-mode.png"
+				}
 			},
 			{
                 "id": "_hyperscript-inox",
