@@ -3224,6 +3224,10 @@
 				},
 				{
 					"name": "variable.name",
+					"match": "[A-Z_][a-zA-Z0-9_-]*[a-z][a-zA-Z0-9_-]*\\b"
+				},
+				{
+					"name": "variable.name",
 					"match": "[a-z_][a-zA-Z0-9_-]*\\b"
 				}
 			]
