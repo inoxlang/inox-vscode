@@ -749,6 +749,30 @@
 				}
 			]
 		},
+		"dictionary-patterns": {
+			"comment": "dictionary patterns are always unprefixed",
+			"patterns": [
+				{
+					"begin": ":\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				}
+			]
+		},
 		"list-patterns": {
 			"patterns": [
 				{
@@ -994,6 +1018,9 @@
 					"include": "#unprefixed-list-patterns"
 				},
 				{
+					"include": "#dictionary-patterns"
+				},
+				{
 					"include": "#unprefixed-object-record-patterns"
 				},
 				{
@@ -1068,6 +1095,39 @@
 				{
 					"comment": "declaration for an object or record pattern",
 					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(#?\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.inox"
+						},
+						"2": {
+							"name": "entity.name.type.inox"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							]
+						},
+						"4": {
+							"name": "punctuation.begin.bracket.curly.inox"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.end.bracket.curly.inox"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					]
+				},
+				{
+					"comment": "declaration for a dictionary  pattern",
+					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(:\\{)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.other.inox"
