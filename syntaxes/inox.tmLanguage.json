@@ -407,6 +407,40 @@
 				{
 					"name": "string.regexp",
 					"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/([-a-zA-Z0-9.*]*)\\.\\*+(:[0-9]{1,4})?"
+				},
+				{
+					"name": "string.regexp",
+					"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/[a-zA-Z0-9]+[-a-zA-Z0-9.]*(:[0-9]{1,4})?"
+				},
+				{
+					"comment": "unterminated host pattern",
+					"patterns": [
+						{
+							"name": "string.regexp",
+							"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/?(?![a-z0-9])"
+						},
+						{
+							"name": "string.regexp",
+							"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/(?!/)"
+						}
+						
+					]
+				}
+			]
+		},
+		"unprefixed-host-patterns": {
+			"patterns": [
+				{
+					"name": "string.regexp",
+					"match": "([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/\\*+(\\.[-a-zA-Z0-9.*]*)?(:[0-9]{1,4})?"
+				},
+				{
+					"name": "string.regexp",
+					"match": "([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/([-a-zA-Z0-9.*]*)\\.\\*+(:[0-9]{1,4})?"
+				},
+				{
+					"name": "string.regexp",
+					"match": "([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/\\/[a-zA-Z0-9][-a-zA-Z0-9.]*(:[0-9]{1,4})?"
 				}
 			]
 		},
@@ -503,6 +537,11 @@
 				{
 					"name": "string.unquoted.scheme",
 					"match": "[a-zA-Z][-a-zA-Z0-9+]*://"
+				},
+				{
+					"comment": "unterminated schemes",
+					"name": "string.unquoted.scheme",
+					"match": "[a-zA-Z][-a-zA-Z0-9+]*:/(?!/)"
 				}
 			]
 		},
@@ -922,6 +961,9 @@
 				},
 				{
 					"include": "#unprefixed-url-patterns"
+				},
+				{
+					"include": "#unprefixed-host-patterns"
 				},
 				{
 					"include": "#unprefixed-pattern-calls"
