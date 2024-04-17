@@ -306,7 +306,7 @@
 					{
 						"type": "inox",
 						"request": "launch",
-						"name": "Launch Main Program",
+						"name": "Launch Main Module",
 						"program": "/main.ix",
 						"logLevels": {
 							"default": "debug",
@@ -317,7 +317,7 @@
 					{
 						"type": "inox",
 						"request": "launch",
-						"name": "Launch Current Program",
+						"name": "Launch Current Module",
 						"program": "${file}",
 						"logLevels": {
 							"default": "debug",

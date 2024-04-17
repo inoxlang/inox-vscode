@@ -33,11 +33,11 @@ export function registerRunDebugLensAndCommands(ctx: InoxExtensionContext) {
                 return
             }
             const configurations = (launch as Record<string, unknown>).configurations as Record<string, unknown>
-            const lowercaseConfigName = 'launch current program'
+            const lowercaseConfigName = 'launch current module'
 
             let usedConfig: unknown
 
-            //find configuration for 'Launch Current Program'
+            //find configuration for 'Launch Current Module'
             for(const [_, config] of Object.entries(configurations)){
                 if(config !== null && (typeof config == 'object') && ('name' in config)){
                     const lowercase = String((config as Record<string, unknown>).name).toLowerCase()

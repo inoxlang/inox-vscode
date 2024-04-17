@@ -417,7 +417,7 @@ function formatHelpMessage(commandTitle: string) {
         `# This file is a tutorial file. Click just above on [${commandTitle}] to load a tutorial.`,
         '# You can execute an Inox program in VSCode by doing the following:',
         "# - Click on 'Run and Debug' in the activity bar (left)",
-        "# - Select the 'Launch Current Program' task",
+        "# - Select the 'Launch Module Program' task",
         "# - Click on the green arrow",
         "manifest {}",
     ]).join('\n')

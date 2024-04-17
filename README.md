@@ -143,7 +143,7 @@ the status should be the following:\
 ### Running and debugging a program
 
 - Click on the same icon as in the screenshot.
-- Select the `Launch Current Program` task, the other task always executes `/main.ix`.
+- Select the `Launch Current Module` task, the other task always executes `/main.ix`.
 - Click on the green arrow.
 
 ![run & debug](assets/docs/run-debug.png)
