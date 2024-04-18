@@ -9,7 +9,6 @@ export const RUN_ALL_TESTS_IN_FILE_CMD_NAME = "inox.testing.run-all-tests-in-fil
 export const RUN_TESTSUITE_IN_FILE_CMD_NAME = "inox.testing.run-suite-in-file"
 export const RUN_TESTCASE_IN_FILE_CMD_NAME = "inox.testing.run-case-in-file"
 
-
 const TEST_FILE_METHOD = "testing/testFileAsync"
 const STOP_TEST_RUN_METHOD = "testing/stopRun"
 
@@ -23,7 +22,7 @@ const FILE_TEST_DEFAULT_TIMEOUT = 10_000
 const TEST_FILE_REQUEST_CANCELLATION_TOKEN_TIMEOUT = 5000
 
 
-interface Filter {
+export interface Filter {
     regex: string
     path?: string
     span?: NodeSpan

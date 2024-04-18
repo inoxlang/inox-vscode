@@ -1,11 +1,13 @@
 
 import * as vscode from 'vscode';
-import { findTestSuiteAndCaseStatements, getNodeBase, getSpanLineColumn, parseInoxChunk } from '../parse/mod';
+import { DEBUG_TESTS_IN_FILE_CMD_NAME } from '../debug/mod';
 import { InoxExtensionContext } from '../inox-extension-context';
 import { INOX_FS_SCHEME } from '../inoxfs/mod';
+import { findTestSuiteAndCaseStatements, getNodeBase, getSpanLineColumn, parseInoxChunk } from '../parse/mod';
 import { RUN_ALL_TESTS_IN_FILE_CMD_NAME, RUN_TESTCASE_IN_FILE_CMD_NAME, RUN_TESTSUITE_IN_FILE_CMD_NAME, registerCommands } from './commands';
 
 export const SPEC_FILE_SUFFIX = ".spec.ix"
+export {Filter} from './commands'
 
 export function registerSpecCodeLensAndCommands(ctx: InoxExtensionContext) {
     const provider = new SpecFileLensProvider(ctx)
@@ -36,7 +38,7 @@ export class SpecFileLensProvider implements vscode.CodeLensProvider {
         let topOfDocument = new vscode.Range(0, 0, 0, 0)
         const selectSeriesCommand: vscode.Command = {
             command: RUN_ALL_TESTS_IN_FILE_CMD_NAME,
-            title: 'Run All Tests',
+            title: 'run all tests',
             arguments: [{ document }]
         }
 
@@ -54,29 +56,37 @@ export class SpecFileLensProvider implements vscode.CodeLensProvider {
 
         const lenses = [new vscode.CodeLens(topOfDocument, selectSeriesCommand)]
 
-        //add a lens above each test suite and test case statement.
+        //Add lenses above each test suite and test case statement.
         await Promise.allSettled(statements.map(async stmt => {
             const span = getNodeBase(stmt)!.span
             const [line, column] = await getSpanLineColumn(this.ctx, chunkId, span.start, span.end)
 
-            let cmd: vscode.Command
+            let cmds: vscode.Command[] = []
             if ('base:test-suite-expr' in stmt) {
-                cmd = {
+                cmds.push({
                     command: RUN_TESTSUITE_IN_FILE_CMD_NAME,
-                    title: 'Run Suite',
+                    title: 'run suite',
                     arguments: [{ document, span }]
-                }
+                })
             } else {
-                cmd = {
+                cmds.push({
                     command: RUN_TESTCASE_IN_FILE_CMD_NAME,
-                    title: 'Run Test',
+                    title: 'run test',
                     arguments: [{ document, span }]
-                }
+                })
+                cmds.push({
+                    command: DEBUG_TESTS_IN_FILE_CMD_NAME,
+                    title: "debug test",
+                    arguments: [{ document, span }]
+                })
             }
 
             let range = new vscode.Range(line - 1, column - 1, line - 1, column - 1)
-            const lens = new vscode.CodeLens(range, cmd)
-            lenses.push(lens)
+
+            for(const cmd of cmds){
+                const lens = new vscode.CodeLens(range, cmd)
+                lenses.push(lens)
+            }
         }))
         return lenses
     }

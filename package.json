@@ -34,15 +34,15 @@
 				}
 			},
 			{
-                "id": "_hyperscript-inox",
-                "aliases": [
-                    "_hyperscript-inox"
-                ],
+				"id": "_hyperscript-inox",
+				"aliases": [
+					"_hyperscript-inox"
+				],
 				"extensions": [
 					"._hs"
 				],
-                "configuration": "./hyperscript-language-configuration.json"
-            }
+				"configuration": "./hyperscript-language-configuration.json"
+			}
 		],
 		"grammars": [
 			{
@@ -51,13 +51,13 @@
 				"path": "./syntaxes/inox.tmLanguage.json"
 			},
 			{
-                "language": "_hyperscript-inox",
-                "scopeName": "source._hyperscript-inox",
-                "path": "./syntaxes/_hyperscript-inox.tmLanguage.json",
-                "embeddedLanguages": {
-                    "meta.embedded.line.js": "javascript"
-                }
-            }
+				"language": "_hyperscript-inox",
+				"scopeName": "source._hyperscript-inox",
+				"path": "./syntaxes/_hyperscript-inox.tmLanguage.json",
+				"embeddedLanguages": {
+					"meta.embedded.line.js": "javascript"
+				}
+			}
 		],
 		"snippets": [
 			{
@@ -263,10 +263,13 @@
 								"type": "string",
 								"description": "The program to debug."
 							},
+							"id": {
+								"type": "string"
+							},
 							"positiveTestFilters": {
 								"type": "array",
 								"items": {
-									"type":"object",
+									"type": "object",
 									"required": [
 										"regex"
 									],
@@ -278,7 +281,7 @@
 											"type": "string"
 										},
 										"span": {
-											"type":"object",
+											"type": "object",
 											"properties": {
 												"regex": {
 													"type": "integer"
@@ -346,6 +349,7 @@
 						"type": "inox",
 						"request": "launch",
 						"name": "Launch Current Module",
+						"id": "run-debug-current",
 						"program": "${file}",
 						"logLevels": {
 							"default": "debug",
@@ -356,8 +360,13 @@
 						"type": "inox",
 						"request": "launch",
 						"name": "Debug Tests in Current Module",
+						"id": "debug-tests-current",
 						"program": "${file}",
-						"positiveTestFilters": [{"regex": ".*"}],
+						"positiveTestFilters": [
+							{
+								"regex": ".*"
+							}
+						],
 						"logLevels": {
 							"default": "debug",
 							"enableInternalDebug": false

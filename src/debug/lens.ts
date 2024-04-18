@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { InoxExtensionContext } from '../inox-extension-context';
+import { INOX_FS_SCHEME } from '../inoxfs/consts';
 import { getSpanEndLineColumn, getSpanLineColumn, loadWASMParsingModule, parseInoxChunk } from '../parse/mod';
 import { SPEC_FILE_SUFFIX } from '../testing/mod';
-import { INOX_FS_SCHEME } from '../inoxfs/consts';
+import { RUN_DEBUG_CURRENT_FILE_CMD_NAME, registerCommands } from './commands';
 
 
-export const RUN_DEBUG_CURRENT_FILE_CMD_NAME = 'inox.debug.run-debug-current'
+
 
 export function registerRunDebugLensAndCommands(ctx: InoxExtensionContext) {
     const provider = new RunDebugCodeLensProvider(ctx)
@@ -20,44 +21,8 @@ export function registerRunDebugLensAndCommands(ctx: InoxExtensionContext) {
     )
 
     ctx.base.subscriptions.push(codeLensProviderDisposable)
-    
-    vscode.commands.registerCommand(
-        RUN_DEBUG_CURRENT_FILE_CMD_NAME,
-        async ({ document }: { document: vscode.TextDocument, }) => {
 
-            const workspaceConfig = vscode.workspace.getConfiguration()
-            const launch = workspaceConfig.get('launch')
-
-            if(launch === null || (typeof launch != 'object') || !('configurations' in launch)){
-                vscode.window.showErrorMessage('Failed to read launch configurations in workspace configuration')
-                return
-            }
-            const configurations = (launch as Record<string, unknown>).configurations as Record<string, unknown>
-            const lowercaseConfigName = 'launch current module'
-
-            let usedConfig: unknown
-
-            //find configuration for 'Launch Current Module'
-            for(const [_, config] of Object.entries(configurations)){
-                if(config !== null && (typeof config == 'object') && ('name' in config)){
-                    const lowercase = String((config as Record<string, unknown>).name).toLowerCase()
-
-                    if(lowercase == lowercaseConfigName) {
-                        usedConfig = config
-                        break
-                    }
-                }
-            }
-
-            if(usedConfig === undefined) {
-                vscode.window.showErrorMessage(`'${lowercaseConfigName}' (case insensitive) launch configuration not found in workspace configuration`)
-                return
-            }
-
-            vscode.commands.executeCommand('debug.startFromConfig', usedConfig)
-        }
-    )
-
+    registerCommands()
 }
 
 export class RunDebugCodeLensProvider implements vscode.CodeLensProvider {
@@ -91,8 +56,8 @@ export class RunDebugCodeLensProvider implements vscode.CodeLensProvider {
             const range = new vscode.Range(line - 1, column - 1, line - 1, column - 1)
 
             //don't show lenses if the databases are provided by another module.
-            const lines = text.split('\n').slice(line-1, endLine)
-            if(lines.some(line => /"?databases"?:\s*[^{\s]/.test(line))){
+            const lines = text.split('\n').slice(line - 1, endLine)
+            if (lines.some(line => /"?databases"?:\s*[^{\s]/.test(line))) {
                 return []
             }
 
@@ -100,11 +65,11 @@ export class RunDebugCodeLensProvider implements vscode.CodeLensProvider {
             const lens = new vscode.CodeLens(range, {
                 command: RUN_DEBUG_CURRENT_FILE_CMD_NAME,
                 title: 'run and debug',
-                arguments: [{document}]
+                arguments: [{ document }]
             })
 
             return [lens]
-        } catch(err) {
+        } catch (err) {
             return []
         }
     }
