@@ -1,23 +1,23 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as vscode from 'vscode';
 
 import { DocumentFormattingParams, TextDocumentIdentifier } from 'vscode-languageclient';
-import { getConfiguration, forceUseCommunityServer } from './configuration';
+import { forceUseCommunityServer, getConfiguration } from './configuration';
 import { InoxExtensionContext } from './inox-extension-context';
 import { INOX_FS_SCHEME, createAndRegisterInoxFs } from './inoxfs/mod';
 
+import { InlineDebugAdapterFactory, registerRunDebugLensAndCommands } from './debug/mod';
 import { registerLearningCodeLensAndCommands } from './learn/mod';
-import { registerRunDebugLensAndCommands, InlineDebugAdapterFactory } from './debug/mod';
 import { registerSpecCodeLensAndCommands } from './testing/mod';
 
-import { createLSPClient, checkConnAndStartLocalProjectServerIfPossible, MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS } from './lsp/mod';
-import { initializeNewProject, SecretEntry, SecretKeeper } from './project/mod';
-import { computeSuggestions } from './suggestions';
 import { AccountManager } from './cloud/mod';
-import { ProdOverview } from './prod/mod';
 import { createEmbeddedContentProvider } from './embedded-support';
-import { isDevToolsProxyRunning, isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
-import { SourceControl, registerSourceControlCommands, SourceControlPanel } from './source-control/mod';
+import { PROJECT_SERVER_DEV_PORT_0, PROJECT_SERVER_DEV_PORT_1, PROJECT_SERVER_DEV_PORT_2, isLocalhostProxyRunning, startLocalhostProxyServer } from './localhost/mod';
+import { MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS, checkConnAndStartLocalProjectServerIfPossible, createLSPClient } from './lsp/mod';
+import { ProdOverview } from './prod/mod';
+import { SecretEntry, SecretKeeper, initializeNewProject } from './project/mod';
+import { SourceControl, SourceControlPanel, registerSourceControlCommands } from './source-control/mod';
+import { computeSuggestions } from './suggestions';
 
 // After this duration the local file cache is used as a fallack.
 const FILE_CACHE_FALLBACK_TIMEOUT_MILLIS = MAX_WAIT_LOCAL_SERVER_DURATION_MILLIS + 1000;
@@ -80,11 +80,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         SourceControlPanel.ctx = ctx
 
         ctx.onProjectOpen(() => {
-            if(ctx.config.defaultLocalhostProxyPort != 0 && !isLocalhostProxyRunning()){
-                startLocalhostProxyServer(ctx, ctx.config.defaultLocalhostProxyPort)
-            }
-            if(ctx.config.defaultDevToolsProxyPort != 0 && !isDevToolsProxyRunning()){
-                startLocalhostProxyServer(ctx, ctx.config.defaultDevToolsProxyPort)
+            if(ctx.config.websocketEndpoint 
+                && ctx.config.websocketEndpoint.hostname != 'localhost'
+                && ctx.config.websocketEndpoint.hostname != '127.0.0.1'){
+
+                for(const ports of [PROJECT_SERVER_DEV_PORT_0, PROJECT_SERVER_DEV_PORT_1, PROJECT_SERVER_DEV_PORT_2]){
+                    if(!isLocalhostProxyRunning(PROJECT_SERVER_DEV_PORT_0)){
+                        startLocalhostProxyServer(ctx, PROJECT_SERVER_DEV_PORT_0)
+                    }
+                }
             }
         })
     }

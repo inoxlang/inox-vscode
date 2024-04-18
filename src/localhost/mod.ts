@@ -10,8 +10,11 @@ import { stringifyCatchedValue } from '../utils'
 import { getSelfSignedCertificate } from './certs'
 
 
-export const PROJECT_SERVER_DEV_PORT_0 = 8080
-const DEV_TOOLS_PORT = 8082
+export const PROJECT_SERVER_DEV_PORT_0 = 8100
+export const PROJECT_SERVER_DEV_PORT_1 = 8101
+export const PROJECT_SERVER_DEV_PORT_2 = 8102
+
+const DEV_TOOLS_PORT = PROJECT_SERVER_DEV_PORT_2
 
 const HTTP_REQUEST_ASYNC_METHOD = "httpClient/requestAsync"
 const HTTP_RESPONSE_EVENT_METHOD = "httpClient/responseEvent"
@@ -26,44 +29,27 @@ const DEVTOOLS_LOG_PREFIX = "[DevTools Proxy] "
 const pendindgRequests = new Map<string, { method: string, url: string, resolve: Function, reject: Function }>()
 const lspClients = new WeakSet<LanguageClient>()
 
-let _isLocalhostProxyRunning = false
-let _isDevToolsProxyRunning = false
+let runningProxies = new Set<number>()
 
-export function isLocalhostProxyRunning(){
-    return _isLocalhostProxyRunning
-}
-
-export function isDevToolsProxyRunning(){
-    return _isDevToolsProxyRunning
+export function isLocalhostProxyRunning(localhostPort: number){
+    return runningProxies.has(localhostPort)
 }
 
 export function startLocalhostProxyServer(ctx: InoxExtensionContext, localhostPort: number) {
-    const isDevToolsProxy = localhostPort == ctx.config.defaultDevToolsProxyPort
-    if(!isDevToolsProxy && localhostPort != ctx.config.defaultLocalhostProxyPort){
-        vscode.window.showErrorMessage(`internal configuration error for localhost proxy`)
-    }
-
     const serverOptions = getServerOptions(ctx, localhostPort)
+    const isDevToolsProxy = localhostPort == DEV_TOOLS_PORT
     const server = https.createServer(serverOptions, ((req, resp) => handleRequest(ctx, req, resp, isDevToolsProxy)))
 
     try {
         //Start server.
 
         server.on('listening', () => {
-            if(isDevToolsProxy){
-                _isDevToolsProxyRunning = true
-            } else {
-                _isLocalhostProxyRunning = true
-            }
+            runningProxies.add(localhostPort)
             ctx.outputChannel.appendLine(`start proxy listening on localhost:${localhostPort} (local machine)`)
         })
 
         server.on('close', () => {
-            if(isDevToolsProxy){
-                _isDevToolsProxyRunning = false
-            } else {
-                _isLocalhostProxyRunning = false
-            }
+            runningProxies.delete(localhostPort)
         })
 
         server.on('error', err => {
@@ -75,11 +61,7 @@ export function startLocalhostProxyServer(ctx: InoxExtensionContext, localhostPo
 
         server.listen(localhostPort, 'localhost')
     } catch (reason) {
-        if(isDevToolsProxy){
-            _isDevToolsProxyRunning = false
-        } else {
-            _isLocalhostProxyRunning = false
-        }
+        runningProxies.delete(localhostPort)
         vscode.window.showErrorMessage("localhost server on local machine: " + stringifyCatchedValue(reason))
     }
 }

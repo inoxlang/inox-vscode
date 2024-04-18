@@ -51,7 +51,7 @@ __A) You have a local VM running Linux__
 
 Install the [inoxd daemon](https://github.com/inoxlang/inox/blob/master/docs/inox-daemon.md) to start the project server automatically __(recommended)__ or start it manually with the following command: `inox project-server &`.
 
-**Make sure to forward the TCP port 8305 to the VM.**
+**Make sure to forward the TCP ports 8100, 8102, and 8305 to the VM.**
 
 </details>
 
