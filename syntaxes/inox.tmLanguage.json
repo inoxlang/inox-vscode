@@ -3363,7 +3363,7 @@
 				},
 				{
 					"comment": "implicit namespace, single line",
-					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z]|\\s*[<>/]))",
+					"begin": "(?=<[a-zA-Z][a-zA-Z_-]*(\\s+[a-zA-Z]|\\s*[<>/\\n]))",
 					"patterns": [
 						{
 							"include": "#xml-expression-inner"
@@ -4243,7 +4243,7 @@
 					"include": "source._hyperscript-inox"
 				}
 			],
-			"end": "\\}((\\s*\\.)|(?=\\s*/?>))"
+			"end": "\\}((\\s*[.])|(?=\\s*/?>)|(?=\n))"
 		},
 		"xml-tag-attribute-name": {
 			"comment": "Note: /\\*  should be kept",
