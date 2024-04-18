@@ -263,6 +263,34 @@
 								"type": "string",
 								"description": "The program to debug."
 							},
+							"positiveTestFilters": {
+								"type": "array",
+								"items": {
+									"type":"object",
+									"required": [
+										"regex"
+									],
+									"properties": {
+										"regex": {
+											"type": "string"
+										},
+										"path": {
+											"type": "string"
+										},
+										"span": {
+											"type":"object",
+											"properties": {
+												"regex": {
+													"type": "integer"
+												},
+												"path": {
+													"type": "integer"
+												}
+											}
+										}
+									}
+								}
+							},
 							"logLevels": {
 								"required": [
 									"default"
@@ -319,6 +347,17 @@
 						"request": "launch",
 						"name": "Launch Current Module",
 						"program": "${file}",
+						"logLevels": {
+							"default": "debug",
+							"enableInternalDebug": false
+						}
+					},
+					{
+						"type": "inox",
+						"request": "launch",
+						"name": "Debug Tests in Current Module",
+						"program": "${file}",
+						"positiveTestFilters": [{"regex": ".*"}],
 						"logLevels": {
 							"default": "debug",
 							"enableInternalDebug": false
