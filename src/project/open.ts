@@ -34,7 +34,8 @@ export async function openProject(ctx: InoxExtensionContext) {
             projectId: projectId,
             memberId: memberId,
             config: ctx.config.project ?? {},
-            tempTokens: ctx.config.tempTokens
+            tempTokens: ctx.config.tempTokens,
+            isProjectServerAccessedThroughLocalhost: ctx.config.websocketEndpoint?.hostname == 'localhost'
         })
 
         if ((typeof resp != 'object') || resp === null) {
