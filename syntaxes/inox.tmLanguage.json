@@ -990,6 +990,10 @@
 					"include": "#unprefixed-host-patterns"
 				},
 				{
+					"comment": "This pattern needs to be present here because `fn` is considered as a pattern name.",
+					"include": "#functions"
+				},
+				{
 					"include": "#unprefixed-pattern-calls"
 				},
 				{
@@ -1011,7 +1015,7 @@
 					"include": "#unprefixed-xml-patterns"
 				},
 				{
-					"comment": "This pattern needs to be present here because of #unprefixed-object-record-patterns",
+					"comment": "This pattern needs to be present here because of #unprefixed-object-record-patterns.",
 					"include": "#unquoted-region"
 				},
 				{
@@ -1126,7 +1130,7 @@
 					]
 				},
 				{
-					"comment": "declaration for a dictionary  pattern",
+					"comment": "declaration for a dictionary pattern",
 					"begin": "^\\s*(pattern)[ \t]+(?:([a-zA-Z_][a-zA-Z0-9_-]*)|(<\\{.*?\\}>))[ \t]*=(?:[ \t]*@)?[ \t]*(:\\{)",
 					"beginCaptures": {
 						"1": {
@@ -2213,7 +2217,7 @@
 		"function-parameters": {
 			"patterns": [
 				{
-					"match": "(?<=^\\s*|[(,.]\\s*)([_a-zA-Z-]+)(\\s+|\\s*(?=[),])|\\s+(?!=[),]))",
+					"match": "(?<=^\\s*|[(,.]\\s*)([_a-zA-Z-][_a-zA-Z0-9-]*)(\\s+|\\s*(?=[),])|\\s+(?!=[),]))",
 					"name": "variable.name.inox"
 				},
 				{
