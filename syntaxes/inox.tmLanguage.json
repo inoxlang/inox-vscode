@@ -2217,7 +2217,7 @@
 		"function-parameters": {
 			"patterns": [
 				{
-					"match": "(?<=^\\s*|[(,.]\\s*)([_a-zA-Z-][_a-zA-Z0-9-]*)(\\s+|\\s*(?=[),])|\\s+(?!=[),]))",
+					"match": "(?<=^\\s*|[(,.]\\s*)([_a-zA-Z][_a-zA-Z0-9-]*)(\\s+|\\s*(?=[),])|\\s+(?!=[),]))",
 					"name": "variable.name.inox"
 				},
 				{
@@ -3021,7 +3021,7 @@
 							"include": "$self"
 						}
 					],
-					"end": "\n"
+					"end": "(\n|;|(?=[}]))"
 				},
 				{
 					"comment": "command-like call: callee is an identifier member",
@@ -3046,7 +3046,7 @@
 							"include": "$self"
 						}
 					],
-					"end": "\n"
+					"end": "(\n|;|(?=[}]))"
 				}
 			]
 		},
