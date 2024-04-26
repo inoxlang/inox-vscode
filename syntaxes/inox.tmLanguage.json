@@ -87,12 +87,6 @@
 			"include": "#return-type"
 		},
 		{
-			"include": "#misplaced-if-keyword"
-		},
-		{
-			"include": "#misplaced-for-keyword"
-		},
-		{
 			"include": "#binary-match"
 		},
 		{
@@ -100,6 +94,12 @@
 		},
 		{
 			"include": "#binary-sub-operator"
+		},
+		{
+			"include": "#misplaced-if-keyword"
+		},
+		{
+			"include": "#misplaced-for-keyword"
 		},
 		{
 			"include": "#keywords"
@@ -2418,8 +2418,8 @@
 		"binary-sub-operator": {
 			"patterns": [
 				{
-					"match": "(?<=[a-z0-9_?()\\]}])\\s+(-)(?=\\)|\\s*$)",
-					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings",
+					"match": "(?<=[a-zA-Z0-9_?()\\]}])\\s+(-)(?=\\)|\\s*$)",
+					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings & option names",
 					"captures": {
 						"1": {
 							"name": "keyword.operator.inox"
@@ -2427,8 +2427,8 @@
 					}
 				},
 				{
-					"match": "(?<=[a-z0-9_?()\\]}])\\s+(-)(?=\\s+[,a-z0-9_()\\]}])",
-					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings",
+					"match": "(?<=[a-zA-Z0-9_?()\\]}])\\s+(-)(?=\\s+[,a-zA-Z0-9_()\\]}])",
+					"comment": "the surrounding spaces should be kept because removing them causes the regexp to match unquoted strings & option names",
 					"captures": {
 						"1": {
 							"name": "keyword.operator.inox"
@@ -2811,7 +2811,7 @@
 					"name": "string.unquoted"
 				},
 				{
-					"match": "-[a-zA-Z_-]+\\b(?!\\s*[a-zA-Z0-9_$(])",
+					"match": "-[a-zA-Z_-]+\\b(?=\\s+|^|[^a-zA-Z0-9_$(])",
 					"name": "string.unquoted"
 				}
 			]
@@ -4724,6 +4724,15 @@
 				},
 				{
 					"include": "#functions"
+				},
+				{
+					"include": "#binary-match"
+				},
+				{
+					"include": "#binary-div-operator"
+				},
+				{
+					"include": "#binary-sub-operator"
 				},
 				{
 					"include": "#misplaced-if-keyword"
