@@ -87,7 +87,7 @@
 			"include": "#return-type"
 		},
 		{
-			"include": "#binary-match"
+			"include": "#binary-match-as"
 		},
 		{
 			"include": "#binary-div-operator"
@@ -2437,11 +2437,11 @@
 				}
 			]
 		},
-		"binary-match": {
+		"binary-match-as": {
 			"patterns": [
 				{
 					"comment": "missing right operand",
-					"match": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=\\s*($|[)}\\],]|or\\b|and\\b))",
+					"match": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match|as)\\b\\s*(?=\\s*($|[)}\\],]|or\\b|and\\b))",
 					"captures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
@@ -2450,7 +2450,7 @@
 				},
 				{
 					"comment": "in 'end' `]` is for list/tuple patterns with a general element pattern starting with '{'",
-					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match)\\b\\s*(?=[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://|[`$a-zA-Z0-9{\\[\\|\\(%<])",
+					"begin": "(?<!^\\s*|[=(\\[{,:]\\s*)(match|not-match|as)\\b\\s*(?=[.]{0,2}/|[a-zA-Z][-a-zA-Z0-9+.]*://|[`$a-zA-Z0-9{\\[\\|\\(%<])",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.operator.expression.inox"
@@ -4726,7 +4726,7 @@
 					"include": "#functions"
 				},
 				{
-					"include": "#binary-match"
+					"include": "#binary-match-as"
 				},
 				{
 					"include": "#binary-div-operator"
