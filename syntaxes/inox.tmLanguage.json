@@ -423,7 +423,6 @@
 							"name": "string.regexp",
 							"match": "%([a-zA-Z][-a-zA-Z0-9+.]*)?:\\/(?!/)"
 						}
-						
 					]
 				}
 			]
@@ -4214,6 +4213,9 @@
 					"name": "invalid.illegal.misplaced-keyword.inox"
 				},
 				{
+					"include": "#inoxjs-attribute"
+				},
+				{
 					"include": "#xml-tag-attribute-name"
 				},
 				{
@@ -4221,6 +4223,9 @@
 				},
 				{
 					"include": "#xml-string-double-quoted"
+				},
+				{
+					"include": "#xml-string-back-quoted"
 				},
 				{
 					"begin": "\\(",
@@ -4312,37 +4317,184 @@
 			"name": "invalid.illegal.attribute.inox",
 			"match": "\\S+"
 		},
-		"client-side-xml-interpolation": {
-			"match": "(\\$\\()([^)]*)(\\))",
-			"captures": {
-				"1": {
-					"name": "punctuation.definition.template-expression.begin"
-				},
-				"2": {
+		"inoxjs-attribute": {
+			"patterns": [
+				{
+					"begin": "(x-if)[=](\")",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.other.attribute-name.inox"
+						},
+						"2": {
+							"name": "punctuation.definition.template-expression.begin"
+						}
+					},
+					"end": "\"",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.template-expression.end"
+						}
+					},
 					"patterns": [
 						{
-							"match": "[_a-zA-Z-]+",
-							"name": "variable.signal.inox"
-						},
-						{
-							"begin": "'",
-							"end": "'",
-							"patterns": [
-								{
-									"include": "#single-quoted-string-content"
-								}
-							]
-						},
-						{
-							"match": "[^\\S:]+",
-							"name": "invalid.illegal.attribute.inox"
+							"include": "#hyperscript-string-expression"
 						}
 					]
 				},
-				"3": {
+				{
+					"begin": "(x-if|x-switch|x-case)[=](`)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.other.attribute-name.inox"
+						},
+						"2": {
+							"name": "string"
+						}
+					},
+					"end": "`",
+					"endCaptures": {
+						"0": {
+							"name": "string"
+						}
+					},
+					"patterns": [
+						{
+							"begin": "\\$\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"include": "#hyperscript-string-expression"
+						}
+					]
+				}
+			]
+		},
+		"client-side-xml-interpolation": {
+			"begin": "(\\(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.template-expression.begin"
+				}
+			},
+			"end": "\\)\\)",
+			"endCaptures": {
+				"0": {
 					"name": "punctuation.definition.template-expression.end"
 				}
-			}
+			},
+			"patterns": [
+				{
+					"include": "#hyperscript-string-expression"
+				}
+			]
+		},
+		"hyperscript-string-expression": {
+			"patterns": [
+				{
+					"name": "string.quoted.double._hyperscript-expr",
+					"begin": "\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"begin": "\\$\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"comment": "#inside-string",
+							"name": "constant.character.escape._hyperscript-expr",
+							"match": "\\\\."
+						}
+					]
+				},
+				{
+					"name": "string.quoted.single._hyperscript-expr",
+					"begin": "'",
+					"end": "'",
+					"patterns": [
+						{
+							"begin": "\\$\\{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.begin"
+								}
+							},
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							],
+							"end": "\\}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.template-expression.end"
+								}
+							}
+						},
+						{
+							"comment": "#inside-string",
+							"name": "constant.character.escape._hyperscript-expr",
+							"match": "\\\\."
+						}
+					]
+				},
+				{
+					"name": "constant.numeric._hyperscript-expr",
+					"match": "\\d+(\\.\\d+)?"
+				},
+				{
+					"name": "constant.language._hyperscript-expr",
+					"match": "\\b(true|false|null|undefined)\\b"
+				},
+				{
+					"name": "meta.attribute._hyperscript-expr",
+					"match": "@([a-zA-Z\\-\\_]+)",
+					"captures": {
+						"1": {
+							"name": "entity.other.attribute-name._hyperscript-expr"
+						}
+					}
+				},
+				{
+					"name": "variable._hyperscript-expr",
+					"comment": "'-' is allowed in attributes but not in variables",
+					"match": "[$:]?([a-zA-Z\\_]+)",
+					"captures": {
+						"1": {
+							"name": "entity.other.attribute-name._hyperscript-expr"
+						}
+					}
+				}
+			]
 		},
 		"multiline-concatenation": {
 			"begin": "(?<=\\(\\s*concat)",
@@ -4823,7 +4975,7 @@
 				}
 			]
 		},
-		"misplaced-for-keyword":  {
+		"misplaced-for-keyword": {
 			"patterns": [
 				{
 					"comment": "misplaced for expressions",
