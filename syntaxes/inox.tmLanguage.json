@@ -4290,6 +4290,9 @@
 			"patterns": [
 				{
 					"include": "#xml-entities"
+				},
+				{
+					"include": "#client-side-xml-interpolation"	
 				}
 			]
 		},
@@ -4310,6 +4313,9 @@
 			"patterns": [
 				{
 					"include": "#xml-entities"
+				},
+				{
+					"include": "#client-side-xml-interpolation"	
 				}
 			]
 		},
@@ -4320,19 +4326,19 @@
 		"inoxjs-attribute": {
 			"patterns": [
 				{
-					"begin": "(x-if)[=](\")",
+					"begin": "\\s*(x-if|x-for-[-_a-zA-Z0-9]*)[=](\")",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.other.attribute-name.inox"
+							"name": "keyword.control"
 						},
 						"2": {
-							"name": "punctuation.definition.template-expression.begin"
+							"name": "string"
 						}
 					},
 					"end": "\"",
 					"endCaptures": {
 						"0": {
-							"name": "punctuation.definition.template-expression.end"
+							"name": "string"
 						}
 					},
 					"patterns": [
@@ -4342,10 +4348,10 @@
 					]
 				},
 				{
-					"begin": "(x-if|x-switch|x-case)[=](`)",
+					"begin": "\\s*(x-if|x-for-[-_a-zA-Z0-9]*)[=](`)",
 					"beginCaptures": {
 						"1": {
-							"name": "entity.other.attribute-name.inox"
+							"name": "keyword.control"
 						},
 						"2": {
 							"name": "string"
@@ -4385,6 +4391,25 @@
 			]
 		},
 		"client-side-xml-interpolation": {
+			"begin": "(\\(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.template-expression.begin"
+				}
+			},
+			"end": "\\)\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.template-expression.end"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#hyperscript-string-expression"
+				}
+			]
+		},
+		"client-side-xml-attribute-interpolation": {
 			"begin": "(\\(\\()",
 			"beginCaptures": {
 				"1": {
@@ -4477,7 +4502,7 @@
 				},
 				{
 					"name": "meta.attribute._hyperscript-expr",
-					"match": "@([a-zA-Z\\-\\_]+)",
+					"match": "(@[a-zA-Z\\-\\_]+)",
 					"captures": {
 						"1": {
 							"name": "entity.other.attribute-name._hyperscript-expr"
