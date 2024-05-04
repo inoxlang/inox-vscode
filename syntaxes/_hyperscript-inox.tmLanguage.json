@@ -8,6 +8,9 @@
       "end": "$"
     },
     {
+      "include": "#global-variables"
+    },
+    {
       "include": "#possessive"
     },
     {
@@ -18,6 +21,9 @@
     },
     {
       "include": "#attributeRefs"
+    },
+    {
+      "include": "#element-scoped-variables"
     },
     {
       "include": "#punctuation"
@@ -137,7 +143,17 @@
         {
           "name": "meta.template.expression._hyperscript-inox",
           "begin": "\\$\\{",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.template-expression.begin"
+            }
+          },
           "end": "\\}",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.template-expression.begin"
+            }
+          },
           "patterns": [
             {
               "include": "source._hyperscript-inox"
@@ -266,6 +282,34 @@
           "match": "@([a-zA-Z\\-\\_]+)",
           "captures": {
             "1": {
+              "name": "entity.other.attribute-name._hyperscript-inox"
+            }
+          }
+        }
+      ]
+    },
+    "global-variables": {
+      "patterns": [
+        {
+          "name": "variable._hyperscript-inox",
+          "comment": "'-' is allowed in attributes but not in variables",
+          "match": "[$]([a-zA-Z\\_]+)",
+          "captures": {
+            "0": {
+              "name": "entity.other.attribute-name._hyperscript-inox"
+            }
+          }
+        }
+      ]
+    },
+    "element-scoped-variables": {
+      "patterns": [
+        {
+          "name": "variable._hyperscript-inox",
+          "comment": "'-' is allowed in attributes but not in variables",
+          "match": "(?<![a-zA-Z0-9]):([a-zA-Z\\_]+)",
+          "captures": {
+            "0": {
               "name": "entity.other.attribute-name._hyperscript-inox"
             }
           }
