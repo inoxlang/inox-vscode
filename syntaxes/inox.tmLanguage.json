@@ -4326,7 +4326,7 @@
 		"inoxjs-attribute": {
 			"patterns": [
 				{
-					"begin": "\\s*(x-if|x-for-[-_a-zA-Z0-9]*)[=](\")",
+					"begin": "\\s*(x-if|x-for)[=](\")",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.control"
@@ -4348,7 +4348,7 @@
 					]
 				},
 				{
-					"begin": "\\s*(x-if|x-for-[-_a-zA-Z0-9]*)[=](`)",
+					"begin": "\\s*(x-if|x-for)[=](`)",
 					"beginCaptures": {
 						"1": {
 							"name": "keyword.control"
@@ -4499,6 +4499,18 @@
 				{
 					"name": "constant.language._hyperscript-expr",
 					"match": "\\b(true|false|null|undefined)\\b"
+				},
+				{
+					"name": "keyword.control._hyperscript-expr",
+					"match": "\\b(in)\\b"
+				},
+				{
+					"match": "\\b(index)(?=\\s+[a-zA-Z_])",
+					"captures": {
+						"1": {
+						"name": "keyword.other._hyperscript-expr"
+						}
+					}
 				},
 				{
 					"name": "meta.attribute._hyperscript-expr",
