@@ -42,7 +42,7 @@
         "scope": "Inox",
         "prefix": "walk",
         "body": [
-            "walk $1 entry {",
+            "walk ${1:walkable} entry {",
             "\t$0$2",
             "}"
         ],
