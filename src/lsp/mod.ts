@@ -118,10 +118,16 @@ function getClientOptionsWithMiddleware(ctx: InoxExtensionContext, documentSchem
     let lastCloseTimes = [0, 0]
 
     return {
-        documentSelector: [{ scheme: documentScheme, language: 'inox', pattern: '**/*.ix' }],
+        documentSelector: [
+            { scheme: documentScheme, language: 'inox', pattern: '**/*.ix' },
+            { scheme: INOX_FS_SCHEME, language: '_hyperscript-inox', pattern: '**/*._hs' },
+        ],
         synchronize: {
             configurationSection: 'Inox',
-            fileEvents: vscode.workspace.createFileSystemWatcher('**/*.ix')
+            fileEvents: [
+                vscode.workspace.createFileSystemWatcher('**/*.ix'),
+                vscode.workspace.createFileSystemWatcher('**/*._hs'),
+            ]
         },
         outputChannel: ctx.outputChannel,
         traceOutputChannel: ctx.debugChannel,
