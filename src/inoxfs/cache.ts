@@ -16,7 +16,7 @@ const PROGRESSIVE_FILE_CACHING_TICK_INTERVAL_MILLIS = 2000
 const MAX_CACHED_CONTENT_SIZE = 1_000_000
 const CACHED_CONTENT_EXTENSIONS = [
     //code
-    '.ix', '.js', '.ts', '.html', '.css',
+    '.ix', '.js', '.ts', '._hs', '.html', '.css',
 
     //doc
     '.md', '.txt',
