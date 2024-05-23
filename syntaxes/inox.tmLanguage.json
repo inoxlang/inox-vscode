@@ -2257,8 +2257,18 @@
 					"end": "(?<=\\})(?=\\s*\\{)"
 				},
 				{
-					"comment": "return type is a list or tuple pattern",
-					"begin": "(?<=\\))\\s*(?=#?\\[)",
+					"comment": "return type is a list pattern, the required space is here to avoid matching index expressions",
+					"begin": "(?<=\\))\\s+(?=[)",
+					"patterns": [
+						{
+							"include": "#pattern-content"
+						}
+					],
+					"end": "(?<=\\])(?=\\s*\\{)"
+				},
+				{
+					"comment": "return type is a tuple pattern",
+					"begin": "(?<=\\))\\s*(?=#\\[)",
 					"patterns": [
 						{
 							"include": "#pattern-content"
