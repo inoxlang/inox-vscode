@@ -2258,7 +2258,7 @@
 				},
 				{
 					"comment": "return type is a list pattern, the required space is here to avoid matching index expressions",
-					"begin": "(?<=\\))\\s+(?=[)",
+					"begin": "(?<=\\))(?=\\s+\\[)",
 					"patterns": [
 						{
 							"include": "#pattern-content"
